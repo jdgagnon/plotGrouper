@@ -636,6 +636,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
 
   cancel.onSessionEnded <- session$onSessionEnded(function() {
     rm(inFile, rawData, data, envir = globalenv())
+  })
+  
+  session$onSessionEnded(function() {
     stopApp()
   })
   
