@@ -579,6 +579,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     rawData
   })
   
+  # Specify heights of plots
   grobH <- eventReactive(input$plt2rprt, {
     l <- length(grobHeights)
     grobHeights[l + 1] <<- unit(as.numeric(input$save.height), 'mm')
@@ -602,45 +603,27 @@ server <- function(input, output, session) { # added session for updateSelectInp
                                    widths = list(grobW()[1:numcol])))
   })
   
-  # Function to add current plot to the report
+  # eventReactive to add current plot to the report
   plotList <- eventReactive(input$plt2rprt, {
     l <- length(plist)
     p <- plotInput()
     plist[[l + 1]] <<- p
-
     return(plist)
   })
   
-  # Funcitons to update the report by removing plots
-  # observeEvent(input$clearReport, {
-  #   if (length(plist) > 0) {
-  #     plotList[['l']] <- length(plist) - 1
-  #     plotList[['p']] <- NULL
-  #   }
-  # })
-  
-  
+  # eventReactive to create the plots to be saved
   plots <- eventReactive(plotList(), {
-    do.call("grid.arrange", c(plotList(),
-                              ncol=floor(sqrt(length(plotList())+1)),
-                              top = str_remove(inFile$name, '.xlsx')))
-
+    numcol <- floor(sqrt(length(plotList())+1))
+    do.call("arrangeGrob", c(plotList(),
+                              ncol=numcol,
+                              top = str_remove(inFile$name, '.xlsx'),
+                              heights = list(grobH()),
+                              widths = list(grobW()[1:numcol])))
   })
-  
-  
-  # Functions to change tab upon action
-  # switch_to_plot <- function(tab) {
-  #   updateTabsetPanel(session, 'tab', selected = tab)
-  # }
-  # 
-  # observeEvent(input$plt2rprt, {
-  #   switch_to_plot('Report')
-  #   shinyjs::delay(50, switch_to_plot('Plot'))
-  # })
   
   output$downloadReport <- downloadHandler(
     filename = function() {
-      paste('my-report', sep = '.', switch(
+      paste(input$report, sep = '.', switch(
         input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
       ))
     },

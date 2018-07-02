@@ -72,7 +72,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   
   if(is.null(y.lim)){
     # y.lim <- c(0,NA)
-    y.lim <- c(0, max(dmax[,c('value','error_max')], na.rm = T)*1.05)
+    y.lim <- c(0, max(dmax[,c('value','error_max')], na.rm = T)*1.08)
     expand.y <- c(0,0)
   }
   
