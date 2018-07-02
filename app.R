@@ -1,18 +1,16 @@
-library(shiny)
-library(tidyverse)
-library(gridExtra)
-library(shinyjs)
-library(readxl)
-library(colourpicker)
-library(Hmisc)
-
+# Check for necessary packages and install them if missing
+list.of.packages <- c('tidyverse', 'Hmisc', 'readxl', 'gridExtra', 'shinyjs', 'shinythemes', 'colourpicker')
+for (i in list.of.packages) {
+  if (!require(i, character.only = TRUE)) {
+    response <- readline(paste('install dependency:', i, "? y/n  "))
+    if (response == 'y'){
+      install.packages(i)
+    } else stop()
+  }
+  require(i, character.only = TRUE)
+}
 
 # Features ----------------------------------------------------------------
-
-# New page with arrangable plots to save
-# allow continuous x axis plots that don't need to be grouped
-
-
 
 # outputDir <- "responses"
 # saveData <- function(inData) {
@@ -21,7 +19,7 @@ library(Hmisc)
 #   # Write the file to the local system
 #   dput(inData, file = paste0(outputDir, '/', fileName))
 # }
-#  test comment
+
 plist <- list()
 gplot <- dget('gplot.R')
 
