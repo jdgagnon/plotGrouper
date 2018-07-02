@@ -174,7 +174,7 @@ ui <- fluidPage(
                              column(3, sliderInput('size', "Point size", min = 0.5, max = 10, value = 3, step = 0.5)),
                              column(3, sliderInput('stroke', "Stroke size", min = 0.25, max = 5, value = 0.5, step = 0.25))
                              ),
-                          textAreaInput("console", "Pass code to manipulate data frame", value = 'data <<- data %>%', width = 800, height = 200),
+                          textAreaInput("console", "Pass code to manipulate data frame", value = 'dataframe <<- dataframe %>%', width = 800, height = 200),
                           actionButton('run', "Run", style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
                           
                           hr(),
@@ -322,21 +322,21 @@ server <- function(input, output, session) { # added session for updateSelectInp
           filter(!grepl('Bead|Ungated',variable))
       }
 
-      assign('data', d, envir = globalenv())
+      assign('dataframe', d, envir = globalenv())
       d
   })
   
   plotInput <- function() {
     
     variables <- c(input$variables)
-    groups <- unique(data[[input$group]])
-    comparisons <- unique(data[[input$comp]])
+    groups <- unique(dataframe[[input$group]])
+    comparisons <- unique(dataframe[[input$comp]])
     comps <- c(input$comps)
     
-    levs.comps <- order(factor(unique(data[[input$comp]]), levels = comps))
+    levs.comps <- order(factor(unique(dataframe[[input$comp]]), levels = comps))
 
     if (input$group == 'variable') {
-      levs <- order(factor(unique(data[[input$group]]), levels = variables))
+      levs <- order(factor(unique(dataframe[[input$group]]), levels = variables))
     } else {
       levs <- order(factor(groups), levels = groups)
     }
@@ -364,7 +364,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       })
     }
     
-    gplot(dataset = data, 
+    gplot(dataset = dataframe, 
           comparison = input$comp,
           group.by = input$group,
           geom = input$geom,
@@ -396,15 +396,15 @@ server <- function(input, output, session) { # added session for updateSelectInp
   stats <- function() {
     
     variables <- c(input$variables)
-    groups <- unique(data[[input$group]])
+    groups <- unique(dataframe[[input$group]])
     
     if (input$group == 'variable') {
-      levs <- order(factor(unique(data[[input$group]]), levels = variables))
+      levs <- order(factor(unique(dataframe[[input$group]]), levels = variables))
     } else {
       levs <- order(factor(groups), levels = groups)
     }
     
-    gplot(dataset = data,
+    gplot(dataset = dataframe,
           comparison = input$comp,
           group.by = input$group,
           errortype = input$errortype,
@@ -519,7 +519,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
 
     req(input$file, input$geom, input$comps, input$save.height, input$save.width)
     
-    lapply(1:length(unique(data[[input$comp]])), function(i) {
+    lapply(1:length(unique(dataframe[[input$comp]])), function(i) {
       req(input[[paste0('shape',i)]], input[[paste0('col',i)]], input[[paste0('fill',i)]])
     })
     
@@ -565,7 +565,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     sheets <- info()
     c <- fi()
     d <- df()
-    data
+    dataframe
   })
   
   # Return a table with all data
@@ -634,8 +634,14 @@ server <- function(input, output, session) { # added session for updateSelectInp
     }
   )
 
-  cancel.onSessionEnded <- session$onSessionEnded(function() {
-    rm(inFile, rawData, data, envir = globalenv())
+  session$onSessionEnded(function(x, env = globalenv()) 
+  {
+    x <- c('inFile', 'rawData', 'dataframe')
+    for (i in x) {
+      if(exists(i, envir = env)) {
+        rm(list = i, envir = env)
+      }
+    }
   })
   
   session$onSessionEnded(function() {
