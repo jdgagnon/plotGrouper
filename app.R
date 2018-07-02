@@ -21,6 +21,8 @@ for (i in list.of.packages) {
 
 
 plist <- list() # Initiallize a list of plots to arrange
+grobHeights <- c()
+grobWidths <- c()
 
 gplot <- dget('gplot.R') # Load plotting function
 
@@ -577,12 +579,27 @@ server <- function(input, output, session) { # added session for updateSelectInp
     rawData
   })
   
+  grobH <- eventReactive(input$plt2rprt, {
+    l <- length(grobHeights)
+    grobHeights[l + 1] <<- unit(as.numeric(input$save.height), 'mm')
+    return(grobHeights)
+  })
+  
+  grobW <- eventReactive(input$plt2rprt, {
+    l <- length(grobWidths)
+    grobWidths[l + 1] <<- unit(as.numeric(input$save.width), 'mm')
+    return(grobWidths)
+  })
+  
   
   # Create a report
   output$regPlot <- renderPlot({
+    numcol <- floor(sqrt(length(plotList())+1))
     p <- do.call("grid.arrange", c(plotList(),
-                                   ncol=floor(sqrt(length(plotList())+1)),
-                                   top = str_remove(inFile$name, '.xlsx')))
+                                   ncol=numcol,
+                                   top = str_remove(inFile$name, '.xlsx'),
+                                   heights = list(grobH()),
+                                   widths = list(grobW()[1:numcol])))
   })
   
   # Function to add current plot to the report
@@ -601,6 +618,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
   #     plotList[['p']] <- NULL
   #   }
   # })
+  
   
   plots <- eventReactive(plotList(), {
     do.call("grid.arrange", c(plotList(),
