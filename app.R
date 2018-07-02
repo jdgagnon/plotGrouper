@@ -10,7 +10,6 @@ for (i in list.of.packages) {
   require(i, character.only = TRUE)
 }
 
-# Features ----------------------------------------------------------------
 
 # outputDir <- "responses"
 # saveData <- function(inData) {
@@ -20,8 +19,13 @@ for (i in list.of.packages) {
 #   dput(inData, file = paste0(outputDir, '/', fileName))
 # }
 
-plist <- list()
-gplot <- dget('gplot.R')
+
+plist <- list() # Initiallize a list of plots to arrange
+
+gplot <- dget('gplot.R') # Load plotting function
+
+
+# UI ----------------------------------------------------------------------
 
 ui <- fluidPage(
   useShinyjs(),
@@ -128,6 +132,7 @@ ui <- fluidPage(
       tabsetPanel(id = 'tab',
                   type = "tabs",
                   tabPanel('Plot',
+                           h1('Plot'),
                            fluidRow(
                              column(3, selectInput('geom', "Select geoms to plot", 
                                        choices = c('bar', 'crossbar', 'errorbar', 
@@ -173,6 +178,7 @@ ui <- fluidPage(
                           actionButton('run', "Run", style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
                           
                           hr(),
+                          h1('Report'),
                           plotOutput('regPlot', width = 612, height = 792),
                           hr(),
                           radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'), inline = TRUE),
@@ -199,6 +205,9 @@ ui <- fluidPage(
     )
 )
 
+
+
+# Server ------------------------------------------------------------------
 
 
 server <- function(input, output, session) { # added session for updateSelectInput
