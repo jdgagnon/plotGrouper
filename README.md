@@ -16,10 +16,23 @@ Next, install the latest version of RStudio Desktop:
 
 https://www.rstudio.com/products/rstudio/#Desktop
 
-Finally, open RStudio and paste the following code in your R console and run it in order to install the `shiny` package
+Finally, open RStudio and paste the following code in your R console and run it in order to install the required packages.
 
 ```
-instal.packages('shiny')
+install.packages("devtools")
+devtools::install_github("tidyverse/ggplot2")
+install.packages("tidyverse")
+install.packages("shiny")
+install.packages("Hmisc")
+install.packages("scales")
+install.packages("readxl")
+install.packages("gridExtra")
+install.packages("egg")
+install.packages("ggpubr")
+install.packages("shinyjs")
+install.packages("shinythemes")
+install.packages("colourpicker")
+instal.packages("shiny")
 ```
 
 ### Installing & Running
