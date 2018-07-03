@@ -1,3 +1,7 @@
+# Copyright 2017-2018 John Gagnon
+# This program is distributed under the terms of the GNU General Public License
+
+
 function(dataset = NULL, # Define your data set which should be a gathered tibble
                   comparison = NULL, # Specify the comparison you would like to make (e.g., Genotype)
                   group.by = NULL, # Specify the variable to group by (e.g., Tissue)
