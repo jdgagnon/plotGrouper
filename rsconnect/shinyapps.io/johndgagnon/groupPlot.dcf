@@ -1,0 +1,12 @@
+name: groupPlot
+title: groupPlot
+username:
+account: johndgagnon
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 372566
+bundleId: 1462005
+url: https://johndgagnon.shinyapps.io/groupPlot/
+when: 1530593363.69388
+asMultiple: FALSE
+asStatic: FALSE

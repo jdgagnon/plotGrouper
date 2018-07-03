@@ -1,23 +1,14 @@
-# Check for necessary packages and install them if missing
-list.of.packages <- c('tidyverse',
-                      'Hmisc',
-                      'readxl',
-                      'gridExtra',
-                      'egg',
-                      'ggpubr',
-                      'shinyjs',
-                      'shinythemes',
-                      'colourpicker')
-for (i in list.of.packages) {
-  if (!require(i, character.only = TRUE)) {
-    response <- readline(paste('install dependency:', i, "? y/n:  "))
-    if (response == 'y'){
-      install.packages(i)
-    } else stop()
-  }
-  require(i, character.only = TRUE)
-}
-
+library(shiny)
+library(tidyverse)
+library(Hmisc)
+library(scales)
+library(readxl)
+library(gridExtra)
+library(egg)
+library(ggpubr)
+library(shinyjs)
+library(shinythemes)
+library(colourpicker)
 
 # outputDir <- "responses"
 # saveData <- function(inData) {
