@@ -37,12 +37,14 @@ instal.packages("shiny")
 
 ### Installing & Running
 
-After installing the `shiny` package, you are ready to run `group_plot` and it will prompt you to install any additional packages you are missing.
+After installing the `shiny` package, you are ready to run `groupPlot`.
+
 To initialize the shiny app, paste the following code in your R console and run it.
 
 ```
 shiny::runGitHub("group_plot", "MrTcell")
 ```
+
 ## Authors
 
 * **John Gagnon**
