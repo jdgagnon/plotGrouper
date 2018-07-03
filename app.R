@@ -186,10 +186,10 @@ ui <- fluidPage(
                             column(3, textInput('report', "Filename", 'Report1')),
                             column(3, style = "margin-top: 30px;", downloadButton('downloadReport', "Save", 
                                                                                   class="btn btn-primary btn-sm", 
-                                                                                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))#,
-                            # column(3, style = "margin-top: 30px;", actionButton('clearReport', 'Clear Report',
-                            #                                                     class="btn btn-primary btn-sm", 
-                            #                                                     style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
+                                                                                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                            column(3, style = "margin-top: 30px;", actionButton('clear', 'Clear last',
+                                                                                class="btn btn-primary btn-sm",
+                                                                                style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
                            )
                   ),
                   
@@ -303,12 +303,12 @@ server <- function(input, output, session) { # added session for updateSelectInp
     input$group
     input$comps}, {
       
-      req(input$file, input$sheet, input$columns, input$comp, input$comps)
+      req(input$file, input$sheet, input$columns, input$comp, input$comps, input$variables)
       
       d <- gather(rawData, variable, value, -c(input$columns)) %>%
         filter(get(input$comp) %in% c(input$comps))
       
-      if (!is.na(input$bead) & !is.na(input$dilution)) {
+      if (!is.na(input$bead) & !is.na(input$dilution) & str_detect(c(input$variables)[1], '#')) {
         d <- d %>%
           group_by_(input$id) %>%
           mutate(value = ifelse(str_detect(variable, '#') & !is.na(input$bead), 
@@ -577,32 +577,47 @@ server <- function(input, output, session) { # added session for updateSelectInp
     rawData
   })
   
-  # Create a report
-  output$regPlot <- renderPlot({
-    numcol <- floor(sqrt(length(plotList())+1))
-    p <- do.call("grid.arrange", c(plotList(),
-                                   ncol=numcol,
-                                   top = str_remove(inFile$name, '.xlsx')))
-  })
   
   # eventReactive to add current plot to the report
-  plotList <- eventReactive(input$plt2rprt, {
+  observeEvent(input$plt2rprt, {
     l <- length(plist)
     p <- plotInput()
     eggp <- egg::set_panel_size(p, 
                                 width = unit(input$save.width, 'mm'),
                                 height = unit(input$save.height, 'mm'))
-    # eggp$respect = T
     plist[[l + 1]] <<- eggp
-    return(plist)
+  })
+  
+  observeEvent({
+    input$clear}, {
+      l <- length(plist)
+      if (l > 0) {
+        plist[[length(plist)]] <<- NULL
+      }
+  })
+  
+  # Create a report
+  output$regPlot <- renderPlot({
+    g <- input$plt2rprt
+    r <- input$clear
+    if (length(plist) > 0){
+      numcol <- floor(sqrt(length(plist)+1))
+      p <- do.call("grid.arrange", c(plist,
+                                     ncol=numcol,
+                                     top = str_remove(inFile$name, '.xlsx')))
+    }
   })
   
   # eventReactive to create the plots to be saved
-  plots <- eventReactive(plotList(), {
-    numcol <- floor(sqrt(length(plotList())+1))
-    do.call("arrangeGrob", c(plotList(),
-                              ncol=numcol,
-                              top = str_remove(inFile$name, '.xlsx')))
+  plots <- eventReactive(input$plt2rprt, {
+      g <- input$plt2rprt
+      r <- input$clear
+      if (length(plist) > 0){
+        numcol <- floor(sqrt(length(plist)+1))
+        do.call("arrangeGrob", c(plist,
+                                  ncol=numcol,
+                                  top = str_remove(inFile$name, '.xlsx')))
+      }
   })
   
   output$downloadReport <- downloadHandler(
