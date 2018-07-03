@@ -42,7 +42,7 @@ After installing the `shiny` package, you are ready to run `groupPlot`.
 To initialize the shiny app, paste the following code in your R console and run it.
 
 ```
-shiny::runGitHub("group_plot", "MrTcell")
+shiny::runGitHub("groupPlot", "MrTcell")
 ```
 
 ## Authors
