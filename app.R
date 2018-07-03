@@ -128,6 +128,22 @@ ui <- fluidPage(
       fluidRow(
         column(6, numericInput('bead', "# Beads/sample", value = NULL)),
         column(6, numericInput('dilution', "Dilution factor", value = NULL))
+        ),
+
+      hr(style="margin-top: 500px"),
+      
+      actionButton('clear', 'Clear last',
+                   class="btn btn-primary btn-sm",
+                   style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+      
+      hr(),
+      
+      radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'), inline = TRUE),
+      fluidRow(
+        column(8, textInput('report', "Filename", 'Report1')),
+        column(4, style = "margin-top: 30px;", downloadButton('downloadReport', "Save", 
+                                                              class="btn btn-primary btn-sm", 
+                                                              style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
         )
       
     ),
@@ -183,17 +199,7 @@ ui <- fluidPage(
                           hr(),
                           h1('Report'),
                           plotOutput('regPlot', width = 612, height = 792),
-                          hr(),
-                          radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'), inline = TRUE),
-                          fluidRow(
-                            column(3, textInput('report', "Filename", 'Report1')),
-                            column(3, style = "margin-top: 30px;", downloadButton('downloadReport', "Save", 
-                                                                                  class="btn btn-primary btn-sm", 
-                                                                                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-                            column(3, style = "margin-top: 30px;", actionButton('clear', 'Clear last',
-                                                                                class="btn btn-primary btn-sm",
-                                                                                style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-                           )
+                          hr()
                   ),
                   
                   tabPanel('Stats',
