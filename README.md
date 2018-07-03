@@ -1,4 +1,4 @@
-# group_plot
+# groupPlot
 
 Tool for generating figure-ready graphs from data in an excel file. 
 
