@@ -79,8 +79,8 @@ ui <- fluidPage(
         ),
       
       fluidRow(
-        column(6, sliderInput('save.height', "Save height (mm)", min = 20, max = 150, value = 150)),
-        column(6, sliderInput('save.width', "Save width (mm)", min = 20, max = 150, value = 150))
+        column(6, sliderInput('save.height', "Save height (mm)", min = 20, max = 150, value = 50)),
+        column(6, sliderInput('save.width', "Save width (mm)", min = 20, max = 150, value = 50))
         ),
       
       # actionButton('submit', "Save inputs"),
@@ -170,8 +170,8 @@ ui <- fluidPage(
                           selectInput('comps', "Order of comparisons", multiple = T, choices = NULL),
                            
                            fluidRow(
-                             column(3, sliderInput('font', "Font size", min = 8, max = 15, value = 12, step = 0.5)),
-                             column(3, sliderInput('size', "Point size", min = 0.5, max = 10, value = 3, step = 0.5)),
+                             column(3, sliderInput('font', "Font size", min = 8, max = 15, value = 9, step = 0.5)),
+                             column(3, sliderInput('size', "Point size", min = 0.5, max = 10, value = 1, step = 0.5)),
                              column(3, sliderInput('stroke', "Stroke size", min = 0.25, max = 5, value = 0.5, step = 0.25))
                              ),
                           textAreaInput("console", "Pass code to manipulate data frame", value = 'dataframe <<- dataframe %>%', width = 800, height = 200),
