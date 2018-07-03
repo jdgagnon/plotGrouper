@@ -1,6 +1,6 @@
 # groupPlot
 
-Tool for generating figure-ready graphs from data in an excel file. 
+This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the `ggplot2` and `dplyr` from the tidyverse and batch statistical calculations from `ggpubr`. 
 
 ## Getting Started
 
@@ -51,6 +51,9 @@ shiny::runGitHub("groupPlot", "MrTcell")
 
 ## License
 
+GNU GPL-3.0-or-later
+
+https://www.gnu.org/licenses/gpl.txt
 
 ## Acknowledgments & Packages Used
 
