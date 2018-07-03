@@ -117,8 +117,8 @@ ui <- fluidPage(
       ),
 
       fluidRow(
-        column(6, sliderInput('width', "Width", min = 0, max = 2, step = 0.05, value = 0.75)),
-        column(6, sliderInput('dodge', "Dodge", min = 0, max = 2, step = 0.05, value = 0.75))
+        column(6, sliderInput('width', "Width", min = 0, max = 2, step = 0.05, value = 0.90)),
+        column(6, sliderInput('dodge', "Dodge", min = 0, max = 2, step = 0.05, value = 0.90))
         ),
       
       hr(),
