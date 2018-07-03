@@ -1,8 +1,8 @@
 # Check for necessary packages and install them if missing
-list.of.packages <- c('tidyverse', 'Hmisc', 'readxl', 'gridExtra', 'shinyjs', 'shinythemes', 'colourpicker')
+list.of.packages <- c('tidyverse', 'Hmisc', 'readxl', 'gridExtra', 'egg', 'shinyjs', 'shinythemes', 'colourpicker')
 for (i in list.of.packages) {
   if (!require(i, character.only = TRUE)) {
-    response <- readline(paste('install dependency:', i, "? y/n  "))
+    response <- readline(paste('install dependency:', i, "? y/n:  "))
     if (response == 'y'){
       install.packages(i)
     } else stop()
@@ -21,8 +21,6 @@ for (i in list.of.packages) {
 
 
 plist <- list() # Initiallize a list of plots to arrange
-grobHeights <- c()
-grobWidths <- c()
 
 gplot <- dget('gplot.R') # Load plotting function
 
@@ -579,35 +577,23 @@ server <- function(input, output, session) { # added session for updateSelectInp
     rawData
   })
   
-  # Specify heights of plots
-  grobH <- eventReactive(input$plt2rprt, {
-    l <- length(grobHeights)
-    grobHeights[l + 1] <<- unit(as.numeric(input$save.height), 'mm')
-    return(grobHeights)
-  })
-  
-  grobW <- eventReactive(input$plt2rprt, {
-    l <- length(grobWidths)
-    grobWidths[l + 1] <<- unit(as.numeric(input$save.width), 'mm')
-    return(grobWidths)
-  })
-  
-  
   # Create a report
   output$regPlot <- renderPlot({
     numcol <- floor(sqrt(length(plotList())+1))
     p <- do.call("grid.arrange", c(plotList(),
                                    ncol=numcol,
-                                   top = str_remove(inFile$name, '.xlsx'),
-                                   heights = list(grobH()),
-                                   widths = list(grobW()[1:numcol])))
+                                   top = str_remove(inFile$name, '.xlsx')))
   })
   
   # eventReactive to add current plot to the report
   plotList <- eventReactive(input$plt2rprt, {
     l <- length(plist)
     p <- plotInput()
-    plist[[l + 1]] <<- p
+    eggp <- egg::set_panel_size(p, 
+                                width = unit(input$save.width, 'mm'),
+                                height = unit(input$save.height, 'mm'))
+    # eggp$respect = T
+    plist[[l + 1]] <<- eggp
     return(plist)
   })
   
@@ -616,9 +602,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     numcol <- floor(sqrt(length(plotList())+1))
     do.call("arrangeGrob", c(plotList(),
                               ncol=numcol,
-                              top = str_remove(inFile$name, '.xlsx'),
-                              heights = list(grobH()),
-                              widths = list(grobW()[1:numcol])))
+                              top = str_remove(inFile$name, '.xlsx')))
   })
   
   output$downloadReport <- downloadHandler(

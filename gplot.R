@@ -224,7 +224,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     scale_fill_manual(values = fill.groups) +
     scale_alpha_manual(values = alpha.groups) +
     scale_color_manual(values = color.groups) +
-    coord_cartesian(clip = 'off') + 
+    coord_cartesian(clip = 'off') +
     theme(line = element_line(colour = "black", size = stroke),
           text = element_text(family = 'Helvetica', size = font_size, colour = "black"),
           rect = element_blank(),
