@@ -132,6 +132,13 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     return(statOut)
   }
   
+  if (trans.y != 'identity' & !all(is.na(statistics$p.signif))) {
+    logBase <- parse_number(trans.y)
+    statistics <- statistics %>%
+      mutate(h.p = h.p^logBase,
+             h.s = h.s^logBase)
+  }
+  
   if(is.null(y.lab) | y.lab == ''){
     y.lab <- df$variable
   } # If not specified by user, set y axis label to the variable being plotted.

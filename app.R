@@ -24,6 +24,9 @@ library(colourpicker)
 
 
 plist <- list() # Initiallize a list of plots to arrange
+respectList <- c()
+wlist <- c()
+hlist <- c()
 
 gplot <- dget('gplot.R') # Load plotting function
 
@@ -594,6 +597,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
     eggp <- egg::set_panel_size(p, 
                                 width = unit(input$save.width, 'mm'),
                                 height = unit(input$save.height, 'mm'))
+    # respectList[l + 1] <<- as.numeric(input$aspect.ratio)
+    # wlist[[l + 1]] <<- as.numeric(input$save.width)
+    # hlist[[l + 1]] <<- as.numeric(input$save.height)
     plist[[l + 1]] <<- eggp
   })
   
@@ -611,8 +617,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
     r <- input$clear
     if (length(plist) > 0){
       numcol <- floor(sqrt(length(plist)+1))
-      p <- do.call("grid.arrange", c(plist,
-                                     ncol=numcol,
+      p <- do.call("grid.arrange", c(grobs = plist,
+                                     ncol = numcol,
                                      top = str_remove(inFile$name, '.xlsx')))
     }
   })
@@ -623,9 +629,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
       r <- input$clear
       if (length(plist) > 0){
         numcol <- floor(sqrt(length(plist)+1))
-        do.call("arrangeGrob", c(plist,
-                                  ncol=numcol,
-                                  top = str_remove(inFile$name, '.xlsx')))
+        do.call("arrangeGrob", c(grobs = plist,
+                                 ncol=numcol,
+                                 top = str_remove(inFile$name, '.xlsx')))
       }
   })
   
