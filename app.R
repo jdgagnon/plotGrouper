@@ -187,26 +187,29 @@ ui <- fluidPage(
              )
     ),
     
-    tabPanel('Report', fluid = T,
-             mainPanel(
-               h1('Report'),
-               actionButton('clear', 'Clear last',
-                            class="btn btn-primary btn-sm",
-                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-               
-               radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'), inline = TRUE),
-               
-               fluidRow(
-                 column(8, textInput('report', "Filename", 'Report1')),
-                 column(4, style = "margin-top: 30px;", downloadButton('downloadReport', "Save", 
-                                                                       class="btn btn-primary btn-sm", 
-                                                                       style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
-               
-               fluidRow(
-                 column(12, align="center", plotOutput('regPlot', height = 'auto', width = 'auto')
+    tabPanel('Report',
+             fluidPage(
+               mainPanel(
+                 h1('Report'),
+                 actionButton('clear', 'Clear last',
+                              class="btn btn-primary btn-md",
+                              style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+                 
+                 fluidRow(
+                   column(3, textInput('report', "Filename", 'Report1')),
+                   column(3, style = 'margin-top: 25px;', downloadButton('downloadReport', 
+                                                                         "Save", 
+                                                                         class="btn btn-primary btn-md", 
+                                                                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                   column(4, radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'), inline = TRUE))),
+                 
+                 fluidRow(
+                   column(12, align="center", plotOutput('regPlot', height = 'auto', width = 'auto')
+                   )
                  )
                )
              )
+
     ),
 
     tabPanel('Stats', fluid = T,
