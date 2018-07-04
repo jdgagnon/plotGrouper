@@ -203,7 +203,7 @@ ui <- fluidPage(
                                                                        style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
                
                fluidRow(
-                 column(12, align="center", plotOutput('regPlot', height = '100%', width = '100%')
+                 column(12, align="center", plotOutput('regPlot', height = 'auto', width = 'auto')
                  )
                )
              )
@@ -639,7 +639,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
                                      ncol = numcol,
                                      top = str_remove(inFile$name, '.xlsx')))
     }
-  }, height = function() h, width = function() w)
+  }, height = function() h + 50, width = function() w + 50)
   
   # eventReactive to create the plots to be saved
   plots <- eventReactive(input$plt2rprt, {
