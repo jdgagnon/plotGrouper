@@ -24,9 +24,9 @@ library(colourpicker)
 
 
 plist <- list() # Initiallize a list of plots to arrange
-respectList <- c()
-wlist <- c()
-hlist <- c()
+# respectList <- c()
+# wlist <- c()
+# hlist <- c()
 
 gplot <- dget('gplot.R') # Load plotting function
 
@@ -264,13 +264,13 @@ server <- function(input, output, session) { # added session for updateSelectInp
       colnames(f) <- column_names
       
       vars <- names(f)
-      columns_select <- c('Experiment', 'Sheet', 'Genotype', 'Sample', 'Condition', 'Mouse', 'Target', 'car','cyl')
+      columns_select <- c('Experiment', 'Sheet', 'Genotype', 'Sample', 'Condition', 'Mouse', 'Target', 'Species')
       variables <- vars[which(!vars %in% c(columns_select, 'Bead %'))]
       updateSelectInput(session, "columns", choices = vars, 
                       selected = vars[which(vars %in% columns_select)])
       updateSelectInput(session, 'variables', choices = variables, selected = variables[1])
       updateSelectInput(session, 'comp', choices = vars, 
-                        selected = vars[which(vars %in% c('Genotype', 'Condition', 'cyl'))])
+                        selected = vars[which(vars %in% c('Genotype', 'Condition', 'Species'))])
       updateSelectInput(session, 'id', choices = vars, selected = 'Sample')
       updateSelectInput(session, 'group', choices = c('variable', vars),
                         selected = 'variable')
@@ -615,9 +615,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
   output$regPlot <- renderPlot({
     g <- input$plt2rprt
     r <- input$clear
-    if (length(plist) > 0){
+    if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
-      p <- do.call("grid.arrange", c(grobs = plist,
+      p <- do.call("grid.arrange", c(plist,
                                      ncol = numcol,
                                      top = str_remove(inFile$name, '.xlsx')))
     }
@@ -627,10 +627,10 @@ server <- function(input, output, session) { # added session for updateSelectInp
   plots <- eventReactive(input$plt2rprt, {
       g <- input$plt2rprt
       r <- input$clear
-      if (length(plist) > 0){
+      if (length(plist) > 0) {
         numcol <- floor(sqrt(length(plist)+1))
         do.call("arrangeGrob", c(grobs = plist,
-                                 ncol=numcol,
+                                 ncol = numcol,
                                  top = str_remove(inFile$name, '.xlsx')))
       }
   })
