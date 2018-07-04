@@ -629,7 +629,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       r <- input$clear
       if (length(plist) > 0) {
         numcol <- floor(sqrt(length(plist)+1))
-        do.call("arrangeGrob", c(grobs = plist,
+        do.call("arrangeGrob", c(plist,
                                  ncol = numcol,
                                  top = str_remove(inFile$name, '.xlsx')))
       }
