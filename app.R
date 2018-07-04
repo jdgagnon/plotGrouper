@@ -29,7 +29,7 @@ wlist <- c()
 hlist <- c()
 h <- 800
 w <- 700
-
+legend <- NULL
 gplot <- dget('gplot.R') # Load plotting function
 
 
@@ -616,7 +616,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
   # eventReactive to add current plot to the report
   observeEvent(input$plt2rprt, {
     l <- length(plist)
-    p <- plotInput()
+    p <- plotInput() + theme(legend.position = 'none')
+    legend <<- get_legend(plotInput())
     eggp <- egg::set_panel_size(p, 
                                 width = unit(input$save.width, 'mm'),
                                 height = unit(input$save.height, 'mm'))
@@ -657,10 +658,11 @@ server <- function(input, output, session) { # added session for updateSelectInp
     g <- input$plt2rprt
     r <- input$clear
     ra <- input$clearAll
+    # plist[[length(plist) + 1]] <- legend # collapse to a single legend
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
       p <- do.call("grid.arrange", c(plist,
-                                     ncol = numcol,
+                                     ncol = numcol + 1,
                                      top = str_remove(inFile$name, '.xlsx')))
     }
   }, height = function() h + 5, width = function() w + 5)
