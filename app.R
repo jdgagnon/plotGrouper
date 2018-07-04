@@ -613,6 +613,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
     # respectList[l + 1] <<- as.numeric(input$aspect.ratio)
     wlist[l + 1] <<- as.numeric(input$save.width)
     hlist[l + 1] <<- as.numeric(input$save.height)
+    h <<- sum(hlist)*3.7795275591
+    w <<- sum(wlist)*3.7795275591
     plist[[l + 1]] <<- eggp
   })
   
@@ -620,7 +622,11 @@ server <- function(input, output, session) { # added session for updateSelectInp
     input$clear}, {
       l <- length(plist)
       if (l > 0) {
-        plist[[length(plist)]] <<- NULL
+        plist[[l]] <<- NULL
+        wlist <<- head(wlist, -1)
+        hlist <<- head(hlist, -1)
+        h <<- sum(hlist)*3.7795275591
+        w <<- sum(wlist)*3.7795275591
       }
   })
   
@@ -629,10 +635,6 @@ server <- function(input, output, session) { # added session for updateSelectInp
     req(input$plt2rprt)
     g <- input$plt2rprt
     r <- input$clear
-    h <<- sum(hlist)*3.7795275591
-    w <<- sum(wlist)*3.7795275591
-    print(h)
-    print(w)
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
       p <- do.call("grid.arrange", c(plist,
@@ -647,7 +649,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       r <- input$clear
       if (length(plist) > 0) {
         numcol <- floor(sqrt(length(plist)+1))
-        do.call("arrangeGrob", c(plist,
+        do.call("arrangeGrob", c(grobs = plist,
                                  ncol = numcol,
                                  top = str_remove(inFile$name, '.xlsx')))
       }
