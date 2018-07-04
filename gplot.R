@@ -247,14 +247,8 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
           axis.ticks.x = element_blank(),
           axis.text.x = element_text(family = 'Helvetica', size = font_size, colour = "black", angle = angle, vjust = vjust, hjust = hjust),
           axis.text = element_text(family = 'Helvetica', size = font_size, colour = "black"))
-          # plot.margin = unit(c(100,5.5,5.5,5.5), "points"))
-  
-  # gb <- suppressWarnings(ggplot_build(g))
-  # gt <- ggplot_gtable(gb)
   
   if (stats == F) {
-    # gt$layout$clip[gt$layout$name=="panel"] <- "off"
-    # grid::grid.newpage()
     g
   }
 

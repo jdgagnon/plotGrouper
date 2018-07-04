@@ -146,7 +146,8 @@ ui <- fluidPage(
                                                    'box', 'violin','line',
                                                    'line_point', 'line_error', 'line_point_stat'),
                                        selected = c('bar','errorbar','point','stat','seg'), multiple = T)),
-                 column(3, selectInput('legend', "Select legend position", choices = c('top','right','bottom','left','none'))),
+                 column(3, selectInput('legend', "Select legend position", choices = c('top','right','bottom','left','none'),
+                                       selected = 'bottom')),
                  column(3, sliderInput('aspect.ratio', "Aspect ratio", min = 0.25, max = 4, value = 1, step = 0.25)),
                  column(3, style = "margin-top: 30px;", actionButton("plt2rprt", label = "Include in report", 
                                                                      class="btn btn-primary btn-sm", 
@@ -191,9 +192,15 @@ ui <- fluidPage(
              fluidPage(
                mainPanel(
                  h1('Report'),
-                 actionButton('clear', 'Clear last',
-                              class="btn btn-primary btn-md",
-                              style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+                 fluidRow(
+                   column(4, actionButton('clear', 'Clear last',
+                                          class="btn btn-primary btn-md",
+                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                   
+                   column(4, actionButton('clearAll', 'Clear All',
+                                class="btn btn-primary btn-md",
+                                style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
+                 ),
                  
                  fluidRow(
                    column(3, textInput('report', "Filename", 'Report1')),
@@ -633,23 +640,36 @@ server <- function(input, output, session) { # added session for updateSelectInp
       }
   })
   
+  observeEvent({
+    input$clearAll}, {
+      plist <<- list()
+      wlist <<- c()
+      hlist <<- c()
+      h <- 800
+      w <- 700
+    })
+  
+  
+  
   # Create a report
   output$regPlot <- renderPlot({
     req(input$plt2rprt)
     g <- input$plt2rprt
     r <- input$clear
+    ra <- input$clearAll
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
       p <- do.call("grid.arrange", c(plist,
                                      ncol = numcol,
                                      top = str_remove(inFile$name, '.xlsx')))
     }
-  }, height = function() h + 50, width = function() w + 50)
+  }, height = function() h + 5, width = function() w + 5)
   
   # eventReactive to create the plots to be saved
   plots <- eventReactive(input$plt2rprt, {
       g <- input$plt2rprt
       r <- input$clear
+      ra <- input$clearAll
       if (length(plist) > 0) {
         numcol <- floor(sqrt(length(plist)+1))
         do.call("arrangeGrob", c(grobs = plist,
