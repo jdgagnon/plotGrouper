@@ -1,5 +1,7 @@
 # groupPlot
 
+
+
 This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the `ggplot2` and `dplyr` from the tidyverse and batch statistical calculations from `ggpubr`. 
 
 ## Getting Started
@@ -8,13 +10,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-If you do not already have R installed, or your version is out of date, download the latest version here: 
+If you do not already have R installed, or your version is out of date, download the latest version [Here](https://cran.r-project.org). 
 
-https://cran.r-project.org
 
-Next, install the latest version of RStudio Desktop: 
 
-https://www.rstudio.com/products/rstudio/#Desktop
+Next, install the latest version of [RStudio Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
+
+Next, download the sample data [excel file](https://github.com/MrTcell/groupPlot/blob/master/iris.xlsx)
 
 Finally, open RStudio and paste the following code in your R console and run it in order to install the required packages.
 
@@ -45,6 +47,9 @@ To initialize the shiny app, paste the following code in your R console and run 
 shiny::runGitHub("groupPlot", "MrTcell")
 ```
 
+Once the web app opens, browse to wherever you downloaded the example data file, "iris.xlsx", and open it.
+
+
 ## Authors
 
 * **John Gagnon**
@@ -53,7 +58,7 @@ shiny::runGitHub("groupPlot", "MrTcell")
 
 GNU GPL-3.0-or-later
 
-https://www.gnu.org/licenses/gpl.txt
+[licence](https://www.gnu.org/licenses/gpl.txt)
 
 ## Acknowledgments & Packages Used
 
