@@ -25,8 +25,10 @@ library(colourpicker)
 
 plist <- list() # Initiallize a list of plots to arrange
 # respectList <- c()
-# wlist <- c()
-# hlist <- c()
+wlist <- c()
+hlist <- c()
+h <- 800
+w <- 700
 
 gplot <- dget('gplot.R') # Load plotting function
 
@@ -201,7 +203,7 @@ ui <- fluidPage(
                           
                           hr(),
                           h1('Report'),
-                          plotOutput('regPlot', width = 612, height = 792),
+                          plotOutput('regPlot', width = '100%', height = '100%'),
                           hr()
                   ),
                   
@@ -598,8 +600,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
                                 width = unit(input$save.width, 'mm'),
                                 height = unit(input$save.height, 'mm'))
     # respectList[l + 1] <<- as.numeric(input$aspect.ratio)
-    # wlist[[l + 1]] <<- as.numeric(input$save.width)
-    # hlist[[l + 1]] <<- as.numeric(input$save.height)
+    wlist[l + 1] <<- as.numeric(input$save.width)
+    hlist[l + 1] <<- as.numeric(input$save.height)
     plist[[l + 1]] <<- eggp
   })
   
@@ -613,15 +615,20 @@ server <- function(input, output, session) { # added session for updateSelectInp
   
   # Create a report
   output$regPlot <- renderPlot({
+    req(input$plt2rprt)
     g <- input$plt2rprt
     r <- input$clear
+    h <<- sum(hlist)*3.7795275591
+    w <<- sum(wlist)*3.7795275591
+    print(h)
+    print(w)
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
       p <- do.call("grid.arrange", c(plist,
                                      ncol = numcol,
                                      top = str_remove(inFile$name, '.xlsx')))
     }
-  })
+  }, height = function() h, width = function() w)
   
   # eventReactive to create the plots to be saved
   plots <- eventReactive(input$plt2rprt, {
@@ -644,8 +651,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
     
     content = function(file) {
       ggsave(file, plot = plots(), useDingbats = F, 
-             height = 11, width = 8.5, 
-             units = 'in', device = "pdf")
+             height = h/3.7795275591, width = w/3.7795275591, 
+             units = 'mm', device = "pdf")
     }
   )
 
