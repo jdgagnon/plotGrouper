@@ -119,12 +119,26 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       select(-max, -error_max, -n, -n_comps, -group.by_n, -group1_n, -group2_n, -start, -unit, -e, -r, -value))
 
   } else {
-    showNotification(paste("Statistics table has been updated but plot output is not yet supported for", method),
-                     duration = 10, type = 'warning')
+    statistics <- try(left_join(statOut, dmax, by = group.by) %>%
+                        mutate(max = max(c(value, error_max), na.rm = T)*0.05) %>%
+                        group_by_(group.by) %>%
+                        mutate(n = row_number(),
+                               r = if_else(p == 'p.signif', max*0.1, max*0.2),
+                               e = max*n,
+                               n_comps = max(n),
+                               group.by_n = as.numeric(get(group.by)),
+                               w.start = group.by_n - width/length(unique(df[[comparison]])),
+                               w.stop = group.by_n + width/length(unique(df[[comparison]]))) %>%
+                        ungroup() %>%
+                        mutate(x.pos = rowMeans(.[,c('w.start','w.stop')]), # center of line segment
+                               w.start = ifelse(!is.na(p.signif), w.start, NA),
+                               w.stop = ifelse(!is.na(p.signif), w.stop, NA),
+                               h.p = value + e,
+                               h.s = value + e - r))
   }
                       
 
-  if(("try-error" %in% class(statOut)) | method %in% c('anova', 'kurskal.test')){
+  if(("try-error" %in% class(statOut))){
     statistics <- tibble('p.signif' = NA)
   }
   
