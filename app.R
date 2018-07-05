@@ -50,8 +50,7 @@ ui <- fluidPage(
     )
   ),
   theme = shinythemes::shinytheme("cosmo"),
-  titlePanel("Grouped Plot", windowTitle = 'Grouped Plot'),
-  tabsetPanel(
+  navbarPage('Grouped Plot',
     tabPanel("Plot", fluid = T,
              sidebarPanel(
                fileInput('file', 'Choose info-file to upload', multiple = T,
@@ -119,7 +118,8 @@ ui <- fluidPage(
                selectInput('errortype', "Select errorbar type", choices = c('mean_se', 'mean_sdl'), selected = 'mean_se'),
                
                fluidRow(
-                 column(8, selectInput('method', "Stat test", choices = c('t.test', 'wilcox.test', 'anova', 'kruskal.test'))),
+                 column(4, selectInput('method', "Stat test", choices = c('t.test', 'wilcox.test', 'anova', 'kruskal.test'))),
+                 column(4, style = "margin-top: 25px;", checkboxInput('refGroup', "Reference group", value = F)),
                  column(4, style = "margin-top: 25px;", checkboxInput('paired', "Paired", value = F))
                ),
                
@@ -377,6 +377,14 @@ server <- function(input, output, session) { # added session for updateSelectInp
     comparisons <- unique(dataframe[[input$comp]])
     comps <- c(input$comps)
     
+    ref.group <- NULL
+    
+    if(input$refGroup == T) {
+      ref.group <- comps[1]
+    }
+    
+    print(ref.group)
+    
     levs.comps <- order(factor(unique(dataframe[[input$comp]]), levels = comps))
 
     if (input$group == 'variable') {
@@ -420,6 +428,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
           width = input$width,
           dodge = input$dodge,
           font_size = input$font,
+          ref.group = ref.group,
           # aspect.ratio = input$aspect.ratio,
           trans.y = input$trans.y,
           split = input$split,

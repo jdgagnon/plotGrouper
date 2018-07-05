@@ -16,17 +16,6 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
                   stroke = 0.5, font_size = 9, size = 1, width = 0.75, dodge = 0.75,
                   shape.groups = c(19,21), color.groups = c("black",'black'), fill.groups = c('black',NA))
 {
-  if(is.null(dataset)){
-    stop("Need to specify a dataset")
-  }
-  
-  if(is.null(comparison)){
-    stop("Need to specify a comparison")
-  }
-  
-  if(is.null(group.by)){
-    stop("Need to specify a grouping variable")
-  }
   
   df <- droplevels(dataset)
 
@@ -115,26 +104,25 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
              w.start = ifelse(!is.na(p.signif), w.start, NA),
              w.stop = ifelse(!is.na(p.signif), w.stop, NA),
              h.p = value + e,
-             h.s = value + e - r) %>%
-      select(-max, -error_max, -n, -n_comps, -group.by_n, -group1_n, -group2_n, -start, -unit, -e, -r, -value))
+             h.s = value + e - r))
 
   } else {
     statistics <- try(left_join(statOut, dmax, by = group.by) %>%
-                        mutate(max = max(c(value, error_max), na.rm = T)*0.05) %>%
-                        group_by_(group.by) %>%
-                        mutate(n = row_number(),
-                               r = if_else(p == 'p.signif', max*0.1, max*0.2),
-                               e = max*n,
-                               n_comps = max(n),
-                               group.by_n = as.numeric(get(group.by)),
-                               w.start = group.by_n - width/length(unique(df[[comparison]])),
-                               w.stop = group.by_n + width/length(unique(df[[comparison]]))) %>%
-                        ungroup() %>%
-                        mutate(x.pos = rowMeans(.[,c('w.start','w.stop')]), # center of line segment
-                               w.start = ifelse(!is.na(p.signif), w.start, NA),
-                               w.stop = ifelse(!is.na(p.signif), w.stop, NA),
-                               h.p = value + e,
-                               h.s = value + e - r))
+      mutate(max = max(c(value, error_max), na.rm = T)*0.05) %>%
+      group_by_(group.by) %>%
+      mutate(n = row_number(),
+             r = if_else(p == 'p.signif', max*0.1, max*0.2),
+             e = max*n,
+             n_comps = max(n),
+             group.by_n = as.numeric(get(group.by)),
+             w.start = group.by_n - width/length(unique(df[[comparison]])),
+             w.stop = group.by_n + width/length(unique(df[[comparison]]))) %>%
+      ungroup() %>%
+      mutate(x.pos = rowMeans(.[,c('w.start','w.stop')]), # center of line segment
+             w.start = ifelse(!is.na(p.signif), w.start, NA),
+             w.stop = ifelse(!is.na(p.signif), w.stop, NA),
+             h.p = value + e,
+             h.s = value + e - r))
   }
                       
 
