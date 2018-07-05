@@ -13,6 +13,7 @@ library(ggpubr)
 library(shinyjs)
 library(shinythemes)
 library(colourpicker)
+library(grid)
 
 # outputDir <- "responses"
 # saveData <- function(inData) {
@@ -69,7 +70,7 @@ ui <- fluidPage(
                  column(8, selectInput('sheet', 'Select sheet', multiple = T, choices = NULL)),
                  column(2, style = "margin-top: 25px;", checkboxInput('header', 'Header', T))),
                
-               selectInput("columns", "Select columns to exclude From gather", multiple = T, choices = NULL), # no choices before uploading 
+               selectInput("columns", "Select columns to exclude from gather", multiple = T, choices = NULL), # no choices before uploading 
                
                selectInput("variables", "Variables to plot", multiple = T, choices = NULL),
                
@@ -361,6 +362,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       d
   })
   
+  # Create plot object to be displayed
   plotInput <- function() {
     
     variables <- c(input$variables)
@@ -428,6 +430,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     
   }
   
+  # Calculate statistics table to be displayed
   stats <- function() {
     
     variables <- c(input$variables)
@@ -449,6 +452,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
           stats = T)
   }
   
+  ######### Attempting to store user settings and load them from file #################
   # AllInputs <- reactive({
   #   reactiveValuesToList(input)
   # })
@@ -464,6 +468,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
   #   session$sendInputMessage(names(inData)[i], list(inData[[names(inData)[i]]]))
   # }
   # })
+  ###################################################################################
   
   # Create a shape picker ui for each level of the comparison
   output$shapes <- renderUI({
@@ -612,12 +617,10 @@ server <- function(input, output, session) { # added session for updateSelectInp
     rawData
   })
   
-  
   # eventReactive to add current plot to the report
   observeEvent(input$plt2rprt, {
     l <- length(plist)
-    p <- plotInput() + theme(legend.position = 'none')
-    legend <<- get_legend(plotInput())
+    p <- plotInput() #+ theme(legend.position = 'none')
     eggp <- egg::set_panel_size(p, 
                                 width = unit(input$save.width, 'mm'),
                                 height = unit(input$save.height, 'mm'))
@@ -629,6 +632,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     plist[[l + 1]] <<- eggp
   })
   
+  # Clear last report from report
   observeEvent({
     input$clear}, {
       l <- length(plist)
@@ -641,6 +645,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       }
   })
   
+  # Clear all plots from report
   observeEvent({
     input$clearAll}, {
       plist <<- list()
@@ -658,12 +663,20 @@ server <- function(input, output, session) { # added session for updateSelectInp
     g <- input$plt2rprt
     r <- input$clear
     ra <- input$clearAll
-    # plist[[length(plist) + 1]] <- legend # collapse to a single legend
+    ############ Attempting to use a common legend in report ###################
+    # leg <- get_legend(plist[[1]])
+    # lheight <- sum(leg$height)
+    # lwidth <- sum(leg$width)
+    # legend <<- egg::set_panel_size(leg,
+    #                                height = lheight,
+    #                                width = lwidth)
+    # plist <<- append(plist, legend, 0)
+    ###########################################################################
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
       p <- do.call("grid.arrange", c(plist,
-                                     ncol = numcol + 1,
-                                     top = str_remove(inFile$name, '.xlsx')))
+                                  ncol = numcol,
+                                  top = str_remove(inFile$name, '.xlsx')))
     }
   }, height = function() h + 5, width = function() w + 5)
   
@@ -680,6 +693,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       }
   })
   
+  # Download the report using ggsave
   output$downloadReport <- downloadHandler(
     filename = function() {
       paste(input$report, sep = '.', switch(
