@@ -141,16 +141,16 @@ ui <- fluidPage(
              mainPanel(
                h1('Plot'),
                fluidRow(
-                 column(3, selectInput('geom', "Select geoms to plot", 
+                 column(4, selectInput('geom', "Select geoms to plot", 
                                        choices = c('bar', 'crossbar', 'errorbar', 
                                                    'point', 'dot', 'stat','seg',
                                                    'box', 'violin','line',
-                                                   'line_point', 'line_error', 'line_point_stat'),
+                                                   'line_point', 'line_error', 'line_point_stat', 'density'),
                                        selected = c('bar','errorbar','point','stat','seg'), multiple = T)),
-                 column(3, selectInput('legend', "Select legend position", choices = c('top','right','bottom','left','none'),
+                 column(4, selectInput('legend', "Select legend position", choices = c('top','right','bottom','left','none'),
                                        selected = 'bottom')),
-                 column(3, sliderInput('aspect.ratio', "Aspect ratio", min = 0.25, max = 4, value = 1, step = 0.25)),
-                 column(3, style = "margin-top: 30px;", actionButton("plt2rprt", label = "Include in report", 
+                 # column(3, sliderInput('aspect.ratio', "Aspect ratio", min = 0.25, max = 4, value = 1, step = 0.25)),
+                 column(4, style = "margin-top: 30px;", actionButton("plt2rprt", label = "Include in report", 
                                                                      class="btn btn-primary btn-sm", 
                                                                      style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
                ),
@@ -314,6 +314,13 @@ server <- function(input, output, session) { # added session for updateSelectInp
     c('#00000080','#00000000')
   )
   
+  # Working on incorporating aspect ratio selection
+  # observe({
+  #   input$aspect.ratio
+  #   current_height <- input$save.height
+  #   updateSliderInput(session, 'save.height', value = current_height*input$aspect.ratio)
+  # })
+  
   observe({
     req(input$comp)
     file <- input$file
@@ -413,7 +420,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
           width = input$width,
           dodge = input$dodge,
           font_size = input$font,
-          aspect.ratio = input$aspect.ratio,
+          # aspect.ratio = input$aspect.ratio,
           trans.y = input$trans.y,
           split = input$split,
           trim = input$trim,
@@ -563,16 +570,20 @@ server <- function(input, output, session) { # added session for updateSelectInp
       req(input[[paste0('shape',i)]], input[[paste0('col',i)]], input[[paste0('fill',i)]])
     })
     
-    plotInput()
+    p <- egg::set_panel_size(plotInput(),
+                        width = unit(input$save.width, 'mm'),
+                        height = unit(input$save.height, 'mm')
+                        )
+    grid.arrange(p)
     
-  }, height = function() input$save.height*3.7795275591, width = function() input$save.width*3.7795275591)
+  }, height = function() input$save.height*3.7795275591 + 37.795275591, width = function() input$save.width*3.7795275591 + 37.795275591)
   
 # Save plot
   output$downloadPlot <- downloadHandler(
     filename = function() { paste0(input$filename, '.pdf') },
     content = function(file) {
       ggsave(file, plot = plotInput(), useDingbats = F, 
-             height = input$save.height, width = input$save.width, 
+             height = input$save.height + 5, width = input$save.width + 5, 
              units = 'mm', device = "pdf")
     }
   )
@@ -624,7 +635,6 @@ server <- function(input, output, session) { # added session for updateSelectInp
     eggp <- egg::set_panel_size(p, 
                                 width = unit(input$save.width, 'mm'),
                                 height = unit(input$save.height, 'mm'))
-    # respectList[l + 1] <<- as.numeric(input$aspect.ratio)
     wlist[l + 1] <<- as.numeric(input$save.width)
     hlist[l + 1] <<- as.numeric(input$save.height)
     h <<- sum(hlist)*3.7795275591
@@ -674,9 +684,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
     ###########################################################################
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
-      p <- do.call("grid.arrange", c(plist,
-                                  ncol = numcol,
-                                  top = str_remove(inFile$name, '.xlsx')))
+     grid.arrange(grobs = plist,
+                  ncol = numcol,
+                  top = str_remove(inFile$name, '.xlsx'))
     }
   }, height = function() h + 5, width = function() w + 5)
   
@@ -687,9 +697,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
       ra <- input$clearAll
       if (length(plist) > 0) {
         numcol <- floor(sqrt(length(plist)+1))
-        do.call("arrangeGrob", c(grobs = plist,
-                                 ncol = numcol,
-                                 top = str_remove(inFile$name, '.xlsx')))
+        arrangeGrob(grobs = plist,
+                    ncol = numcol,
+                    top = str_remove(inFile$name, '.xlsx'))
       }
   })
   
@@ -703,7 +713,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     
     content = function(file) {
       ggsave(file, plot = plots(), useDingbats = F, 
-             height = h/3.7795275591, width = w/3.7795275591, 
+             height = (h/3.7795275591), width = (w/3.7795275591), 
              units = 'mm', device = "pdf")
     }
   )

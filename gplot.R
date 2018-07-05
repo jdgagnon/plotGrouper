@@ -211,6 +211,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   line_point <- stat_summary(aes(fill = get(comparison), shape = get(comparison),  color = get(comparison)), stroke = stroke, size = size,
                              fun.y = mean, geom = "point")
   dot <- geom_dotplot(aes(color = get(comparison)), binaxis = "y", stackdir = "center", method = 'histodot', position = position_dodge(dodge))
+  density <- geom_density(aes(color = get(comparison), fill = get(comparison), x = value), inherit.aes = F)
   
   if(all(is.na(statOut$p.signif))) {
     geom <- geom[which(!geom %in% c('stat', 'seg'))] 
@@ -223,11 +224,15 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   
   suppressWarnings(if(geom == 'line_point_stat'){
     geom <- c('line','line_error','line_point','stat')
-  })
+    })
+  
+  suppressWarnings(if(geom %in% 'density') {
+    scale.x <- scale_x_continuous()
+    y.lim <- c(0,NA)
+    })
   
   # Create ggplot object and plot
   g <- ggplot(data = df, aes(x = get(group.by), y = value)) +
-    lapply(geom, function(x) get(x)) +
     labs(x = x.lab, y = y.lab, color = comparison, shape = comparison, fill = comparison, alpha = comparison, hjust = 0.5) +
     scale_y_continuous(limits = y.lim, expand = expand.y, labels = labs.y, trans = trans.y, oob = function(x, ...) x) +
     scale.x +
@@ -236,17 +241,22 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     scale_alpha_manual(values = alpha.groups) +
     scale_color_manual(values = color.groups) +
     coord_cartesian(clip = 'off') +
+    lapply(geom, function(x) get(x)) +
     theme(line = element_line(colour = "black", size = stroke),
           text = element_text(family = 'Helvetica', size = font_size, colour = "black"),
           rect = element_blank(),
           panel.grid = element_blank(),
-          aspect.ratio = aspect.ratio,
+          # aspect.ratio = aspect.ratio,
           legend.position = leg.pos,
+          legend.title = element_text(family = 'Helvetica', size = font_size, colour = "black"),
           legend.text = element_text(family = 'Helvetica', size = font_size, colour = "black"),
-          axis.line = element_line(colour = "black", size = stroke),
+          # axis.line = element_line(colour = "black", size = stroke),
+          axis.line.x = element_line(colour = "black", size = stroke),
+          axis.line.y = element_line(colour = "black", size = stroke),
           axis.ticks.x = element_blank(),
           axis.text.x = element_text(family = 'Helvetica', size = font_size, colour = "black", angle = angle, vjust = vjust, hjust = hjust),
           axis.text = element_text(family = 'Helvetica', size = font_size, colour = "black"))
+          # plot.margin = margin(1,1,1,1,'mm'))
   
   if (stats == F) {
     g
