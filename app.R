@@ -218,24 +218,33 @@ ui <- fluidPage(
              )
     ),
 
-    tabPanel('Stats', fluid = T,
-             mainPanel(
-               dataTableOutput('stat_display'),
-               downloadButton("save.stat", "Download", 
-                              style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+    tabPanel('Statistics', 
+             fluidPage(
+               mainPanel(
+                 h1('Statistics'),
+                 dataTableOutput('stat_display'),
+                 downloadButton("save.stat", "Download",
+                                style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+               )
              )
 
     ),
     
-    tabPanel('Data', fluid = T,
-             mainPanel(
-               dataTableOutput('data_table_display')
+    tabPanel('Data',
+             fluidPage(
+               h1('Plot Data'),
+               mainPanel(
+                 dataTableOutput('data_table_display')
+               )
              )
     ),
     
-    tabPanel('Raw Data', fluid = T,
-             mainPanel(
-               dataTableOutput('raw_data_table_display')
+    tabPanel('Raw Data',
+             fluidPage(
+               mainPanel(
+                 h1('Raw Data'),
+                 dataTableOutput('raw_data_table_display')
+               )
              )
     )
   )
@@ -248,7 +257,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
  
   # Input file and read in the sheets
   info <- eventReactive(input$file, {
-    assign('inFile', input$file, envir = globalenv())
+    inFile <<- input$file
     # Instead # if (is.null(inFile)) ... use "req"
     req(inFile)
     
@@ -300,7 +309,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
         updateSelectInput(session, 'group', choices = c('variable', vars),
                           selected = 'Sheet')
       }
-      assign('rawData', f, envir = globalenv())
+      
+      rawData <<- f
+      
       f
   })
   
@@ -363,7 +374,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
           filter(!grepl('Bead|Ungated',variable))
       }
 
-      assign('dataframe', d, envir = globalenv())
+      dataframe <<- d
       d
   })
   
@@ -743,16 +754,6 @@ server <- function(input, output, session) { # added session for updateSelectInp
     }
   )
 
-  session$onSessionEnded(function(x, env = globalenv()) 
-  {
-    x <- c('inFile', 'rawData', 'dataframe')
-    for (i in x) {
-      if(exists(i, envir = env)) {
-        rm(list = i, envir = env)
-      }
-    }
-  })
-  
   session$onSessionEnded(function() {
     stopApp()
   })
