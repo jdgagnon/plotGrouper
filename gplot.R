@@ -248,7 +248,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
           text = element_text(family = 'Helvetica', size = font_size, colour = "black"),
           rect = element_blank(),
           panel.grid = element_blank(),
-          # aspect.ratio = aspect.ratio,
+          aspect.ratio = aspect.ratio,
           legend.position = leg.pos,
           legend.title = element_text(family = 'Helvetica', size = font_size, colour = "black"),
           legend.text = element_text(family = 'Helvetica', size = font_size, colour = "black"),

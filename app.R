@@ -28,8 +28,8 @@ plist <- list() # Initiallize a list of plots to arrange
 # respectList <- c()
 wlist <- c()
 hlist <- c()
-h <- 800
-w <- 700
+h <- NULL
+w <- NULL
 legend <- NULL
 gplot <- dget('gplot.R') # Load plotting function
 
@@ -212,12 +212,10 @@ ui <- fluidPage(
                    column(4, radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'), inline = TRUE))),
                  
                  fluidRow(
-                   column(12, align="center", plotOutput('regPlot', height = 'auto', width = 'auto')
-                   )
+                   column(12, align="center", uiOutput('regPlot'))
                  )
                )
              )
-
     ),
 
     tabPanel('Stats', fluid = T,
@@ -382,8 +380,6 @@ server <- function(input, output, session) { # added session for updateSelectInp
     if(input$refGroup == T) {
       ref.group <- comps[1]
     }
-    
-    print(ref.group)
     
     levs.comps <- order(factor(unique(dataframe[[input$comp]]), levels = comps))
 
@@ -579,20 +575,22 @@ server <- function(input, output, session) { # added session for updateSelectInp
       req(input[[paste0('shape',i)]], input[[paste0('col',i)]], input[[paste0('fill',i)]])
     })
     
-    p <- egg::set_panel_size(plotInput(),
+    plt <<- egg::set_panel_size(plotInput(),
                         width = unit(input$save.width, 'mm'),
-                        height = unit(input$save.height, 'mm')
-                        )
-    grid.arrange(p)
+                        height = unit(input$save.height, 'mm'),
+                        margin = unit(50, 'mm'))
+    grid.arrange(plt)
     
-  }, height = function() input$save.height*3.7795275591 + 37.795275591, width = function() input$save.width*3.7795275591 + 37.795275591)
+  }, 
+  height = function() input$save.height*3.7795275591 + 37.795275591*2, 
+  width = function() input$save.width*3.7795275591 + 37.795275591*2)
   
 # Save plot
   output$downloadPlot <- downloadHandler(
     filename = function() { paste0(input$filename, '.pdf') },
     content = function(file) {
-      ggsave(file, plot = plotInput(), useDingbats = F, 
-             height = input$save.height + 5, width = input$save.width + 5, 
+      ggsave(file, plot = plt, useDingbats = F, 
+             height = input$save.height + 50, width = input$save.width + 50, 
              units = 'mm', device = "pdf")
     }
   )
@@ -638,7 +636,10 @@ server <- function(input, output, session) { # added session for updateSelectInp
   })
   
   # eventReactive to add current plot to the report
-  observeEvent(input$plt2rprt, {
+  observeEvent({
+    input$plt2rprt}, {
+    h <<- NULL
+    w <<- NULL
     l <- length(plist)
     p <- plotInput() #+ theme(legend.position = 'none')
     eggp <- egg::set_panel_size(p, 
@@ -646,8 +647,10 @@ server <- function(input, output, session) { # added session for updateSelectInp
                                 height = unit(input$save.height, 'mm'))
     wlist[l + 1] <<- as.numeric(input$save.width)
     hlist[l + 1] <<- as.numeric(input$save.height)
-    h <<- sum(hlist)*3.7795275591
-    w <<- sum(wlist)*3.7795275591
+    h <<- sum(hlist, 20)*3.7795275591
+    w <<- sum(wlist, 20)*3.7795275591
+    # print(h)
+    # print(w)
     plist[[l + 1]] <<- eggp
   })
   
@@ -670,15 +673,22 @@ server <- function(input, output, session) { # added session for updateSelectInp
       plist <<- list()
       wlist <<- c()
       hlist <<- c()
-      h <- 800
-      w <- 700
+      h <<- 800
+      w <<- 600
     })
   
+  reportHeight <- reactive({
+    pltrprt <- input$plt2rprt
+    return(h)
+  })
   
+  reportWidth <- reactive({
+    pltrprt <- input$plt2rprt
+    return(w)
+  })
   
   # Create a report
-  output$regPlot <- renderPlot({
-    req(input$plt2rprt)
+  output$contents <- renderPlot({
     g <- input$plt2rprt
     r <- input$clear
     ra <- input$clearAll
@@ -693,23 +703,29 @@ server <- function(input, output, session) { # added session for updateSelectInp
     ###########################################################################
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
-     grid.arrange(grobs = plist,
-                  ncol = numcol,
-                  top = str_remove(inFile$name, '.xlsx'))
+      grid.newpage()
+      grid.arrange(grobs = plist,
+                  ncol = numcol)
     }
-  }, height = function() h + 5, width = function() w + 5)
+  })
+  
+  output$regPlot <- renderUI({
+    plotOutput("contents", 
+               height = reportHeight(), 
+               width = reportWidth())
+  })
   
   # eventReactive to create the plots to be saved
   plots <- eventReactive(input$plt2rprt, {
-      g <- input$plt2rprt
-      r <- input$clear
-      ra <- input$clearAll
-      if (length(plist) > 0) {
-        numcol <- floor(sqrt(length(plist)+1))
-        arrangeGrob(grobs = plist,
-                    ncol = numcol,
-                    top = str_remove(inFile$name, '.xlsx'))
-      }
+    req(h,w)
+    g <- input$plt2rprt
+    r <- input$clear
+    ra <- input$clearAll
+    if (length(plist) > 0) {
+      numcol <- floor(sqrt(length(plist)+1))
+      arrangeGrob(grobs = plist,
+                  ncol = numcol)
+    }
   })
   
   # Download the report using ggsave
@@ -722,7 +738,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     
     content = function(file) {
       ggsave(file, plot = plots(), useDingbats = F, 
-             height = (h/3.7795275591), width = (w/3.7795275591), 
+             height = (h/3.7795275591) + 20, width = (w/3.7795275591) + 20, 
              units = 'mm', device = "pdf")
     }
   )
