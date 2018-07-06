@@ -25,11 +25,8 @@ library(grid)
 
 
 plist <- list() # Initiallize a list of plots to arrange
-# respectList <- c()
-wlist <- c()
-hlist <- c()
-h <- NULL
-w <- NULL
+wlist <- c() # Initialize a vector of plot width values
+hlist <- c() # Initialize a vector of plot height values
 legend <- NULL
 gplot <- dget('gplot.R') # Load plotting function
 
