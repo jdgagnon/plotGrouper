@@ -252,10 +252,9 @@ ui <- fluidPage(
 
 server <- function(input, output, session) { # added session for updateSelectInput
  
-  # Input file and read in the sheets
+  # Get file/read sheets ####
   info <- eventReactive(input$file, {
     inFile <<- input$file
-    # Instead # if (is.null(inFile)) ... use "req"
     req(inFile)
     
     # Identify sheets and use them as choices to load file
@@ -264,7 +263,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     sheets
     })
   
-  # If a file is read in create a tibble from all the sheets
+  # Make tibble from file ####
   fi <- eventReactive({
     input$sheet
     input$file}, {
@@ -320,7 +319,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     c('#00000080','#00000000')
   )
   
-  # Working on incorporating aspect ratio selection
+  # Incorporate aspect ratio ####
   # observe({
   #   input$aspect.ratio
   #   current_height <- input$save.height
@@ -341,7 +340,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
     updateSelectInput(session, 'comps', choices = vars, selected = vars)
   })
   
-  # Based on the selected variables, subset the tibble
+  
+  # Filter tibble ####
   df <- eventReactive({
     input$file
     input$sheet
@@ -375,7 +375,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       d
   })
   
-  # Create plot object to be displayed
+  # Create plot object ####
   plotInput <- function() {
     
     variables <- c(input$variables)
@@ -450,7 +450,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     
   }
   
-  # Calculate statistics table to be displayed
+  # Calculate stats ####
   stats <- function() {
     
     variables <- c(input$variables)
@@ -472,7 +472,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
           stats = T)
   }
   
-  ######### Attempting to store user settings and load them from file #################
+  # Store user settings ####
   # AllInputs <- reactive({
   #   reactiveValuesToList(input)
   # })
@@ -488,9 +488,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
   #   session$sendInputMessage(names(inData)[i], list(inData[[names(inData)[i]]]))
   # }
   # })
-  ###################################################################################
   
-  # Create a shape picker ui for each level of the comparison
+  
+  # Create shape picker ####
   output$shapes <- renderUI({
     req(input$variables, input$comp, input$comps, input$group, df())
     
@@ -517,7 +517,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     })
   })
   
-  # Create a color picker ui for each level of the comparison
+  # Create color picker ####
   output$colors <- renderUI({
     req(input$variables, input$comp, input$comps, input$group, df())
     
@@ -543,7 +543,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     })
   })
   
-  # Create a color picker ui for each level of the comparison
+  # Create fill picker ####
   output$fills <- renderUI({
     req(input$variables, input$comp, input$comps, input$group, df())
     
@@ -570,7 +570,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     })
   })
   
-  # Plot the data
+  # Plot the data ####
   output$plot_display <- renderPlot({
 
     sheets <- info()
@@ -593,7 +593,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
   height = function() input$save.height*3.7795275591 + 37.795275591*2, 
   width = function() input$save.width*3.7795275591 + 37.795275591*2)
   
-# Save plot
+# Save plot ####
   output$downloadPlot <- downloadHandler(
     filename = function() { paste0(input$filename, '.pdf') },
     content = function(file) {
@@ -603,7 +603,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     }
   )
   
-# Return a statistics table
+# Create stats table ####
   output$stat_display <- renderDataTable({
     sheets <- info()
     c <- fi()
@@ -615,7 +615,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
 
   })
   
-# Save statistics table
+# Save stats table ####
   output$save.stat <- downloadHandler(
     filename = function() {
       paste0(input$filename, "_stats", ".csv")
@@ -625,7 +625,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     }
   )
   
-  # Return a table with all plotted data
+  # Create table of plotted data ####
   output$data_table_display <- renderDataTable({
     req(input$variables)
     sheets <- info()
@@ -634,7 +634,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     dataframe
   })
   
-  # Return a table with all data
+  # Create table with raw data ####
   output$raw_data_table_display <- renderDataTable({
     req(input$variables)
     sheets <- info()
@@ -643,7 +643,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     rawData
   })
   
-  # eventReactive to add current plot to the report
+  # Add current plot to report ####
   observeEvent({
     input$plt2rprt}, {
     h <<- NULL
@@ -662,7 +662,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     plist[[l + 1]] <<- eggp
   })
   
-  # Clear last report from report
+  # Clear last report from report ####
   observeEvent({
     input$clear}, {
       l <- length(plist)
@@ -675,7 +675,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
       }
   })
   
-  # Clear all plots from report
+  # Clear all plots from report ####
   observeEvent({
     input$clearAll}, {
       plist <<- list()
@@ -695,12 +695,12 @@ server <- function(input, output, session) { # added session for updateSelectInp
     return(w)
   })
   
-  # Create a report
+  # Create report ####
   output$contents <- renderPlot({
     g <- input$plt2rprt
     r <- input$clear
     ra <- input$clearAll
-    ############ Attempting to use a common legend in report ###################
+    # Common legend in report ####
     # leg <- get_legend(plist[[1]])
     # lheight <- sum(leg$height)
     # lwidth <- sum(leg$width)
@@ -708,7 +708,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     #                                height = lheight,
     #                                width = lwidth)
     # plist <<- append(plist, legend, 0)
-    ###########################################################################
+    
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist)+1))
       grid.newpage()
@@ -717,13 +717,14 @@ server <- function(input, output, session) { # added session for updateSelectInp
     }
   })
   
+  # Create UI for report ####
   output$regPlot <- renderUI({
     plotOutput("contents", 
                height = reportHeight(), 
                width = reportWidth())
   })
   
-  # eventReactive to create the plots to be saved
+  # Store plots to be saved in report ####
   plots <- eventReactive(input$plt2rprt, {
     req(h,w)
     g <- input$plt2rprt
@@ -736,7 +737,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     }
   })
   
-  # Download the report using ggsave
+  # Download report ####
   output$downloadReport <- downloadHandler(
     filename = function() {
       paste(input$report, sep = '.', switch(
@@ -751,6 +752,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     }
   )
 
+  # Stop app on close ####
   session$onSessionEnded(function() {
     stopApp()
   })
