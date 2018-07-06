@@ -34,7 +34,7 @@ install.packages("ggpubr")
 install.packages("shinyjs")
 install.packages("shinythemes")
 install.packages("colourpicker")
-instal.packages("shiny")
+install.packages("shiny")
 ```
 
 ### Installing & Running
