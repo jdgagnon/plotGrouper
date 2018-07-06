@@ -95,10 +95,10 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
              group.by_n = as.numeric(get(group.by)), # number of grouping variables
              group1_n = as.integer(group1),
              group2_n = as.integer(group2),
-             unit = width/max(group2_n),
-             start = group.by_n - unit*max(group2_n)/2,
-             w.start = start + (group1_n - 1)*unit + unit/2,
-             w.stop = start + (group2_n - 1)*unit + unit/2) %>%
+             unit = (width/max(group2_n))*dodge/width, # relative width of 1 bar
+             start = group.by_n - unit*max(group2_n)/2, # center position of the first bar
+             w.start = start + (group1_n - 1)*unit + unit/2, # center position of group1
+             w.stop = start + (group2_n - 1)*unit + unit/2) %>% # center position of group2
       ungroup() %>%
       mutate(x.pos = rowMeans(.[,c('w.start','w.stop')]), # center of line segment
              w.start = ifelse(!is.na(p.signif), w.start, NA),

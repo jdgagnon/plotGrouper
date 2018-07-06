@@ -124,8 +124,8 @@ ui <- fluidPage(
                ),
                
                fluidRow(
-                 column(6, sliderInput('width', "Width", min = 0, max = 2, step = 0.05, value = 0.90)),
-                 column(6, sliderInput('dodge', "Dodge", min = 0, max = 2, step = 0.05, value = 0.90))
+                 column(6, sliderInput('width', "Width", min = 0, max = 1, step = 0.05, value = 0.80)),
+                 column(6, sliderInput('dodge', "Dodge", min = 0, max = 2, step = 0.05, value = 0.85))
                ),
                
                hr(),
@@ -178,9 +178,9 @@ ui <- fluidPage(
                selectInput('comps', "Order of comparisons", multiple = T, choices = NULL),
                
                fluidRow(
-                 column(3, sliderInput('font', "Font size", min = 8, max = 15, value = 9, step = 0.5)),
+                 column(3, sliderInput('font', "Font size", min = 8, max = 25, value = 9, step = 0.5)),
                  column(3, sliderInput('size', "Point size", min = 0.5, max = 10, value = 1, step = 0.5)),
-                 column(3, sliderInput('stroke', "Stroke size", min = 0.25, max = 5, value = 0.5, step = 0.25))
+                 column(3, sliderInput('stroke', "Stroke size", min = 0.25, max = 2, value = 0.5, step = 0.25))
                ),
                
                textAreaInput("console", "Pass code to manipulate data frame", value = 'dataframe <<- dataframe %>%', width = 800, height = 200),
