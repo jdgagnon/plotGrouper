@@ -496,7 +496,7 @@ ui <- fluidPage(
 # Server ------------------------------------------------------------------
 
 
-server <- function(input, output, session) { # added session for updateSelectInput
+server <- function(input, output, session) {
 
   # Get file/read sheets ####
   info <- eventReactive(input$file, {
@@ -505,7 +505,11 @@ server <- function(input, output, session) { # added session for updateSelectInp
 
     # Identify sheets and use them as choices to load file
     sheets <- readxl::excel_sheets(inFile$datapath)
-    updateSelectInput(session, "sheet", "Select Sheet", choices = sheets, selected = sheets[1])
+    updateSelectInput(session, 
+                      "sheet", 
+                      "Select Sheet",
+                      choices = sheets, 
+                      selected = sheets[1])
     sheets
   })
 
@@ -517,7 +521,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
     req(input$sheet, inFile)
     # Read excel file in
     for (i in 1:length(input$sheet)) {
-      a <- readxl::read_excel(inFile$datapath, sheet = input$sheet[i], col_names = input$header) %>%
+      a <- readxl::read_excel(inFile$datapath, 
+                              sheet = input$sheet[i], 
+                              col_names = input$header) %>%
         mutate(Sheet = input$sheet[i]) %>%
         select(Sheet, everything())
 
@@ -541,13 +547,23 @@ server <- function(input, output, session) { # added session for updateSelectInp
     colnames(f) <- column_names
 
     vars <- names(f)
-    columns_select <- c("Experiment", "Sheet", "Genotype", "Sample", "Condition", "Mouse", "Target", "Species")
+    columns_select <- c("Experiment", 
+                        "Sheet", 
+                        "Genotype", 
+                        "Sample", 
+                        "Condition", 
+                        "Mouse", 
+                        "Target", 
+                        "Species")
     variables <- vars[which(!vars %in% c(columns_select, "Bead %"))]
     updateSelectInput(session, "columns",
       choices = vars,
       selected = vars[which(vars %in% columns_select)]
     )
-    updateSelectInput(session, "variables", choices = variables, selected = variables[1])
+    updateSelectInput(session, 
+                      "variables", 
+                      choices = variables, 
+                      selected = variables[1])
     updateSelectInput(session, "comp",
       choices = vars,
       selected = vars[which(vars %in% c("Genotype", "Condition", "Species"))]
@@ -577,11 +593,13 @@ server <- function(input, output, session) { # added session for updateSelectInp
     c("#00000080", "#00000000")
   )
 
-  # Incorporate aspect ratio ####
+  # Incorporate aspect ratio
   # observe({
   #   input$aspect.ratio
   #   current_height <- input$save.height
-  #   updateSliderInput(session, 'save.height', value = current_height*input$aspect.ratio)
+  #   updateSliderInput(session,
+  #                     'save.height',
+  #                     value = current_height*input$aspect.ratio)
   # })
 
   observe({
@@ -595,7 +613,10 @@ server <- function(input, output, session) { # added session for updateSelectInp
       vars <- character(0)
     }
 
-    updateSelectInput(session, "comps", choices = vars, selected = vars)
+    updateSelectInput(session, 
+                      "comps", 
+                      choices = vars, 
+                      selected = vars)
   })
 
 
@@ -610,16 +631,28 @@ server <- function(input, output, session) { # added session for updateSelectInp
     input$group
     input$comps
   }, {
-    req(inFile, input$sheet, input$columns, input$comp, input$comps, input$variables)
+    req(inFile, 
+        input$sheet, 
+        input$columns, 
+        input$comp, 
+        input$comps, 
+        input$variables)
 
-    d <- gather(rawData, variable, value, -c(input$columns)) %>%
+    d <- gather(rawData, 
+                variable, 
+                value, 
+                -c(input$columns)) %>%
       filter(get(input$comp) %in% c(input$comps))
 
-    if (!is.na(input$bead) & !is.na(input$dilution) & str_detect(c(input$variables)[1], "#")) {
+    if (!is.na(input$bead) & 
+        !is.na(input$dilution) & 
+        str_detect(c(input$variables)[1], "#")) {
       d <- d %>%
         group_by_(input$id) %>%
-        mutate(value = ifelse(str_detect(variable, "#") & !is.na(input$bead),
-          value / value[variable == "Bead #"] * input$bead * input$dilution, value
+        mutate(value = ifelse(str_detect(variable, "#") & 
+                                !is.na(input$bead),
+          value / value[variable == "Bead #"] * input$bead * input$dilution, 
+          value
         )) %>%
         ungroup() %>%
         filter(variable %in% c(input$variables)) %>%
@@ -647,10 +680,12 @@ server <- function(input, output, session) { # added session for updateSelectInp
       ref.group <- comps[1]
     }
 
-    levs.comps <- order(factor(unique(dataframe[[input$comp]]), levels = comps))
+    levs.comps <- order(factor(unique(dataframe[[input$comp]]), 
+                               levels = comps))
 
     if (input$group == "variable") {
-      levs <- order(factor(unique(dataframe[[input$group]]), levels = variables))
+      levs <- order(factor(unique(dataframe[[input$group]]), 
+                           levels = variables))
     } else {
       levs <- order(factor(groups), levels = groups)
     }
@@ -713,7 +748,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
     groups <- unique(dataframe[[input$group]])
 
     if (input$group == "variable") {
-      levs <- order(factor(unique(dataframe[[input$group]]), levels = variables))
+      levs <- order(factor(unique(dataframe[[input$group]]), 
+                           levels = variables))
     } else {
       levs <- order(factor(groups), levels = groups)
     }
@@ -771,7 +807,11 @@ server <- function(input, output, session) { # added session for updateSelectInp
     selection <- rep(choices[1:length(comparisons)], length(comparisons))
 
     lapply(1:length(comparisons), function(i) {
-      tags$div(style = "margin-bottom:25px;", selectInput(inputId = paste0("shape", i), label = comparisons[i], choices = options, selected = selection[i]))
+      tags$div(style = "margin-bottom:25px;", 
+               selectInput(inputId = paste0("shape", i), 
+                           label = comparisons[i], 
+                           choices = options, 
+                           selected = selection[i]))
     })
   })
 
@@ -797,7 +837,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
     selection <- rep(choices, length(comparisons))
 
     lapply(1:length(comparisons), function(i) {
-      colourpicker::colourInput(inputId = paste0("col", i), label = comparisons[i], value = selection[i])
+      colourpicker::colourInput(inputId = paste0("col", i), 
+                                label = comparisons[i], 
+                                value = selection[i])
     })
   })
 
@@ -824,7 +866,10 @@ server <- function(input, output, session) { # added session for updateSelectInp
     selection <- rep(choices, length(comparisons))
 
     lapply(1:length(comparisons), function(i) {
-      colourpicker::colourInput(inputId = paste0("fill", i), label = comparisons[i], value = selection[i], allowTransparent = T)
+      colourpicker::colourInput(inputId = paste0("fill", i), 
+                                label = comparisons[i], 
+                                value = selection[i], 
+                                allowTransparent = T)
     })
   })
 
@@ -837,7 +882,9 @@ server <- function(input, output, session) { # added session for updateSelectInp
     req(inFile, input$geom, input$comps, input$save.height, input$save.width)
 
     lapply(1:length(unique(dataframe[[input$comp]])), function(i) {
-      req(input[[paste0("shape", i)]], input[[paste0("col", i)]], input[[paste0("fill", i)]])
+      req(input[[paste0("shape", i)]], 
+          input[[paste0("col", i)]], 
+          input[[paste0("fill", i)]])
     })
 
     plt <<- egg::set_panel_size(plotInput(),
@@ -858,9 +905,11 @@ server <- function(input, output, session) { # added session for updateSelectInp
     },
     content = function(file) {
       ggsave(file,
-        plot = plt, useDingbats = F,
-        height = input$save.height + 50, width = input$save.width + 50,
-        units = "mm", device = "pdf"
+             plot = plt,
+             useDingbats = F,
+             height = input$save.height + 50,
+             width = input$save.width + 50,
+             units = "mm", device = "pdf"
       )
     }
   )
@@ -905,16 +954,14 @@ server <- function(input, output, session) { # added session for updateSelectInp
   })
 
   # Add current plot to report ####
-  observeEvent({
-    input$plt2rprt
-  }, {
+  observeEvent(input$plt2rprt, {
     h <<- NULL
     w <<- NULL
     l <- length(plist)
     p <- plotInput() #+ theme(legend.position = 'none')
     eggp <- egg::set_panel_size(p,
-      width = unit(input$save.width, "mm"),
-      height = unit(input$save.height, "mm")
+                                width = unit(input$save.width, "mm"),
+                                height = unit(input$save.height, "mm")
     )
     wlist[l + 1] <<- as.numeric(input$save.width)
     hlist[l + 1] <<- as.numeric(input$save.height)
@@ -926,9 +973,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
   })
 
   # Clear last report from report ####
-  observeEvent({
-    input$clear
-  }, {
+  observeEvent(input$clear, {
     l <- length(plist)
     if (l > 0) {
       plist[[l]] <<- NULL
@@ -987,8 +1032,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
   # Create UI for report ####
   output$regPlot <- renderUI({
     plotOutput("contents",
-      height = reportHeight(),
-      width = reportWidth()
+               height = reportHeight(),
+               width = reportWidth()
     )
   })
 
@@ -1000,26 +1045,27 @@ server <- function(input, output, session) { # added session for updateSelectInp
     ra <- input$clearAll
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
-      arrangeGrob(
-        grobs = plist,
-        ncol = numcol
-      )
+      arrangeGrob(grobs = plist,
+                  ncol = numcol)
     }
   })
 
   # Download report ####
   output$downloadReport <- downloadHandler(
     filename = function() {
-      paste(input$report, sep = ".", switch(
-        input$format, PDF = "pdf", HTML = "html", Word = "docx"
-      ))
+      paste(input$report, 
+            switch(input$format, PDF = "pdf", HTML = "html", Word = "docx"),
+            sep = ".")
     },
 
     content = function(file) {
       ggsave(file,
-        plot = plots(), useDingbats = F,
-        height = (h / 3.7795275591) + 20, width = (w / 3.7795275591) + 20,
-        units = "mm", device = "pdf"
+             plot = plots(), 
+             useDingbats = F,
+             height = (h / 3.7795275591) + 20, 
+             width = (w / 3.7795275591) + 20,
+             units = "mm", 
+             device = "pdf"
       )
     }
   )
