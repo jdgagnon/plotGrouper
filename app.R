@@ -23,7 +23,6 @@ library(grid)
 #   dput(inData, file = paste0(outputDir, '/', fileName))
 # }
 
-
 plist <- list() # Initiallize a list of plots to arrange
 wlist <- c() # Initialize a vector of plot width values
 hlist <- c() # Initialize a vector of plot height values
@@ -251,9 +250,10 @@ ui <- fluidPage(
 
 
 server <- function(input, output, session) { # added session for updateSelectInput
-
+  
   # Get file/read sheets ####
   info <- eventReactive(input$file, {
+
     inFile <<- input$file
     req(inFile)
     
@@ -268,7 +268,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     input$sheet
     input$file}, {
       
-      req(input$sheet, input$file)
+      req(input$sheet, inFile)
       # Read excel file in
       for (i in 1:length(input$sheet)) {
         a <- readxl::read_excel(inFile$datapath, sheet = input$sheet[i], col_names = input$header) %>%
@@ -352,7 +352,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     input$group
     input$comps}, {
       
-      req(input$file, input$sheet, input$columns, input$comp, input$comps, input$variables)
+      req(inFile, input$sheet, input$columns, input$comp, input$comps, input$variables)
       
       d <- gather(rawData, variable, value, -c(input$columns)) %>%
         filter(get(input$comp) %in% c(input$comps))
@@ -577,7 +577,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     fileIn <- fi()
     d <- df()
 
-    req(input$file, input$geom, input$comps, input$save.height, input$save.width)
+    req(inFile, input$geom, input$comps, input$save.height, input$save.width)
     
     lapply(1:length(unique(dataframe[[input$comp]])), function(i) {
       req(input[[paste0('shape',i)]], input[[paste0('col',i)]], input[[paste0('fill',i)]])
