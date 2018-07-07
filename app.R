@@ -1,3 +1,4 @@
+
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
@@ -18,7 +19,9 @@ library(grid)
 # outputDir <- "responses"
 # saveData <- function(inData) {
 #   # Create a unique file name
-#   fileName <- sprintf("%s_%s.txt", as.integer(Sys.time()), digest::digest(inData))
+  # fileName <- sprintf("%s_%s.txt", 
+  #                     as.integer(Sys.time()), 
+  #                     digest::digest(inData))
 #   # Write the file to the local system
 #   dput(inData, file = paste0(outputDir, '/', fileName))
 # }
@@ -34,217 +37,407 @@ gplot <- dget('gplot.R') # Load plotting function
 
 ui <- fluidPage(
   useShinyjs(),
-  tags$head(
-    tags$style(
-      HTML(".shiny-notification {
-           position:fixed;
-           top: calc(50%);;
-           left: calc(50%);;
-           }
-           "
-      )
-    )
-  ),
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage('Grouped Plot',
-    tabPanel("Plot", fluid = T,
-             sidebarPanel(
-               fileInput('file', 'Choose info-file to upload', multiple = T,
-                         accept = c(
-                           'text/csv',
-                           'text/comma-separated-values',
-                           'text/tab-separated-values',
-                           'text/plain',
-                           '.csv',
-                           '.tsv',
-                           '.xlsx',
-                           '.xls'
+             tabPanel("Plot", 
+                      fluidPage(
+                        sidebarPanel(
+                          fileInput('file', 
+                                    'Choose info-file to upload',
+                                    accept = c('text/csv',
+                                               'text/comma-separated-values',
+                                               'text/tab-separated-values',
+                                               'text/plain',
+                                               '.csv',
+                                               '.tsv',
+                                               '.xlsx',
+                                               '.xls')
+                          ),
+                          
+                          fluidRow(
+                            column(8, selectInput('sheet',
+                                                  'Select sheet',
+                                                  multiple = T,
+                                                  choices = NULL)
+                            ),
+                            column(2, style = "margin-top: 25px;", 
+                                   checkboxInput('header',
+                                                 'Header',
+                                                 T)
+                            )
+                          ),
+                          
+                          selectInput("columns",
+                                      "Select columns to exclude from gather",
+                                      multiple = T,
+                                      choices = NULL),
+                          
+                          selectInput("variables",
+                                      "Variables to plot",
+                                      multiple = T,
+                                      choices = NULL),
+                          
+                          fluidRow(
+                            column(6, selectInput('comp',
+                                                  "Compare by",
+                                                  choices = NULL)
+                            ),
+                            column(6, selectInput('group',
+                                                  "Group by",
+                                                  choices = NULL)
+                            )
+                          ),
+                          
+                          hr(),
+                          
+                          fluidRow(
+                            column(8, textInput('filename', 
+                                                "Filename", 
+                                                'Plot1')
+                            ),
+                            column(4, style = "margin-top: 30px;",
+                                   downloadButton('downloadPlot', 
+                                   "Save", 
+                                   class="btn btn-primary btn-sm", 
+                                   style="color: #fff; 
+                                   background-color: #337ab7; 
+                                   border-color: #2e6da4")
+                            )
+                          ),
+                          fluidRow(
+                            column(6, sliderInput('save.height', 
+                                                  "Save height (mm)", 
+                                                  min = 20, 
+                                                  max = 150, 
+                                                  value = 50)
+                            ),
+                            column(6, sliderInput('save.width', 
+                                                   "Save width (mm)", 
+                                                   min = 20, 
+                                                   max = 150, 
+                                                   value = 50)
+                            )
+                          ),
+               
+                         # actionButton('submit', "Save inputs"),
+                         # actionButton('load', "Load inputs"),
+                          
+                         hr(),
+                         
+                         fluidRow(
+                           column(8, textInput('y.lab', 
+                                     'Replace y axis label', 
+                                     value = NULL)
+                           ),
+                           column(1.5, style = "margin-top: 25px;",
+                                  checkboxInput('scientific',
+                                                "10^x",
+                                                value = F)
+                           )
+                         ),
+                         fluidRow(
+                           column(6,
+                                  textInput('split.on', 
+                                            "Split on text", 
+                                            value = NULL)
+                           ),
+                           column(3, style = "margin-top: 25px;", 
+                                  checkboxInput('split', 
+                                                'Split', 
+                                                T)
+                           ),
+                           column(3, style = "margin-top: 25px;", 
+                                  checkboxInput('angle.x', 
+                                                "Angle", F)
+                           )
+                         ),
+               
+                         textInput('trim', 
+                                   'Trim text from right side of group labels', 
+                                   value = 'none'),
+                         
+                         hr(),
+                         
+                         selectInput('trans.y', 
+                                     "Transform y", 
+                                     choices = c('identity', 'log2', 'log10'), 
+                                     selected = 'identity'),
+                         
+                         
+                         
+                         selectInput('errortype', 
+                                     "Select errorbar type", 
+                                     choices = c('mean_se', 'mean_sdl'), 
+                                     selected = 'mean_se'),
+                         
+                         fluidRow(
+                           column(4, selectInput('method', 
+                                                 "Stat test", 
+                                                 choices = c('t.test', 
+                                                             'wilcox.test', 
+                                                             'anova', 
+                                                             'kruskal.test')
+                                                 )
+                                  ),
+                           column(4, style = "margin-top: 25px;", 
+                                  checkboxInput('refGroup', 
+                                                "Reference group", 
+                                                value = F)
+                                  ),
+                           column(4, style = "margin-top: 25px;", 
+                                  checkboxInput('paired', 
+                                                "Paired", 
+                                                value = F)
+                                  )
+                         ),
+                         
+                         fluidRow(
+                           column(6, sliderInput('width', 
+                                                 "Width", 
+                                                 min = 0, 
+                                                 max = 1, 
+                                                 step = 0.05, 
+                                                 value = 0.80)
+                                  ),
+                           column(6, sliderInput('dodge', 
+                                                 "Dodge", 
+                                                 min = 0, 
+                                                 max = 2, 
+                                                 step = 0.05, 
+                                                 value = 0.85)
+                                  )
+                         ),
+                         
+                         hr(),
+                         
+                         selectInput('id', 
+                                     "ID column", 
+                                     choices = NULL),
+                         
+                         fluidRow(
+                           column(6, numericInput('bead', 
+                                                  "# Beads/sample", 
+                                                  value = NULL)
+                                  ),
+                           column(6, numericInput('dilution', 
+                                                  "Dilution factor", 
+                                                  value = NULL)
+                                  )
                          )
-               ),
-               fluidRow(
-                 column(8, selectInput('sheet', 'Select sheet', multiple = T, choices = NULL)),
-                 column(2, style = "margin-top: 25px;", checkboxInput('header', 'Header', T))),
-               
-               selectInput("columns", "Select columns to exclude from gather", multiple = T, choices = NULL), # no choices before uploading 
-               
-               selectInput("variables", "Variables to plot", multiple = T, choices = NULL),
-               
-               fluidRow(
-                 column(6, selectInput('comp', "Compare by", choices = NULL)),
-                 column(6, selectInput('group', "Group by", choices = NULL))
-               ),
-               
-               hr(),
-               
-               fluidRow(
-                 column(8, textInput('filename', "Filename", 'Plot1')),
-                 column(4, style = "margin-top: 30px;", downloadButton('downloadPlot', "Save", 
-                                                                       class="btn btn-primary btn-sm", 
-                                                                       style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-               ),
-               
-               fluidRow(
-                 column(6, sliderInput('save.height', "Save height (mm)", min = 20, max = 150, value = 50)),
-                 column(6, sliderInput('save.width', "Save width (mm)", min = 20, max = 150, value = 50))
-               ),
-               
-               # actionButton('submit', "Save inputs"),
-               # actionButton('load', "Load inputs"),
-               
-               hr(),
-               
-               fluidRow(
-                 column(8, textInput('y.lab', 'Replace y axis label', value = NULL)),
-                 column(1.5, style = "margin-top: 25px;", checkboxInput('scientific', "10^x", value = F))
-               ),
-               
-               fluidRow(
-                 column(6, textInput('split.on', "Split on text", value = NULL)),
-                 column(3, style = "margin-top: 25px;", checkboxInput('split', 'Split', T)),
-                 column(3, style = "margin-top: 25px;", checkboxInput('angle.x', "Angle", F))
-               ),
-               textInput('trim', 'Trim text from right side of group labels', value = 'none'),
-               
-               hr(),
-               
-               selectInput('trans.y', "Transform y", choices = c('identity', 'log2', 'log10'), selected = 'identity'),
-               
-               
-               
-               selectInput('errortype', "Select errorbar type", choices = c('mean_se', 'mean_sdl'), selected = 'mean_se'),
-               
-               fluidRow(
-                 column(4, selectInput('method', "Stat test", choices = c('t.test', 'wilcox.test', 'anova', 'kruskal.test'))),
-                 column(4, style = "margin-top: 25px;", checkboxInput('refGroup', "Reference group", value = F)),
-                 column(4, style = "margin-top: 25px;", checkboxInput('paired', "Paired", value = F))
-               ),
-               
-               fluidRow(
-                 column(6, sliderInput('width', "Width", min = 0, max = 1, step = 0.05, value = 0.80)),
-                 column(6, sliderInput('dodge', "Dodge", min = 0, max = 2, step = 0.05, value = 0.85))
-               ),
-               
-               hr(),
-               
-               selectInput('id', "ID column", choices = NULL),
-               
-               fluidRow(
-                 column(6, numericInput('bead', "# Beads/sample", value = NULL)),
-                 column(6, numericInput('dilution', "Dilution factor", value = NULL))
-               )
+                       ),
+                       
+                       mainPanel(
+                         h1('Plot'),
+                         fluidRow(
+                           column(4, selectInput('geom', 
+                                                 "Select geoms to plot", 
+                                                 choices = c('bar', 
+                                                             'crossbar', 
+                                                             'errorbar', 
+                                                             'point', 
+                                                             'dot', 
+                                                             'stat',
+                                                             'seg',
+                                                             'box', 
+                                                             'violin',
+                                                             'line',
+                                                             'line_point', 
+                                                             'line_error', 
+                                                             'line_point_stat', 
+                                                             'density'),
+                                                 selected = c('bar',
+                                                              'errorbar',
+                                                              'point',
+                                                              'stat',
+                                                              'seg'), 
+                                                 multiple = T)
+                                  ),
+                           column(4, selectInput('legend', 
+                                                 "Select legend position", 
+                                                 choices = c('top',
+                                                             'right',
+                                                             'bottom',
+                                                             'left',
+                                                             'none'),
+                                                 selected = 'bottom')
+                                  ),
+                           # column(3, sliderInput('aspect.ratio', 
+                           #                       "Aspect ratio", 
+                           #                       min = 0.25, 
+                           #                       max = 4, 
+                           #                       value = 1, 
+                           #                       step = 0.25)
+                           #        ),
+                           column(4, 
+                                  style = "margin-top: 30px;", 
+                                  actionButton("plt2rprt", 
+                                               label = "Include in report",
+                                               class="btn btn-primary btn-sm",
+                                               style= "color: #fff; 
+                                               background-color: #337ab7; 
+                                               border-color: #2e6da4")
+                                  )
+                         ),
+                         
+                         hr(),
+                         
+                         fluidRow(
+                           column(12, 
+                                  align="center", 
+                                  plotOutput('plot_display', 
+                                             width = 'auto', 
+                                             height = 'auto')
+                                  )
+                         ),
+                         
+                         hr(),
+                         
+                         fluidRow(
+                           column(4, h4('Shapes') ,uiOutput("shapes")),
+                           column(4, h4('Color'), uiOutput("colors")),
+                           column(4, h4('Fill'), uiOutput("fills"))
+                         ),
+                         
+                         fluidRow(
+                           column(4, checkboxInput('lock.shapes', 'Lock', F)),
+                           column(4, checkboxInput('lock.cols', 'Lock', F)),
+                           column(4, checkboxInput('lock.fills', 'Lock', F))
+                         ),
+                         
+                         selectInput('comps', 
+                                     "Order of comparisons", 
+                                     multiple = T, 
+                                     choices = NULL),
+                         
+                         fluidRow(
+                           column(3, sliderInput('font', 
+                                                 "Font size", 
+                                                 min = 8, 
+                                                 max = 25, 
+                                                 value = 9, 
+                                                 step = 0.5)
+                                  ),
+                           column(3, sliderInput('size', 
+                                                 "Point size", 
+                                                 min = 0.5, 
+                                                 max = 10, 
+                                                 value = 1, 
+                                                 step = 0.5)
+                                  ),
+                           column(3, sliderInput('stroke', 
+                                                 "Stroke size", 
+                                                 min = 0.25, 
+                                                 max = 2, 
+                                                 value = 0.5, 
+                                                 step = 0.25)
+                                  )
+                         ),
+                         
+                         textAreaInput("console", 
+                                       "Pass code to manipulate data frame", 
+                                       value = 'dataframe <<- dataframe %>%', 
+                                       width = 800, 
+                                       height = 200),
+                         
+                         actionButton('run', 
+                                      "Run", 
+                                      style="color: #fff; 
+                                      background-color: #337ab7; 
+                                      border-color: #2e6da4")
+                       )
+                      )
              ),
              
-             mainPanel(
-               h1('Plot'),
-               fluidRow(
-                 column(4, selectInput('geom', "Select geoms to plot", 
-                                       choices = c('bar', 'crossbar', 'errorbar', 
-                                                   'point', 'dot', 'stat','seg',
-                                                   'box', 'violin','line',
-                                                   'line_point', 'line_error', 'line_point_stat', 'density'),
-                                       selected = c('bar','errorbar','point','stat','seg'), multiple = T)),
-                 column(4, selectInput('legend', "Select legend position", choices = c('top','right','bottom','left','none'),
-                                       selected = 'bottom')),
-                 # column(3, sliderInput('aspect.ratio', "Aspect ratio", min = 0.25, max = 4, value = 1, step = 0.25)),
-                 column(4, style = "margin-top: 30px;", actionButton("plt2rprt", label = "Include in report", 
-                                                                     class="btn btn-primary btn-sm", 
-                                                                     style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-               ),
-               
-               hr(),
-               
-               fluidRow(
-                 column(12, align="center", plotOutput('plot_display', width = 'auto', height = 'auto'))
-               ),
-               
-               hr(),
-               
-               fluidRow(
-                 column(4, h4('Shapes') ,uiOutput("shapes")),
-                 column(4, h4('Color'), uiOutput("colors")),
-                 column(4, h4('Fill'), uiOutput("fills"))
-               ),
-               
-               fluidRow(
-                 column(4, checkboxInput('lock.shapes', 'Lock', F)),
-                 column(4, checkboxInput('lock.cols', 'Lock', F)),
-                 column(4, checkboxInput('lock.fills', 'Lock', F))
-               ),
-               
-               selectInput('comps', "Order of comparisons", multiple = T, choices = NULL),
-               
-               fluidRow(
-                 column(3, sliderInput('font', "Font size", min = 8, max = 25, value = 9, step = 0.5)),
-                 column(3, sliderInput('size', "Point size", min = 0.5, max = 10, value = 1, step = 0.5)),
-                 column(3, sliderInput('stroke', "Stroke size", min = 0.25, max = 2, value = 0.5, step = 0.25))
-               ),
-               
-               textAreaInput("console", "Pass code to manipulate data frame", value = 'dataframe <<- dataframe %>%', width = 800, height = 200),
-               
-               actionButton('run', "Run", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
-             )
-    ),
-    
-    tabPanel('Report',
-             fluidPage(
-               mainPanel(
-                 h1('Report'),
-                 fluidRow(
-                   column(4, actionButton('clear', 'Clear last',
-                                          class="btn btn-primary btn-md",
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-                   
-                   column(4, actionButton('clearAll', 'Clear All',
-                                class="btn btn-primary btn-md",
-                                style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-                 ),
-                 
-                 fluidRow(
-                   column(3, textInput('report', "Filename", 'Report1')),
-                   column(3, style = 'margin-top: 25px;', downloadButton('downloadReport', 
-                                                                         "Save", 
-                                                                         class="btn btn-primary btn-md", 
-                                                                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-                   column(4, radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'), inline = TRUE))),
-                 
-                 fluidRow(
-                   column(12, align="center", uiOutput('regPlot'))
-                 )
-               )
-             )
-    ),
-
-    tabPanel('Statistics', 
-             fluidPage(
-               mainPanel(
-                 h1('Statistics'),
-                 dataTableOutput('stat_display'),
-                 downloadButton("save.stat", "Download",
-                                style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
-               )
-             )
-
-    ),
-    
-    tabPanel('Data',
-             fluidPage(
-               h1('Plot Data'),
-               mainPanel(
-                 dataTableOutput('data_table_display')
-               )
-             )
-    ),
-    
-    tabPanel('Raw Data',
-             fluidPage(
-               mainPanel(
-                 h1('Raw Data'),
-                 dataTableOutput('raw_data_table_display')
-               )
-             )
-    )
-  )
-)
+             tabPanel('Report',
+                     fluidPage(
+                       mainPanel(
+                         h1('Report'),
+                         fluidRow(
+                           column(4, 
+                                  actionButton('clear',
+                                               'Clear last',
+                                               class = "btn btn-primary btn-md",
+                                               style="color: #fff; 
+                                               background-color: #337ab7; 
+                                               border-color: #2e6da4")
+                           ),
+                           
+                           column(4, actionButton('clearAll', 
+                                                  'Clear All',
+                                        class= "btn btn-primary btn-md",
+                                        style= "color: #fff;
+                                        background-color: #337ab7; 
+                                        border-color: #2e6da4")
+                           )
+                         ),
+                         
+                         fluidRow(
+                           column(3, textInput('report', 
+                                               "Filename", 
+                                               'Report1')
+                           ),
+                           column(3, style = 'margin-top: 25px;', 
+                                  downloadButton('downloadReport',
+                                                 "Save",
+                                                 class="btn btn-primary btn-md", 
+                                                 style="color: #fff; 
+                                                 background-color: #337ab7; 
+                                                 border-color: #2e6da4")
+                                  ),
+                           column(4, radioButtons('format', 
+                                                  'Document format', 
+                                                  choices = c('PDF', 
+                                                              'HTML', 
+                                                              'Word'), 
+                                                  inline = TRUE)
+                           )
+                         ),
+                         
+                         fluidRow(
+                           column(12, align="center", 
+                                  uiOutput('regPlot')
+                           )
+                         )
+                       )
+                     )
+            ),
+            
+            tabPanel('Statistics',
+                     fluidPage(
+                       mainPanel(
+                         
+                         h1('Statistics'),
+                         
+                         dataTableOutput('stat_display'),
+                         
+                         downloadButton("save.stat", 
+                                        "Download",
+                                        style="color: #fff; 
+                                        background-color: #337ab7; 
+                                        border-color: #2e6da4")
+                       )
+                     )
+            ),
+            
+            tabPanel('Data',
+                     fluidPage(
+                       h1('Plot Data'),
+                       mainPanel(
+                         dataTableOutput('data_table_display')
+                       )
+                     )
+            ),
+            
+            tabPanel('Raw Data',
+                     fluidPage(
+                       mainPanel(
+                         h1('Raw Data'),
+                         dataTableOutput('raw_data_table_display')
+                       )
+                     )
+            )
+          )
+        )
 
 # Server ------------------------------------------------------------------
 
