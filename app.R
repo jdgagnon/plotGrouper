@@ -155,7 +155,7 @@ ui <- fluidPage(
                hr(),
                
                fluidRow(
-                 column(12, align="center", plotOutput('plot_display', width = '600px', height = '600px'))
+                 column(12, align="center", plotOutput('plot_display', width = 'auto', height = 'auto'))
                ),
                
                hr(),
@@ -251,7 +251,7 @@ ui <- fluidPage(
 
 
 server <- function(input, output, session) { # added session for updateSelectInput
- 
+
   # Get file/read sheets ####
   info <- eventReactive(input$file, {
     inFile <<- input$file
@@ -589,8 +589,8 @@ server <- function(input, output, session) { # added session for updateSelectInp
                         margin = unit(50, 'mm'))
     grid.arrange(plt)
     
-  }, 
-  height = function() input$save.height*3.7795275591 + 37.795275591*2, 
+  },
+  height = function() input$save.height*3.7795275591 + 37.795275591*2,
   width = function() input$save.width*3.7795275591 + 37.795275591*2)
   
 # Save plot ####
@@ -700,7 +700,7 @@ server <- function(input, output, session) { # added session for updateSelectInp
     g <- input$plt2rprt
     r <- input$clear
     ra <- input$clearAll
-    # Common legend in report ####
+    # Common legend in report ###
     # leg <- get_legend(plist[[1]])
     # lheight <- sum(leg$height)
     # lwidth <- sum(leg$width)
