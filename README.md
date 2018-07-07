@@ -2,7 +2,24 @@
 
 
 
-This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the `ggplot2` and `dplyr` from the tidyverse and batch statistical calculations from `ggpubr`. 
+This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the `ggplot2` and `dplyr` from the tidyverse and batch statistical calculations from `ggpubr`.
+
+Plots can be made using combinations of geoms such as
+
+![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Bar_example.png)
+
+
+
+![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Violin_example.png)
+
+
+
+![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Box_example.png)
+
+
+
+![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Crossbar_example.png)
+
 
 ## Getting Started
 
