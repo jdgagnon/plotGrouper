@@ -2,19 +2,7 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-
-library(shiny)
 library(tidyverse)
-library(Hmisc)
-library(scales)
-library(readxl)
-library(gridExtra)
-library(egg)
-library(ggpubr)
-library(shinyjs)
-library(shinythemes)
-library(colourpicker)
-library(grid)
 
 # outputDir <- "responses"
 # saveData <- function(inData) {
@@ -36,7 +24,7 @@ gplot <- dget("gplot.R") # Load plotting function
 # UI ----------------------------------------------------------------------
 
 ui <- fluidPage(
-  useShinyjs(),
+  shinyjs::useShinyjs(),
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage(
     "Grouped Plot",
@@ -917,7 +905,7 @@ server <- function(input, output, session) {
       height = unit(input$save.height, "mm"),
       margin = unit(50, "mm")
     )
-    grid.arrange(plt)
+    gridExtra::grid.arrange(plt)
   },
   height = function() input$save.height * 3.7795275591 + 37.795275591 * 2,
   width = function() input$save.width * 3.7795275591 + 37.795275591 * 2
@@ -1046,8 +1034,7 @@ server <- function(input, output, session) {
 
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
-      grid.newpage()
-      grid.arrange(
+      gridExtra::grid.arrange(
         grobs = plist,
         ncol = numcol
       )
@@ -1070,7 +1057,7 @@ server <- function(input, output, session) {
     ra <- input$clearAll
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
-      arrangeGrob(
+      gridExtra::arrangeGrob(
         grobs = plist,
         ncol = numcol
       )
@@ -1104,4 +1091,4 @@ server <- function(input, output, session) {
   })
 }
 
-shinyApp(ui, server)
+shiny::shinyApp(ui, server)
