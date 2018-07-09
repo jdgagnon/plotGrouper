@@ -781,10 +781,15 @@ server <- function(input, output, session) {
   # observeEvent(input$load,{
   #   files <- list.files(outputDir, full.names = TRUE)
   #   inData <- dget(file = files)
-  # for (i in 1:length(inData)) {
-  #   session$sendInputMessage(names(inData)[i], list(inData[[names(inData)[i]]]))
-  # }
+  #   updateSelectInput(session, 'sheet', selected = inData$sheet)
+  #   updateSelectInput(session, 'columns', selected = inData$columns)
+  #   updateSelectInput(session, 'variables', selected = inData$variables)
+  #   updateSelectInput(session, 'comp', selected = inData$comp)
+  #   updateSelectInput(session, 'group', selected = inData$group)
+  #   updateSelectInput(session, 'group', selected = inData$group)
+  #   
   # })
+  # 
 
 
   # Create shape picker ####
