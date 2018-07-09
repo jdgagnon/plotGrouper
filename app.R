@@ -907,8 +907,7 @@ server <- function(input, output, session) {
 
     plt <<- egg::set_panel_size(plotInput(),
       width = unit(input$save.width, "mm"),
-      height = unit(input$save.height, "mm"),
-      margin = unit(50, "mm")
+      height = unit(input$save.height, "mm")
     )
     gridExtra::grid.arrange(plt)
   },
@@ -981,8 +980,8 @@ server <- function(input, output, session) {
       width = unit(input$save.width, "mm"),
       height = unit(input$save.height, "mm")
     )
-    wlist[l + 1] <<- as.numeric(input$save.width)
-    hlist[l + 1] <<- as.numeric(input$save.height)
+    wlist[l + 1] <<- unit(sum(as.numeric(grid::convertUnit(eggp$widths, 'mm'))), 'mm')
+    hlist[l + 1] <<- unit(sum(as.numeric(grid::convertUnit(eggp$heights, 'mm'))), 'mm')
     h <<- sum(hlist, 20) * 3.7795275591
     w <<- sum(wlist, 20) * 3.7795275591
     # print(h)
