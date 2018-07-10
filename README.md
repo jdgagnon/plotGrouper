@@ -61,7 +61,7 @@ After installing the `shiny` package, you are ready to run `groupPlot`.
 To initialize the shiny app, paste the following code in your R console and run it.
 
 ```
-shiny::runGitHub("groupPlot", "jdgagnon")
+shiny::runGitHub("plotGrouper", "jdgagnon")
 ```
 
 Once the web app opens, browse to wherever you downloaded the example data file, "iris.xlsx", and open it.
