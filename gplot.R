@@ -186,17 +186,18 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   }
 
   if (is.null(y.lab) | y.lab == "") {
-    
     y.lab <- unique(df$variable)
-    
+
     if (length(y.lab) > 1) {
       y.lab <- y.lab[1]
-      showNotification(ui = "Plotting of multiple variables may
+      showNotification(
+        ui = "Plotting of multiple variables may
                             result in incorrect y-axis label.",
-                       type = 'message', 
-                       duration = 2)
+        type = "message",
+        duration = 2
+      )
     }
-    
+
     # Function to get shared text among variables being plotted
     # y.labs <- c(as.character(df$variable))
     # intersect2 <- function (x, y)
@@ -204,9 +205,8 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     #   y <- as.vector(y)
     #   y[match(as.vector(x), y, 0L)]
     # }
-    # 
+    #
     # y.lab <- paste(Reduce(intersect2, strsplit(y.labs, NULL)), collapse = '')
-
   } # If not specified by user, set y axis label to the variable being plotted.
 
   # Make pretty scientific notation

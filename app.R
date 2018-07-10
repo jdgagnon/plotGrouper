@@ -313,8 +313,8 @@ ui <- fluidPage(
             column(12,
               align = "center",
               plotOutput("plot_display",
-                width = "auto",
-                height = "auto"
+                width = "600px",
+                height = "600px"
               )
             )
           ),
@@ -365,7 +365,7 @@ ui <- fluidPage(
 
           textAreaInput("console",
             "Pass code to manipulate data frame",
-            value = "dataframe <<- dataframe %>%",
+            value = "dataFrame <<- dataFrame %>%",
             width = 800,
             height = 200
           ),
@@ -489,7 +489,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
 
   # Get file/read sheets ####
-  info <- eventReactive(input$file, {
+  observeEvent(input$file, {
     inFile <<- input$file
     req(inFile)
 
@@ -501,11 +501,10 @@ server <- function(input, output, session) {
       choices = sheets,
       selected = sheets[1]
     )
-    sheets
   })
 
   # Make tibble from file ####
-  fi <- eventReactive({
+  observeEvent({
     input$sheet
     input$file
   }, {
@@ -617,7 +616,7 @@ server <- function(input, output, session) {
 
 
   # Filter tibble ####
-  df <- eventReactive({
+  observeEvent({
     input$file
     input$sheet
     input$variables
@@ -663,15 +662,14 @@ server <- function(input, output, session) {
         filter(!grepl("Bead|Ungated", variable))
     }
 
-    dataframe <<- d
-    d
+    dataFrame <<- d
   })
 
   # Create plot object ####
   plotInput <- function() {
     variables <- c(input$variables)
-    groups <- unique(dataframe[[input$group]])
-    comparisons <- unique(dataframe[[input$comp]])
+    groups <- unique(dataFrame[[input$group]])
+    comparisons <- unique(dataFrame[[input$comp]])
     comps <- c(input$comps)
 
     ref.group <- NULL
@@ -680,12 +678,12 @@ server <- function(input, output, session) {
       ref.group <- comps[1]
     }
 
-    levs.comps <- order(factor(unique(dataframe[[input$comp]]),
+    levs.comps <- order(factor(unique(dataFrame[[input$comp]]),
       levels = comps
     ))
 
     if (input$group == "variable") {
-      levs <- order(factor(unique(dataframe[[input$group]]),
+      levs <- order(factor(unique(dataFrame[[input$group]]),
         levels = variables
       ))
     } else {
@@ -715,7 +713,7 @@ server <- function(input, output, session) {
     }
 
     gplot(
-      dataset = dataframe,
+      dataset = dataFrame,
       comparison = input$comp,
       group.by = input$group,
       geom = input$geom,
@@ -744,13 +742,36 @@ server <- function(input, output, session) {
     )
   }
 
+  # Create current plot
+  currentPlot <- reactive({
+    egg::set_panel_size(plotInput(),
+      width = unit(input$save.width, "mm"),
+      height = unit(input$save.height, "mm")
+    )
+  })
+
+  # Store current plot height
+  cpHeight <- reactive({
+    leg <- ggpubr::get_legend(plotInput())
+    lheight <- sum(as.numeric(grid::convertUnit(leg$height, "mm")))
+    return(sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")), lheight) * 3.7795275591)
+  })
+
+  # Store current plot width
+  cpWidth <- reactive({
+    leg <- ggpubr::get_legend(plotInput())
+    lwidth <- sum(as.numeric(grid::convertUnit(leg$width, "mm")))
+    return(sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")), lwidth) * 3.7795275591)
+  })
+
+
   # Calculate stats ####
   stats <- function() {
     variables <- c(input$variables)
-    groups <- unique(dataframe[[input$group]])
+    groups <- unique(dataFrame[[input$group]])
 
     if (input$group == "variable") {
-      levs <- order(factor(unique(dataframe[[input$group]]),
+      levs <- order(factor(unique(dataFrame[[input$group]]),
         levels = variables
       ))
     } else {
@@ -758,7 +779,7 @@ server <- function(input, output, session) {
     }
 
     gplot(
-      dataset = dataframe,
+      dataset = dataFrame,
       comparison = input$comp,
       group.by = input$group,
       errortype = input$errortype,
@@ -768,6 +789,7 @@ server <- function(input, output, session) {
       stats = T
     )
   }
+
 
   # Store user settings ####
   # AllInputs <- reactive({
@@ -787,18 +809,14 @@ server <- function(input, output, session) {
   #   updateSelectInput(session, 'comp', selected = inData$comp)
   #   updateSelectInput(session, 'group', selected = inData$group)
   #   updateSelectInput(session, 'group', selected = inData$group)
-  #   
+  #
   # })
-  # 
+  #
 
 
   # Create shape picker ####
   output$shapes <- renderUI({
-    req(input$variables, input$comp, input$comps, input$group, df())
-
-    sheets <- info()
-    c <- fi()
-    d <- df()
+    req(input$variables, input$comp, input$comps, input$group)
     comparison <- c(input$comp)
     comparisons <- c(input$comps)
     options <- c(19, 21, 17, 24, 15, 22)
@@ -829,11 +847,8 @@ server <- function(input, output, session) {
 
   # Create color picker ####
   output$colors <- renderUI({
-    req(input$variables, input$comp, input$comps, input$group, df())
+    req(input$variables, input$comp, input$comps, input$group)
 
-    sheets <- info()
-    c <- fi()
-    d <- df()
     comparison <- c(input$comp)
     comparisons <- c(input$comps)
     choices <- palette_cols()
@@ -859,11 +874,8 @@ server <- function(input, output, session) {
 
   # Create fill picker ####
   output$fills <- renderUI({
-    req(input$variables, input$comp, input$comps, input$group, df())
+    req(input$variables, input$comp, input$comps, input$group)
 
-    sheets <- info()
-    c <- fi()
-    d <- df()
     comparison <- c(input$comp)
     comparisons <- c(input$comps)
     comps <- input$comps
@@ -891,13 +903,9 @@ server <- function(input, output, session) {
 
   # Plot the data ####
   output$plot_display <- renderPlot({
-    sheets <- info()
-    fileIn <- fi()
-    d <- df()
-
     req(inFile, input$geom, input$comps, input$save.height, input$save.width)
 
-    lapply(1:length(unique(dataframe[[input$comp]])), function(i) {
+    lapply(1:length(unique(dataFrame[[input$comp]])), function(i) {
       req(
         input[[paste0("shape", i)]],
         input[[paste0("col", i)]],
@@ -905,15 +913,16 @@ server <- function(input, output, session) {
       )
     })
 
-    plt <<- egg::set_panel_size(plotInput(),
-      width = unit(input$save.width, "mm"),
-      height = unit(input$save.height, "mm")
-    )
-    gridExtra::grid.arrange(plt)
-  },
-  height = function() input$save.height * 3.7795275591 + 37.795275591 * 2,
-  width = function() input$save.width * 3.7795275591 + 37.795275591 * 2
-  )
+    gridExtra::grid.arrange(currentPlot())
+  })
+  #
+  #   # Create UI for plot ####
+  #   output$plot_display <- renderUI({
+  #     plotOutput("plot_contents",
+  #       height = cpHeight(),
+  #       width = cpWidth()
+  #     )
+  #   })
 
   # Save plot ####
   output$downloadPlot <- downloadHandler(
@@ -922,10 +931,10 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       ggsave(file,
-        plot = plt,
+        plot = currentPlot(),
         useDingbats = F,
-        height = input$save.height + 50,
-        width = input$save.width + 50,
+        height = cpHeight() / 3.7795275591,
+        width = cpWidth() / 3.7795275591,
         units = "mm", device = "pdf"
       )
     }
@@ -933,10 +942,6 @@ server <- function(input, output, session) {
 
   # Create stats table ####
   output$stat_display <- renderDataTable({
-    sheets <- info()
-    c <- fi()
-    d <- df()
-
     req(input$variables)
 
     stats()
@@ -955,18 +960,12 @@ server <- function(input, output, session) {
   # Create table of plotted data ####
   output$data_table_display <- renderDataTable({
     req(input$variables)
-    sheets <- info()
-    c <- fi()
-    d <- df()
-    dataframe
+    dataFrame
   })
 
   # Create table with raw data ####
   output$raw_data_table_display <- renderDataTable({
     req(input$variables)
-    sheets <- info()
-    c <- fi()
-    d <- df()
     rawData
   })
 
@@ -975,18 +974,11 @@ server <- function(input, output, session) {
     h <<- NULL
     w <<- NULL
     l <- length(plist)
-    p <- plotInput() #+ theme(legend.position = 'none')
-    eggp <- egg::set_panel_size(p,
-      width = unit(input$save.width, "mm"),
-      height = unit(input$save.height, "mm")
-    )
-    wlist[l + 1] <<- unit(sum(as.numeric(grid::convertUnit(eggp$widths, 'mm'))), 'mm')
-    hlist[l + 1] <<- unit(sum(as.numeric(grid::convertUnit(eggp$heights, 'mm'))), 'mm')
-    h <<- sum(hlist, 20) * 3.7795275591
-    w <<- sum(wlist, 20) * 3.7795275591
-    # print(h)
-    # print(w)
-    plist[[l + 1]] <<- eggp
+    wlist[l + 1] <<- cpWidth()
+    hlist[l + 1] <<- cpHeight()
+    h <<- sum(hlist)
+    w <<- sum(wlist)
+    plist[[l + 1]] <<- currentPlot()
   })
 
   # Clear last report from report ####
@@ -996,8 +988,8 @@ server <- function(input, output, session) {
       plist[[l]] <<- NULL
       wlist <<- head(wlist, -1)
       hlist <<- head(hlist, -1)
-      h <<- sum(hlist) * 3.7795275591
-      w <<- sum(wlist) * 3.7795275591
+      h <<- sum(hlist)
+      w <<- sum(wlist)
     }
   })
 
@@ -1027,14 +1019,6 @@ server <- function(input, output, session) {
     g <- input$plt2rprt
     r <- input$clear
     ra <- input$clearAll
-    # Common legend in report ###
-    # leg <- get_legend(plist[[1]])
-    # lheight <- sum(leg$height)
-    # lwidth <- sum(leg$width)
-    # legend <<- egg::set_panel_size(leg,
-    #                                height = lheight,
-    #                                width = lwidth)
-    # plist <<- append(plist, legend, 0)
 
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
