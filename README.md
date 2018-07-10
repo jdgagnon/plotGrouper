@@ -1,4 +1,4 @@
-# groupPlot
+# plotGrouper
 
 
 
