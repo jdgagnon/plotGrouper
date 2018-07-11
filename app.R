@@ -32,7 +32,7 @@ ui <- fluidPage(title = 'plotGrouper',
       h4("Plot", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         sidebarPanel(
-          tags$style(type="text/css", "body {padding-top: 135px;}"),
+          tags$style(type="text/css", "body {padding-top: 140px;}"),
           fileInput("file",
             "Choose info-file to upload",
             accept = c(
@@ -579,7 +579,7 @@ server <- function(input, output, session) {
   )
 
   palette_fills <- reactiveVal(
-    c("#00000080", "#00000000")
+    c("#444444", "#00000000")
   )
 
   # Incorporate aspect ratio
@@ -767,7 +767,6 @@ server <- function(input, output, session) {
     if (input$legend %in% c('top', 'bottom')) {
       total.width <- sum(pwidth, c(lwidth - pwidth))
     } else {
-      print('False')
       total.width <- sum(pwidth, lwidth)
     }
     
