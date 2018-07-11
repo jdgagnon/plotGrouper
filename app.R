@@ -27,10 +27,12 @@ ui <- fluidPage(title = 'plotGrouper',
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage(
     (tags$img(src="logo_white.png", width="100px", height = "100px")),
+    position = 'fixed-top',
     tabPanel(
       h4("Plot", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         sidebarPanel(
+          tags$style(type="text/css", "body {padding-top: 135px;}"),
           fileInput("file",
             "Choose info-file to upload",
             accept = c(
@@ -247,7 +249,6 @@ ui <- fluidPage(title = 'plotGrouper',
         ),
 
         mainPanel(
-          h1("Plot"),
           fluidRow(
             column(4, selectInput("geom",
               "Select geoms to plot",
@@ -383,7 +384,6 @@ ui <- fluidPage(title = 'plotGrouper',
       h4("Report", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         mainPanel(
-          h1("Report"),
           fluidRow(
             column(
               4,
@@ -446,8 +446,6 @@ ui <- fluidPage(title = 'plotGrouper',
       h4("Statistics", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         mainPanel(
-          h1("Statistics"),
-
           dataTableOutput("stat_display"),
 
           downloadButton("save.stat",
@@ -461,9 +459,8 @@ ui <- fluidPage(title = 'plotGrouper',
     ),
 
     tabPanel(
-      h4("Data", style = "margin-top: 40px; margin-bottom: 40px"),
+      h4("Plot Data", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
-        h1("Plot Data"),
         mainPanel(
           dataTableOutput("data_table_display")
         )
@@ -474,7 +471,6 @@ ui <- fluidPage(title = 'plotGrouper',
       h4("Raw Data", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         mainPanel(
-          h1("Raw Data"),
           dataTableOutput("raw_data_table_display")
         )
       )
