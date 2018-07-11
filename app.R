@@ -27,7 +27,7 @@ ui <- fluidPage(
   shinyjs::useShinyjs(),
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage(
-    (tags$img(src="logo_white2.png", width="100px", height = "100px")),
+    (tags$img(src="logo_white3.png", width="100px", height = "100px")),
     tabPanel(
       h4("Plot", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
