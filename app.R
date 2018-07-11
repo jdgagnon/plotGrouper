@@ -22,18 +22,19 @@ gplot <- dget("gplot.R") # Load plotting function
 
 # UI ----------------------------------------------------------------------
 
-ui <- fluidPage(title = 'plotGrouper',
+ui <- fluidPage(
+  title = "plotGrouper",
   # shinyjs::useShinyjs(),
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage(
-    (tags$img(src="logo_white.png", width="100px", height = "100px")),
+    (tags$img(src = "logo_white.png", width = "100px", height = "100px")),
     fluid = T,
-    position = 'fixed-top',
+    position = "fixed-top",
     tabPanel(
       h4("Plot", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         sidebarPanel(
-          tags$style(type="text/css", "body {padding-top: 140px;}"),
+          tags$style(type = "text/css", "body {padding-top: 140px;}"),
           fileInput("file",
             "Choose info-file to upload",
             accept = c(
@@ -246,7 +247,8 @@ ui <- fluidPage(title = 'plotGrouper',
               "Dilution factor",
               value = NULL
             ))
-          )
+          ),
+          actionButton("sampleFile", "Iris")
         ),
 
         mainPanel(
@@ -483,14 +485,10 @@ ui <- fluidPage(title = 'plotGrouper',
 
 
 server <- function(input, output, session) {
-
-  # Get file/read sheets ####
-  observeEvent(input$file, {
-    inFile <<- input$file
-    req(inFile)
-
-    # Identify sheets and use them as choices to load file
-    sheets <- readxl::excel_sheets(inFile$datapath)
+  observeEvent(input$sampleFile, {
+    nullCheck <<- NULL
+    inFile <<- "Place holder"
+    sheets <- readxl::excel_sheets("iris.xlsx")
     updateSelectInput(session,
       "sheet",
       "Select Sheet",
@@ -499,27 +497,50 @@ server <- function(input, output, session) {
     )
   })
 
+  # Get file/read sheets ####
+  observeEvent(input$file, {
+    nullCheck <<- T
+    inFile <<- input$file
+    req(inFile)
+    # Identify sheets and use them as choices to load file
+    sheets <- readxl::excel_sheets(inFile$datapath)
+    updateSelectInput(session,
+      "sheet",
+      "Select Sheet",
+      choices = sheets,
+      selected = sheets[1]
+    )
+  }, priority = 1)
+
   # Make tibble from file ####
   observeEvent({
     input$sheet
-    input$file
   }, {
     req(input$sheet, inFile)
-    # Read excel file in
-    for (i in 1:length(input$sheet)) {
-      a <- readxl::read_excel(inFile$datapath,
-        sheet = input$sheet[i],
-        col_names = input$header
-      ) %>%
-        mutate(Sheet = input$sheet[i]) %>%
-        select(Sheet, everything())
 
-      if (i == 1) {
-        f <- a
-      } else {
-        f <- bind_rows(f, a)
+    # Read excel file in
+    if (!is.null(nullCheck)) {
+      for (i in 1:length(input$sheet)) {
+        a <- readxl::read_excel(inFile$datapath,
+          sheet = input$sheet[i],
+          col_names = input$header
+        ) %>%
+          mutate(Sheet = input$sheet[i]) %>%
+          select(Sheet, everything())
+
+        if (i == 1) {
+          f <- a
+        } else {
+          f <- bind_rows(f, a)
+        }
+        rm(a)
       }
-      rm(a)
+    }
+
+    if (is.null(nullCheck)) {
+      f <- readxl::read_excel("iris.xlsx", col_names = T) %>%
+        mutate(Sheet = input$sheet) %>%
+        select(Sheet, everything())
     }
 
     column_names <- names(f)
@@ -573,7 +594,7 @@ server <- function(input, output, session) {
     rawData <<- f
 
     f
-  })
+  }, priority = 2)
 
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
@@ -594,8 +615,6 @@ server <- function(input, output, session) {
 
   observe({
     req(input$comp)
-    file <- input$file
-    sheet <- input$sheet
 
     vars <- unique(rawData[[input$comp]])
 
@@ -659,7 +678,7 @@ server <- function(input, output, session) {
     }
 
     dataFrame <<- d
-  })
+  }, priority = 3)
 
   # Create plot object ####
   plotInput <- function() {
@@ -751,16 +770,12 @@ server <- function(input, output, session) {
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
     leg <- ggpubr::get_legend(plotInput())
     lheight <- sum(as.numeric(grid::convertUnit(leg$height, "mm")))
-    if (input$legend %in% c('top', 'bottom')) {
+    if (input$legend %in% c("top", "bottom")) {
       total.height <- sum(pheight, lheight)
     } else {
       total.height <- pheight
     }
     # return total height in pixels
-    # print(paste('lheight:',lheight))
-    # print(paste('pheight:',pheight))
-    # print(paste('theight:',total.height))
-    # print(paste('pxheight:',total.height * 3.7795275591))
     return(total.height * 3.7795275591)
   })
 
@@ -769,14 +784,11 @@ server <- function(input, output, session) {
     pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
     leg <- ggpubr::get_legend(plotInput())
     lwidth <- sum(as.numeric(grid::convertUnit(leg$width, "mm")))
-    if (input$legend %in% c('top', 'bottom')) {
+    if (input$legend %in% c("top", "bottom")) {
       total.width <- sum(pwidth, c(lwidth - pwidth))
     } else {
       total.width <- sum(pwidth, lwidth)
     }
-    # return total width in pixels
-    # print(lwidth)
-    # print(pwidth)
     return(total.width * 3.7795275591)
   })
 
@@ -830,7 +842,7 @@ server <- function(input, output, session) {
   #
 
 
-  
+
   # Create shape picker ####
   output$shapes <- renderUI({
     req(input$variables, input$comp, input$comps, input$group)
@@ -952,7 +964,7 @@ server <- function(input, output, session) {
         useDingbats = F,
         height = sum((cpHeight() / 3.7795275591), 15),
         width = cpWidth() / 3.7795275591,
-        units = "mm", 
+        units = "mm",
         device = "pdf"
       )
     }
@@ -1002,7 +1014,7 @@ server <- function(input, output, session) {
     } else {
       hlist[length(hlist) + 1] <<- cpHeight()
     }
-    
+
     h <<- sum(hlist)
     w <<- sum(wlist)
     plist[[l + 1]] <<- currentPlot()
@@ -1013,20 +1025,20 @@ server <- function(input, output, session) {
     l <- length(plist)
     ncols <- length(wlist)
     nrows <- length(hlist)
-    
+
     if (l > 0) {
       plist[[l]] <<- NULL
       new_ncols <- floor(sqrt(l))
-      new_nrows <- floor((l)/new_ncols)
-      
+      new_nrows <- floor((l) / new_ncols)
+
       if (l == 2) {
         hlist <<- head(hlist, -1)
       }
-      
+
       if (new_ncols < ncols) {
         wlist <<- head(wlist, -1)
       }
-      
+
       if (new_nrows < nrows) {
         hlist <<- head(hlist, -1)
       }
@@ -1122,7 +1134,6 @@ server <- function(input, output, session) {
 
   # Stop app on close ####
   session$onSessionEnded(stopApp)
-
 }
 
 shiny::shinyApp(ui, server)
