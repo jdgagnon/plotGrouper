@@ -2,9 +2,8 @@
 <br>
 This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the `ggplot2` and `dplyr` from the tidyverse and batch statistical calculations from `ggpubr`.
 
-<br>
-Plots can be made using combinations of geoms such as
-
+Plots can be made using combinations of geoms including bar, violin, box, crossbar, density, point, line, and errorbar.
+<br><br>
 <img src="www/Bar_example.png" width ="350"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp: <img src="www/Violin_example.png" width ="350"/>
 <br><br><br><br>
 <img src="www/Box_example.png" width ="350" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="www/Crossbar_example.png" width ="350"/>
@@ -22,8 +21,6 @@ If you do not already have R installed, or your version is out of date, download
 
 
 Next, install the latest version of [RStudio Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
-
-Next, download the sample data [excel file](https://github.com/MrTcell/plotGrouper/blob/master/iris.xlsx)
 
 Finally, open RStudio and paste the following code in your R console and run it in order to install the required packages.
 
@@ -54,7 +51,7 @@ To initialize the shiny app, paste the following code in your R console and run 
 shiny::runGitHub("plotGrouper", "jdgagnon")
 ```
 
-Once the web app opens, browse to wherever you downloaded the example data file, "iris.xlsx", and open it.
+Once the web app opens, you can access the `iris` dataset by clicking the iris button to learn how to use the app.
 
 
 ## Authors
