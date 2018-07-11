@@ -1,4 +1,4 @@
-# plotGrouper
+<img src="www/logo.png" alt="drawing" width="200px"/>
 
 
 
