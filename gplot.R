@@ -484,9 +484,10 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
         family = "Helvetica",
         size = font_size,
         colour = "black"
-      )
+      ),
+      plot.margin = margin(5,5,5,5,'mm'),
+      legend.margin = margin(0,0,0,0, 'mm')
     )
-  # plot.margin = margin(1,1,1,1,'mm'))
 
   if (stats == F) {
     g

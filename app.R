@@ -23,10 +23,11 @@ gplot <- dget("gplot.R") # Load plotting function
 # UI ----------------------------------------------------------------------
 
 ui <- fluidPage(title = 'plotGrouper',
-  shinyjs::useShinyjs(),
+  # shinyjs::useShinyjs(),
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage(
     (tags$img(src="logo_white.png", width="100px", height = "100px")),
+    fluid = T,
     position = 'fixed-top',
     tabPanel(
       h4("Plot", style = "margin-top: 40px; margin-bottom: 40px"),
@@ -737,7 +738,7 @@ server <- function(input, output, session) {
     )
   }
 
-  # Create current plot
+  # Create current plot ####
   currentPlot <- reactive({
     egg::set_panel_size(plotInput(),
       width = unit(input$save.width, "mm"),
@@ -745,7 +746,7 @@ server <- function(input, output, session) {
     )
   })
 
-  # Store current plot height
+  # Store current plot height ####
   cpHeight <- reactive({
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
     leg <- ggpubr::get_legend(plotInput())
@@ -755,11 +756,15 @@ server <- function(input, output, session) {
     } else {
       total.height <- pheight
     }
-    
-    return(sum(total.height, 10) * 3.7795275591)
+    # return total height in pixels
+    # print(paste('lheight:',lheight))
+    # print(paste('pheight:',pheight))
+    # print(paste('theight:',total.height))
+    # print(paste('pxheight:',total.height * 3.7795275591))
+    return(total.height * 3.7795275591)
   })
 
-  # Store current plot width
+  # Store current plot width ####
   cpWidth <- reactive({
     pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
     leg <- ggpubr::get_legend(plotInput())
@@ -769,8 +774,10 @@ server <- function(input, output, session) {
     } else {
       total.width <- sum(pwidth, lwidth)
     }
-    
-    return(sum(total.width, 10) * 3.7795275591)
+    # return total width in pixels
+    # print(lwidth)
+    # print(pwidth)
+    return(total.width * 3.7795275591)
   })
 
 
@@ -800,7 +807,7 @@ server <- function(input, output, session) {
   }
 
 
-  # Store user settings ####
+  # Store user settings (not working) ####
   # AllInputs <- reactive({
   #   reactiveValuesToList(input)
   # })
@@ -943,9 +950,10 @@ server <- function(input, output, session) {
       ggsave(file,
         plot = currentPlot(),
         useDingbats = F,
-        height = cpHeight() / 3.7795275591,
+        height = sum((cpHeight() / 3.7795275591), 15),
         width = cpWidth() / 3.7795275591,
-        units = "mm", device = "pdf"
+        units = "mm", 
+        device = "pdf"
       )
     }
   )
@@ -984,8 +992,17 @@ server <- function(input, output, session) {
     h <<- NULL
     w <<- NULL
     l <- length(plist)
-    wlist[l + 1] <<- cpWidth()
-    hlist[l + 1] <<- cpHeight()
+    prev_numcol <- floor(sqrt(l + 1))
+    current_numcol <- floor(sqrt(l + 2))
+    if (l + 1 == 1) {
+      wlist[l + 1] <<- cpWidth()
+      hlist[l + 1] <<- cpHeight()
+    } else if (current_numcol > prev_numcol) {
+      wlist[length(wlist) + 1] <<- cpWidth()
+    } else {
+      hlist[length(hlist) + 1] <<- cpHeight()
+    }
+    
     h <<- sum(hlist)
     w <<- sum(wlist)
     plist[[l + 1]] <<- currentPlot()
@@ -993,13 +1010,27 @@ server <- function(input, output, session) {
 
   # Clear last report from report ####
   observeEvent(input$clear, {
-    h <<- NULL
-    w <<- NULL
     l <- length(plist)
+    ncols <- length(wlist)
+    nrows <- length(hlist)
+    
     if (l > 0) {
       plist[[l]] <<- NULL
-      wlist <<- head(wlist, -1)
-      hlist <<- head(hlist, -1)
+      new_ncols <- floor(sqrt(l))
+      new_nrows <- floor((l)/new_ncols)
+      
+      if (l == 2) {
+        hlist <<- head(hlist, -1)
+      }
+      
+      if (new_ncols < ncols) {
+        wlist <<- head(wlist, -1)
+      }
+      
+      if (new_nrows < nrows) {
+        hlist <<- head(hlist, -1)
+      }
+
       h <<- sum(hlist)
       w <<- sum(wlist)
     }
@@ -1081,8 +1112,8 @@ server <- function(input, output, session) {
       ggsave(file,
         plot = plots(),
         useDingbats = F,
-        height = (h / 3.7795275591) + 20,
-        width = (w / 3.7795275591) + 20,
+        height = (h / 3.7795275591),
+        width = (w / 3.7795275591),
         units = "mm",
         device = "pdf"
       )
@@ -1090,9 +1121,8 @@ server <- function(input, output, session) {
   )
 
   # Stop app on close ####
-  session$onSessionEnded(function() {
-    stopApp()
-  })
+  session$onSessionEnded(stopApp)
+
 }
 
 shiny::shinyApp(ui, server)
