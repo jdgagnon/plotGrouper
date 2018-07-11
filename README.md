@@ -1,4 +1,4 @@
-<img src="www/logo.png" alt="drawing" width="200px"/>
+<img src="www/logo_small.png" alt="drawing"/>
 
 
 
@@ -6,9 +6,7 @@ This package was designed as a tool for generating figure-ready graphs from data
 
 Plots can be made using combinations of geoms such as
 
-![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Bar_example.png)
-
-
+<img src="www/Bar_example.png" alt="drawing"/>
 
 ![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Violin_example.png)
 
