@@ -31,7 +31,7 @@ ui <- fluidPage(
     fluid = T,
     position = "fixed-top",
     tabPanel(
-      h4("Plot", style = "margin-top: 40px; margin-bottom: 40px"),
+      h2("Plot", style = "margin-top: 30px; margin-bottom: 30px"),
       fluidPage(
         sidebarPanel(
           tags$style(type = "text/css", "body {padding-top: 140px;}"),
@@ -384,7 +384,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      h4("Report", style = "margin-top: 40px; margin-bottom: 40px"),
+      h2("Report", style = "margin-top: 30px; margin-bottom: 30px"),
       fluidPage(
         mainPanel(
           fluidRow(
@@ -446,7 +446,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      h4("Statistics", style = "margin-top: 40px; margin-bottom: 40px"),
+      h2("Statistics", style = "margin-top: 30px; margin-bottom: 30px"),
       fluidPage(
         mainPanel(
           dataTableOutput("stat_display"),
@@ -462,7 +462,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      h4("Plot Data", style = "margin-top: 40px; margin-bottom: 40px"),
+      h2("Plot Data", style = "margin-top: 30px; margin-bottom: 30px"),
       fluidPage(
         mainPanel(
           dataTableOutput("data_table_display")
@@ -471,7 +471,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      h4("Raw Data", style = "margin-top: 40px; margin-bottom: 40px"),
+      h2("Raw Data", style = "margin-top: 30px; margin-bottom: 30px"),
       fluidPage(
         mainPanel(
           dataTableOutput("raw_data_table_display")
