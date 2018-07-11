@@ -22,7 +22,7 @@ gplot <- dget("gplot.R") # Load plotting function
 
 # UI ----------------------------------------------------------------------
 
-ui <- fluidPage(
+ui <- function(request) {fluidPage(
   title = "plotGrouper",
   # shinyjs::useShinyjs(),
   theme = shinythemes::shinytheme("cosmo"),
@@ -478,8 +478,8 @@ ui <- fluidPage(
         )
       )
     )
-  )
-)
+  ), bookmarkButton()
+)}
 
 # Server ------------------------------------------------------------------
 
@@ -511,6 +511,7 @@ server <- function(input, output, session) {
       selected = sheets[1]
     )
   }, priority = 1)
+  
 
   # Make tibble from file ####
   observeEvent({
@@ -1136,4 +1137,4 @@ server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
 }
 
-shiny::shinyApp(ui, server)
+shiny::shinyApp(ui, server, enableBookmarking = "server")
