@@ -1,4 +1,4 @@
-<img src="www/logo_small.png" alt="drawing"/>
+<img src="www/logo_small.png" alt="drawing" width ="300"/>
 
 
 
@@ -6,17 +6,10 @@ This package was designed as a tool for generating figure-ready graphs from data
 
 Plots can be made using combinations of geoms such as
 
-<img src="www/Bar_example.png" alt="drawing"/>
+<img src="www/Bar_example.png" alt="drawing" width ="350"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="www/Violin_example.png" alt="drawing" width ="350"/>
+<br><br><br><br>
+<img src="www/Box_example.png" alt="drawing" width ="350" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="www/Crossbar_example.png" alt="drawing" width ="350"/>
 
-![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Violin_example.png)
-
-
-
-![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Box_example.png)
-
-
-
-![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Crossbar_example.png)
 
 
 ## Getting Started
