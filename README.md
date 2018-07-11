@@ -2,6 +2,7 @@
 <br>
 This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the `ggplot2` and `dplyr` from the tidyverse and batch statistical calculations from `ggpubr`.
 
+<br>
 Plots can be made using combinations of geoms such as
 
 <img src="www/Bar_example.png" width ="350"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp: <img src="www/Violin_example.png" width ="350"/>
