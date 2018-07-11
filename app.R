@@ -22,7 +22,7 @@ gplot <- dget("gplot.R") # Load plotting function
 
 # UI ----------------------------------------------------------------------
 
-ui <- fluidPage(
+ui <- fluidPage(title = 'plotGrouper',
   shinyjs::useShinyjs(),
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage(
