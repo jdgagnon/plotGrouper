@@ -6,19 +6,19 @@ This package was designed as a tool for generating figure-ready graphs from data
 
 Plots can be made using combinations of geoms such as
 
-![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Bar_example.png)
+![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Bar_example.png)
 
 
 
-![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Violin_example.png)
+![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Violin_example.png)
 
 
 
-![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Box_example.png)
+![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Box_example.png)
 
 
 
-![alt text](https://raw.githubusercontent.com/jdgagnon/groupPlot/master/Examples/Crossbar_example.png)
+![alt text](https://raw.githubusercontent.com/jdgagnon/plotGrouper/master/Examples/Crossbar_example.png)
 
 
 ## Getting Started
@@ -33,7 +33,7 @@ If you do not already have R installed, or your version is out of date, download
 
 Next, install the latest version of [RStudio Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
 
-Next, download the sample data [excel file](https://github.com/MrTcell/groupPlot/blob/master/iris.xlsx)
+Next, download the sample data [excel file](https://github.com/MrTcell/plotGrouper/blob/master/iris.xlsx)
 
 Finally, open RStudio and paste the following code in your R console and run it in order to install the required packages.
 
@@ -56,7 +56,7 @@ install.packages("shiny")
 
 ### Installing & Running
 
-After installing the `shiny` package, you are ready to run `groupPlot`.
+After installing the `shiny` package, you are ready to run `plotGrouper`.
 
 To initialize the shiny app, paste the following code in your R console and run it.
 
@@ -77,14 +77,6 @@ GNU GPL-3.0-or-later
 
 [licence](https://www.gnu.org/licenses/gpl.txt)
 
-## Acknowledgments & Packages Used
+## Acknowledgments
 
-* tidyverse
-* Hmisc
-* readxl
-* gridExtra
-* egg
-* ggpubr
-* shinyjs
-* shinythemes
-* colourpicker
+Logo designed by Jarrett Dow
