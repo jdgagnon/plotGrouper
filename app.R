@@ -27,9 +27,10 @@ ui <- fluidPage(
   shinyjs::useShinyjs(),
   theme = shinythemes::shinytheme("cosmo"),
   navbarPage(
-    "Grouped Plot",
+    (tags$img(src="logo_white.png", width="100px", height = "100px")), 
+    fluid = T,
     tabPanel(
-      "Plot",
+      h4("Plot", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         sidebarPanel(
           fileInput("file",
@@ -286,7 +287,7 @@ ui <- fluidPage(
                 "left",
                 "none"
               ),
-              selected = "bottom"
+              selected = "right"
             )),
             # column(3, sliderInput('aspect.ratio',
             #                       "Aspect ratio",
@@ -381,7 +382,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      "Report",
+      h4("Report", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         mainPanel(
           h1("Report"),
@@ -444,7 +445,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      "Statistics",
+      h4("Statistics", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         mainPanel(
           h1("Statistics"),
@@ -462,7 +463,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      "Data",
+      h4("Data", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         h1("Plot Data"),
         mainPanel(
@@ -472,7 +473,7 @@ ui <- fluidPage(
     ),
 
     tabPanel(
-      "Raw Data",
+      h4("Raw Data", style = "margin-top: 40px; margin-bottom: 40px"),
       fluidPage(
         mainPanel(
           h1("Raw Data"),
@@ -752,16 +753,31 @@ server <- function(input, output, session) {
 
   # Store current plot height
   cpHeight <- reactive({
+    pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
     leg <- ggpubr::get_legend(plotInput())
     lheight <- sum(as.numeric(grid::convertUnit(leg$height, "mm")))
-    return(sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")), lheight) * 3.7795275591)
+    if (input$legend %in% c('top', 'bottom')) {
+      total.height <- sum(pheight, lheight)
+    } else {
+      total.height <- pheight
+    }
+    
+    return(sum(total.height, 10) * 3.7795275591)
   })
 
   # Store current plot width
   cpWidth <- reactive({
+    pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
     leg <- ggpubr::get_legend(plotInput())
     lwidth <- sum(as.numeric(grid::convertUnit(leg$width, "mm")))
-    return(sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")), lwidth) * 3.7795275591)
+    if (input$legend %in% c('top', 'bottom')) {
+      total.width <- sum(pwidth, c(lwidth - pwidth))
+    } else {
+      print('False')
+      total.width <- sum(pwidth, lwidth)
+    }
+    
+    return(sum(total.width, 10) * 3.7795275591)
   })
 
 
@@ -814,6 +830,7 @@ server <- function(input, output, session) {
   #
 
 
+  
   # Create shape picker ####
   output$shapes <- renderUI({
     req(input$variables, input$comp, input$comps, input$group)
@@ -983,6 +1000,8 @@ server <- function(input, output, session) {
 
   # Clear last report from report ####
   observeEvent(input$clear, {
+    h <<- NULL
+    w <<- NULL
     l <- length(plist)
     if (l > 0) {
       plist[[l]] <<- NULL
@@ -1006,11 +1025,15 @@ server <- function(input, output, session) {
 
   reportHeight <- reactive({
     pltrprt <- input$plt2rprt
+    clearlast <- input$clear
+    clearall <- input$clearAll
     return(h)
   })
 
   reportWidth <- reactive({
     pltrprt <- input$plt2rprt
+    clearlast <- input$clear
+    clearall <- input$clearAll
     return(w)
   })
 
