@@ -364,21 +364,21 @@ ui <- function(request) {fluidPage(
               value = 0.5,
               step = 0.25
             ))
-          ),
+          )#,
 
-          textAreaInput("console",
-            "Pass code to manipulate data frame",
-            value = "dataFrame <<- dataFrame %>%",
-            width = 800,
-            height = 200
-          ),
-
-          actionButton("run",
-            "Run",
-            style = "color: #fff; 
-                                      background-color: #337ab7; 
-                                      border-color: #2e6da4"
-          )
+          # textAreaInput("console",
+          #   "Pass code to manipulate data frame",
+          #   value = "dataFrame <<- dataFrame %>%",
+          #   width = 800,
+          #   height = 200
+          # ),
+          # 
+          # actionButton("run",
+          #   "Run",
+          #   style = "color: #fff; 
+          #                             background-color: #337ab7; 
+          #                             border-color: #2e6da4"
+          # )
         )
       )
     ),
@@ -478,13 +478,15 @@ ui <- function(request) {fluidPage(
         )
       )
     )
-  ), bookmarkButton()
+  # ), bookmarkButton()
+  )
 )}
 
 # Server ------------------------------------------------------------------
 
 
 server <- function(input, output, session) {
+  
   observeEvent(input$sampleFile, {
     nullCheck <<- NULL
     inFile <<- "Place holder"
@@ -596,41 +598,43 @@ server <- function(input, output, session) {
     f
   }, priority = 2)
   
-  onBookmark(function(state) {
-    state$values$currentSheets <- input$sheet
-    state$values$currentColumns <- input$columns
-    state$values$currentVariables <- input$variables
-    state$values$currentComp <- input$comp
-    state$values$currentId <- input$id
-    state$values$currentGroup <- input$group
-  })
-  
-  onRestored(function(state) {
-    updateSelectInput(session,
-                      "sheet",
-                      selected = state$values$currentSheets
-    )
-    updateSelectInput(session,
-                      "columns",
-                      selected = state$values$currentColumns
-    )
-    updateSelectInput(session,
-                      "variables",
-                      selected = state$values$currentVariables
-    )
-    updateSelectInput(session,
-                      "comp",
-                      selected = state$values$currentComp
-    )
-    updateSelectInput(session,
-                      "id",
-                      selected = state$values$currentId
-    )
-    updateSelectInput(session,
-                      "group",
-                      selected = state$values$currentGroup
-    )
-  })
+  # Bookmarking ####
+  # onBookmark(function(state) {
+  #   state$values$currentSheets <- input$sheet
+  #   state$values$currentColumns <- input$columns
+  #   state$values$currentVariables <- input$variables
+  #   state$values$currentComp <- input$comp
+  #   state$values$currentId <- input$id
+  #   state$values$currentGroup <- input$group
+  #   state$values$currentComps <- input$comps
+  # })
+  # 
+  # onRestored(function(state) {
+  #   updateSelectInput(session,
+  #                     "sheet",
+  #                     selected = state$values$currentSheets
+  #   )
+  #   # updateSelectInput(session,
+  #   #                   "columns",
+  #   #                   selected = state$values$currentColumns
+  #   # )
+  #   updateSelectInput(session,
+  #                     "variables",
+  #                     selected = state$values$currentVariables
+  #   )
+  #   updateSelectInput(session,
+  #                     "comp",
+  #                     selected = state$values$currentComp
+  #   )
+  #   updateSelectInput(session,
+  #                     "id",
+  #                     selected = state$values$currentId
+  #   )
+  #   updateSelectInput(session,
+  #                     "group",
+  #                     selected = state$values$currentGroup
+  #   )
+  # })
 
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
@@ -722,6 +726,12 @@ server <- function(input, output, session) {
     groups <- unique(dataFrame[[input$group]])
     comparisons <- unique(dataFrame[[input$comp]])
     comps <- c(input$comps)
+    
+    if (input$y.lab == "") {
+      y.lab <- NULL
+    } else {
+      y.lab <- input$y.lab
+    }
 
     ref.group <- NULL
 
@@ -755,13 +765,13 @@ server <- function(input, output, session) {
       updateTextInput(session, "trim", value = "none")
     }
 
-    if (input$run) {
-      isolate({
-        assign("a", input$console)
-        a <- gsub("[“”]", "\"", gsub("[‘’]", "'", a))
-        eval(parse(text = a))
-      })
-    }
+    # if (input$run) {
+    #   isolate({
+    #     assign("a", input$console)
+    #     a <- gsub("[“”]", "\"", gsub("[‘’]", "'", a))
+    #     eval(parse(text = a))
+    #   })
+    # }
 
     gplot(
       dataset = dataFrame,
@@ -782,7 +792,7 @@ server <- function(input, output, session) {
       split = input$split,
       trim = input$trim,
       angle = input$angle.x,
-      y.lab = input$y.lab,
+      y.lab = y.lab,
       leg.pos = input$legend,
       levs = levs,
       levs.comps = levs.comps,
@@ -1172,4 +1182,4 @@ server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
 }
 
-shiny::shinyApp(ui, server, enableBookmarking = "server")
+shiny::shinyApp(ui, server)

@@ -185,7 +185,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       )
   }
 
-  if (is.null(y.lab) | y.lab == "") {
+  if (is.null(y.lab)) {
     y.lab <- unique(df$variable)
 
     if (length(y.lab) > 1) {
