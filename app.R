@@ -511,7 +511,6 @@ server <- function(input, output, session) {
       selected = sheets[1]
     )
   }, priority = 1)
-  
 
   # Make tibble from file ####
   observeEvent({
@@ -596,6 +595,42 @@ server <- function(input, output, session) {
 
     f
   }, priority = 2)
+  
+  onBookmark(function(state) {
+    state$values$currentSheets <- input$sheet
+    state$values$currentColumns <- input$columns
+    state$values$currentVariables <- input$variables
+    state$values$currentComp <- input$comp
+    state$values$currentId <- input$id
+    state$values$currentGroup <- input$group
+  })
+  
+  onRestored(function(state) {
+    updateSelectInput(session,
+                      "sheet",
+                      selected = state$values$currentSheets
+    )
+    updateSelectInput(session,
+                      "columns",
+                      selected = state$values$currentColumns
+    )
+    updateSelectInput(session,
+                      "variables",
+                      selected = state$values$currentVariables
+    )
+    updateSelectInput(session,
+                      "comp",
+                      selected = state$values$currentComp
+    )
+    updateSelectInput(session,
+                      "id",
+                      selected = state$values$currentId
+    )
+    updateSelectInput(session,
+                      "group",
+                      selected = state$values$currentGroup
+    )
+  })
 
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
