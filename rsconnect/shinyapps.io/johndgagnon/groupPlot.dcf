@@ -5,8 +5,8 @@ account: johndgagnon
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 372566
-bundleId: 1464707
+bundleId: 1479255
 url: https://johndgagnon.shinyapps.io/groupPlot/
-when: 1530715280.46547
+when: 1531494335.08468
 asMultiple: FALSE
 asStatic: FALSE

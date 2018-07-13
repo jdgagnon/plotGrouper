@@ -482,8 +482,7 @@ ui <- function(request) {fluidPage(
         )
       )
     )
-  # ), bookmarkButton()
-  )
+  ), bookmarkButton()
 )}
 
 # Server ------------------------------------------------------------------
@@ -625,32 +624,32 @@ server <- function(input, output, session) {
   #   state$values$currentComps <- input$comps
   # })
   # 
-  # onRestored(function(state) {
-  #   updateSelectInput(session,
-  #                     "sheet",
-  #                     selected = state$values$currentSheets
-  #   )
-  #   # updateSelectInput(session,
-  #   #                   "columns",
-  #   #                   selected = state$values$currentColumns
-  #   # )
-  #   updateSelectInput(session,
-  #                     "variables",
-  #                     selected = state$values$currentVariables
-  #   )
-  #   updateSelectInput(session,
-  #                     "comp",
-  #                     selected = state$values$currentComp
-  #   )
-  #   updateSelectInput(session,
-  #                     "id",
-  #                     selected = state$values$currentId
-  #   )
-  #   updateSelectInput(session,
-  #                     "group",
-  #                     selected = state$values$currentGroup
-  #   )
-  # })
+  onRestored(function(state) {
+    updateSelectInput(session,
+                      "sheet",
+                      selected = state$input$sheet
+    )
+    updateSelectInput(session,
+                      "columns",
+                      selected = state$input$columns
+    )
+    updateSelectInput(session,
+                      "variables",
+                      selected = state$input$variables
+    )
+    updateSelectInput(session,
+                      "comp",
+                      selected = state$input$comp
+    )
+    updateSelectInput(session,
+                      "id",
+                      selected = state$input$id
+    )
+    updateSelectInput(session,
+                      "group",
+                      selected = state$input$group
+    )
+  })
 
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
@@ -703,7 +702,7 @@ server <- function(input, output, session) {
         input$group,
         input$comps
     )
-    print(input$columns)
+ 
     d <- gather(
       rawData(),
       variable,
@@ -735,7 +734,6 @@ server <- function(input, output, session) {
         ungroup() %>%
         filter(variable %in% c(input$variables)) %>%
         filter(!grepl("Bead|Ungated", variable))
-      print("this ran")
       } else {
       d <- d %>%
         filter(variable %in% c(input$variables)) %>%
@@ -1211,4 +1209,4 @@ server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
 }
 
-shiny::shinyApp(ui, server)
+shiny::shinyApp(ui, server, enableBookmarking = "server")
