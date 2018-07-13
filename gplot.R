@@ -7,7 +7,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
          group.by = NULL, # Specify the variable to group by (e.g., Tissue)
          levs = T,
          val = "value", # If your tibble is not 'tidy', and there are multiple value columns, specify the one you want to plot
-         geom = c("bar", "errorbar", "dot", "stat", "seg"), # Define the list of geoms you want to plot
+         geom = c("bar", "errorbar", "point", "stat", "seg"), # Define the list of geoms you want to plot
          p = "p.signif", # Specify representation of pvalue ('p.signif' = *; 'p.format' = 'p = 0.05')
          ref.group = NULL,
          comparisons = NULL,
@@ -35,11 +35,11 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
          stroke = 0.5,
          font_size = 9,
          size = 1,
-         width = 0.75,
-         dodge = 0.75,
+         width = 0.8,
+         dodge = 0.85,
          shape.groups = c(19, 21),
          color.groups = c("black", "black"),
-         fill.groups = c("black", NA)) {
+         fill.groups = c("#444444", NA)) {
   df <- droplevels(dataset)
 
   # Assign labels to the groups
@@ -169,6 +169,10 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
 
 
   if (("try-error" %in% class(statOut))) {
+    statistics <- tibble("p.signif" = NA)
+  }
+  
+  if (("try-error" %in% class(statistics))) {
     statistics <- tibble("p.signif" = NA)
   }
 

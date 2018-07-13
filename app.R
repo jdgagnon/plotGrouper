@@ -237,6 +237,10 @@ ui <- function(request) {fluidPage(
             "ID column",
             choices = NULL
           ),
+          
+          checkboxInput("count", 
+                        "# Beads/dilution factor included in data",
+                        value = F),
 
           fluidRow(
             column(6, numericInput("bead",
@@ -487,6 +491,9 @@ ui <- function(request) {fluidPage(
 
 server <- function(input, output, session) {
   
+  dataFrame <- reactiveVal(NULL)
+  rawData <- reactiveVal(NULL)
+  
   observeEvent(input$sampleFile, {
     nullCheck <<- NULL
     inFile <<- "Place holder"
@@ -518,7 +525,7 @@ server <- function(input, output, session) {
   observeEvent({
     input$sheet
   }, {
-    req(input$sheet, inFile)
+    req(input$sheet)
 
     # Read excel file in
     if (!is.null(nullCheck)) {
@@ -529,6 +536,17 @@ server <- function(input, output, session) {
         ) %>%
           mutate(Sheet = input$sheet[i]) %>%
           select(Sheet, everything())
+        
+        column_names <- names(a)
+        column_names <- str_replace_all(column_names, c(
+          ",Freq. of Parent" = " %",
+          ",Count" = " #",
+          "—" = "-",
+          ",," = "",
+          ",Median,<.*>," = " MFI "
+        ))
+        
+        colnames(a) <- column_names
 
         if (i == 1) {
           f <- a
@@ -545,16 +563,7 @@ server <- function(input, output, session) {
         select(Sheet, everything())
     }
 
-    column_names <- names(f)
-    column_names <- str_replace_all(column_names, c(
-      ",Freq. of Parent" = " %",
-      ",Count" = " #",
-      "—" = "-",
-      ",," = "",
-      ",Median,<.*>," = " MFI "
-    ))
 
-    colnames(f) <- column_names
 
     vars <- names(f)
     columns_select <- c(
@@ -565,9 +574,17 @@ server <- function(input, output, session) {
       "Condition",
       "Mouse",
       "Target",
-      "Species"
+      "Species",
+      "Dilution",
+      "Total Beads", 
+      "Total Bead"
     )
-    variables <- vars[which(!vars %in% c(columns_select, "Bead %"))]
+    variables <- vars[which(!vars %in% c(
+      columns_select, 
+      "Bead %", 
+      "Bead #", 
+      "Beads %",
+      "Beads #"))]
     updateSelectInput(session, "columns",
       choices = vars,
       selected = vars[which(vars %in% columns_select)]
@@ -593,9 +610,8 @@ server <- function(input, output, session) {
       )
     }
 
-    rawData <<- f
+    rawData(f)
 
-    f
   }, priority = 2)
   
   # Bookmarking ####
@@ -656,7 +672,7 @@ server <- function(input, output, session) {
   observe({
     req(input$comp)
 
-    vars <- unique(rawData[[input$comp]])
+    vars <- unique(rawData()[[input$comp]])
 
     if (is.null(vars)) {
       vars <- character(0)
@@ -680,18 +696,16 @@ server <- function(input, output, session) {
     input$comp
     input$group
     input$comps
+    input$count
   }, {
-    req(
-      inFile,
-      input$sheet,
-      input$columns,
-      input$comp,
-      input$comps,
-      input$variables
+    req(input$variables,
+        input$comp,
+        input$group,
+        input$comps
     )
-
+    print(input$columns)
     d <- gather(
-      rawData,
+      rawData(),
       variable,
       value,
       -c(input$columns)
@@ -711,20 +725,31 @@ server <- function(input, output, session) {
         ungroup() %>%
         filter(variable %in% c(input$variables)) %>%
         filter(!grepl("Bead|Ungated", variable))
-    } else {
+    } else if (input$count == T) {
+      d <- d %>%
+        group_by_(input$id) %>%
+        mutate(value = ifelse(str_detect(variable, "#"),
+                              (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
+                              value
+        )) %>%
+        ungroup() %>%
+        filter(variable %in% c(input$variables)) %>%
+        filter(!grepl("Bead|Ungated", variable))
+      print("this ran")
+      } else {
       d <- d %>%
         filter(variable %in% c(input$variables)) %>%
         filter(!grepl("Bead|Ungated", variable))
     }
 
-    dataFrame <<- d
+    dataFrame(d)
   }, priority = 3)
 
   # Create plot object ####
   plotInput <- function() {
     variables <- c(input$variables)
-    groups <- unique(dataFrame[[input$group]])
-    comparisons <- unique(dataFrame[[input$comp]])
+    groups <- unique(dataFrame()[[input$group]])
+    comparisons <- unique(dataFrame()[[input$comp]])
     comps <- c(input$comps)
     
     if (input$y.lab == "") {
@@ -739,12 +764,12 @@ server <- function(input, output, session) {
       ref.group <- comps[1]
     }
 
-    levs.comps <- order(factor(unique(dataFrame[[input$comp]]),
+    levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
       levels = comps
     ))
 
     if (input$group == "variable") {
-      levs <- order(factor(unique(dataFrame[[input$group]]),
+      levs <- order(factor(unique(dataFrame()[[input$group]]),
         levels = variables
       ))
     } else {
@@ -774,7 +799,7 @@ server <- function(input, output, session) {
     # }
 
     gplot(
-      dataset = dataFrame,
+      dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
       geom = input$geom,
@@ -815,7 +840,9 @@ server <- function(input, output, session) {
   cpHeight <- reactive({
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
     leg <- ggpubr::get_legend(plotInput())
-    lheight <- sum(as.numeric(grid::convertUnit(leg$height, "mm")))
+    lheight <- ifelse(input$legend != "none", 
+                      sum(as.numeric(grid::convertUnit(leg$height, "mm"))),
+                      0)
     if (input$legend %in% c("top", "bottom")) {
       total.height <- sum(pheight, lheight)
     } else {
@@ -829,7 +856,9 @@ server <- function(input, output, session) {
   cpWidth <- reactive({
     pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
     leg <- ggpubr::get_legend(plotInput())
-    lwidth <- sum(as.numeric(grid::convertUnit(leg$width, "mm")))
+    lwidth <- ifelse(input$legend != "none",
+                     sum(as.numeric(grid::convertUnit(leg$width, "mm"))),
+                     0)
     if (input$legend %in% c("top", "bottom")) {
       total.width <- sum(pwidth, c(lwidth - pwidth))
     } else {
@@ -842,10 +871,10 @@ server <- function(input, output, session) {
   # Calculate stats ####
   stats <- function() {
     variables <- c(input$variables)
-    groups <- unique(dataFrame[[input$group]])
+    groups <- unique(dataFrame()[[input$group]])
 
     if (input$group == "variable") {
-      levs <- order(factor(unique(dataFrame[[input$group]]),
+      levs <- order(factor(unique(dataFrame()[[input$group]]),
         levels = variables
       ))
     } else {
@@ -853,7 +882,7 @@ server <- function(input, output, session) {
     }
 
     gplot(
-      dataset = dataFrame,
+      dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
       errortype = input$errortype,
@@ -980,7 +1009,7 @@ server <- function(input, output, session) {
   output$plot_display <- renderPlot({
     req(inFile, input$geom, input$comps, input$save.height, input$save.width)
 
-    lapply(1:length(unique(dataFrame[[input$comp]])), function(i) {
+    lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
       req(
         input[[paste0("shape", i)]],
         input[[paste0("col", i)]],
@@ -1036,13 +1065,13 @@ server <- function(input, output, session) {
   # Create table of plotted data ####
   output$data_table_display <- renderDataTable({
     req(input$variables)
-    dataFrame
+    dataFrame()
   })
 
   # Create table with raw data ####
   output$raw_data_table_display <- renderDataTable({
     req(input$variables)
-    rawData
+    rawData()
   })
 
   # Add current plot to report ####
