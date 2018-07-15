@@ -854,31 +854,6 @@ server <- function(input, output, session) {
     )
   }
 
-
-  # Store user settings (not working) ####
-  # AllInputs <- reactive({
-  #   reactiveValuesToList(input)
-  # })
-  #
-  # observeEvent(input$submit, {
-  #   saveData(AllInputs())
-  # })
-  #
-  # observeEvent(input$load,{
-  #   files <- list.files(outputDir, full.names = TRUE)
-  #   inData <- dget(file = files)
-  #   updateSelectInput(session, 'sheet', selected = inData$sheet)
-  #   updateSelectInput(session, 'columns', selected = inData$columns)
-  #   updateSelectInput(session, 'variables', selected = inData$variables)
-  #   updateSelectInput(session, 'comp', selected = inData$comp)
-  #   updateSelectInput(session, 'group', selected = inData$group)
-  #   updateSelectInput(session, 'group', selected = inData$group)
-  #
-  # })
-  #
-
-
-
   # Create shape picker ####
   output$shapes <- renderUI({
     req(input$variables, input$comp, input$comps, input$group)
@@ -980,14 +955,6 @@ server <- function(input, output, session) {
 
     gridExtra::grid.arrange(currentPlot())
   })
-  #
-  #   # Create UI for plot ####
-  #   output$plot_display <- renderUI({
-  #     plotOutput("plot_contents",
-  #       height = cpHeight(),
-  #       width = cpWidth()
-  #     )
-  #   })
 
   # Save plot ####
   output$downloadPlot <- downloadHandler(
