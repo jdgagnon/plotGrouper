@@ -613,43 +613,6 @@ server <- function(input, output, session) {
 
   }, priority = 2)
   
-  # Bookmarking ####
-  # onBookmark(function(state) {
-  #   state$values$currentSheets <- input$sheet
-  #   state$values$currentColumns <- input$columns
-  #   state$values$currentVariables <- input$variables
-  #   state$values$currentComp <- input$comp
-  #   state$values$currentId <- input$id
-  #   state$values$currentGroup <- input$group
-  #   state$values$currentComps <- input$comps
-  # })
-  # 
-  onRestored(function(state) {
-    updateSelectInput(session,
-                      "sheet",
-                      selected = state$input$sheet
-    )
-    updateSelectInput(session,
-                      "columns",
-                      selected = state$input$columns
-    )
-    updateSelectInput(session,
-                      "variables",
-                      selected = state$input$variables
-    )
-    updateSelectInput(session,
-                      "comp",
-                      selected = state$input$comp
-    )
-    updateSelectInput(session,
-                      "id",
-                      selected = state$input$id
-    )
-    updateSelectInput(session,
-                      "group",
-                      selected = state$input$group
-    )
-  })
 
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
@@ -1204,6 +1167,34 @@ server <- function(input, output, session) {
       )
     }
   )
+  
+  
+  onRestored(function(state) {
+    updateSelectInput(session,
+                      "sheet",
+                      selected = state$input$sheet
+    )
+    updateSelectInput(session,
+                      "columns",
+                      selected = state$input$columns
+    )
+    updateSelectInput(session,
+                      "variables",
+                      selected = state$input$variables
+    )
+    updateSelectInput(session,
+                      "comp",
+                      selected = state$input$comp
+    )
+    updateSelectInput(session,
+                      "id",
+                      selected = state$input$id
+    )
+    updateSelectInput(session,
+                      "group",
+                      selected = state$input$group
+    )
+  })
 
   # Stop app on close ####
   session$onSessionEnded(stopApp)
