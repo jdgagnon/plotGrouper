@@ -493,9 +493,12 @@ server <- function(input, output, session) {
   dataFrame <- reactiveVal(NULL)
   rawData <- reactiveVal(NULL)
   
+  nullCheck <- eventReactive(input$file, {
+    return(T)
+  })
+  
   observeEvent(input$sampleFile, {
-    nullCheck <<- NULL
-    inFile <<- "Place holder"
+    inFile <<- NULL
     sheets <- readxl::excel_sheets("iris.xlsx")
     updateSelectInput(session,
       "sheet",
@@ -507,11 +510,9 @@ server <- function(input, output, session) {
 
   # Get file/read sheets ####
   observeEvent(input$file, {
-    nullCheck <<- T
     inFile <<- input$file
-    req(inFile)
     # Identify sheets and use them as choices to load file
-    sheets <- readxl::excel_sheets(inFile$datapath)
+    sheets <- readxl::excel_sheets(input$file$datapath)
     updateSelectInput(session,
       "sheet",
       "Select Sheet",
@@ -527,9 +528,9 @@ server <- function(input, output, session) {
     req(input$sheet)
 
     # Read excel file in
-    if (!is.null(nullCheck)) {
+    if (!is.null(inFile)) {
       for (i in 1:length(input$sheet)) {
-        a <- readxl::read_excel(inFile$datapath,
+        a <- readxl::read_excel(input$file$datapath,
           sheet = input$sheet[i],
           col_names = input$header
         ) %>%
@@ -556,7 +557,7 @@ server <- function(input, output, session) {
       }
     }
 
-    if (is.null(nullCheck)) {
+    if (is.null(inFile)) {
       f <- readxl::read_excel("iris.xlsx", col_names = T) %>%
         mutate(Sheet = input$sheet) %>%
         select(Sheet, everything())
@@ -791,6 +792,7 @@ server <- function(input, output, session) {
 
   # Create current plot ####
   currentPlot <- reactive({
+    req(dataFrame)
     egg::set_panel_size(plotInput(),
       width = unit(input$save.width, "mm"),
       height = unit(input$save.height, "mm")
@@ -943,7 +945,7 @@ server <- function(input, output, session) {
 
   # Plot the data ####
   output$plot_display <- renderPlot({
-    req(inFile, input$geom, input$comps, input$save.height, input$save.width)
+    req(input$geom, input$comps, input$save.height, input$save.width)
 
     lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
       req(
