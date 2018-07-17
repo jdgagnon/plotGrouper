@@ -37,6 +37,8 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
          size = 1,
          width = 0.8,
          dodge = 0.85,
+         plotWidth = 30,
+         plotHeight = 40,
          shape.groups = c(19, 21),
          color.groups = c("black", "black"),
          fill.groups = c("#444444", NA)) {
@@ -201,7 +203,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
         duration = 2
       )
     }
-
+    
     # Function to get shared text among variables being plotted
     # y.labs <- c(as.character(df$variable))
     # intersect2 <- function (x, y)
@@ -260,7 +262,6 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   } else {
     labs.y <- waiver()
   }
-
   if (trans.y != "identity") {
     # logBase <- parse_number(trans.y)
     # log_trans <- function(x) {
@@ -276,8 +277,9 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     y.lim <- c(NA, NA)
     expand.y <- c(0.05, 0.05)
   }
-
+  
   # Assign names to the shape, fill, color, and alpha arguments
+
   for (x in c("shape.groups", "fill.groups", "color.groups")) {
     assign(x, setNames(object = get(x), levels(df[[comparison]])))
   }
@@ -494,6 +496,9 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     )
 
   if (stats == F) {
-    g
+    leg <<- ggpubr::get_legend(g)
+    egg::set_panel_size(g,
+                        width = unit(plotWidth, "mm"),
+                        height = unit(plotHeight, "mm"))
   }
 }

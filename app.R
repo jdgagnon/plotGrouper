@@ -4,15 +4,6 @@
 
 library(tidyverse)
 
-# outputDir <- "responses"
-# saveData <- function(inData) {
-#   # Create a unique file name
-# fileName <- sprintf("%s_%s.txt",
-#                     as.integer(Sys.time()),
-#                     digest::digest(inData))
-#   # Write the file to the local system
-#   dput(inData, file = paste0(outputDir, '/', fileName))
-# }
 
 plist <- list() # Initiallize a list of plots to arrange
 wlist <- c() # Initialize a vector of plot width values
@@ -109,17 +100,17 @@ ui <- function(request) {fluidPage(
           ),
 
           fluidRow(
-            column(6, sliderInput("save.height",
-              "Save height (mm)",
+            column(6, sliderInput("plotHeight",
+              "Plot height (mm)",
               min = 20,
               max = 150,
-              value = 50
+              value = 40
             )),
-            column(6, sliderInput("save.width",
-              "Save width (mm)",
+            column(6, sliderInput("plotWidth",
+              "Plot width (mm)",
               min = 20,
               max = 150,
-              value = 50
+              value = 30
             ))
           ),
 
@@ -295,13 +286,7 @@ ui <- function(request) {fluidPage(
               ),
               selected = "right"
             )),
-            # column(3, sliderInput('aspect.ratio',
-            #                       "Aspect ratio",
-            #                       min = 0.25,
-            #                       max = 4,
-            #                       value = 1,
-            #                       step = 0.25)
-            #        ),
+
             column(4,
               style = "margin-top: 30px;",
               actionButton("plt2rprt",
@@ -320,8 +305,8 @@ ui <- function(request) {fluidPage(
             column(12,
               align = "center",
               plotOutput("plot_display",
-                width = "600px",
-                height = "600px"
+                width = "auto",
+                height = "auto"
               )
             )
           ),
@@ -368,21 +353,7 @@ ui <- function(request) {fluidPage(
               value = 0.5,
               step = 0.25
             ))
-          )#,
-
-          # textAreaInput("console",
-          #   "Pass code to manipulate data frame",
-          #   value = "dataFrame <<- dataFrame %>%",
-          #   width = 800,
-          #   height = 200
-          # ),
-          # 
-          # actionButton("run",
-          #   "Run",
-          #   style = "color: #fff; 
-          #                             background-color: #337ab7; 
-          #                             border-color: #2e6da4"
-          # )
+          )
         )
       )
     ),
@@ -563,8 +534,6 @@ server <- function(input, output, session) {
         select(Sheet, everything())
     }
 
-
-
     vars <- names(f)
     columns_select <- c(
       "Experiment",
@@ -576,7 +545,6 @@ server <- function(input, output, session) {
       "Target",
       "Species",
       "Dilution",
-      "Total Beads", 
       "Total Bead"
     )
     variables <- vars[which(!vars %in% c(
@@ -603,12 +571,6 @@ server <- function(input, output, session) {
       choices = c("variable", vars),
       selected = "variable"
     )
-    if (length(input$sheet) > 1) {
-      updateSelectInput(session, "group",
-        choices = c("variable", vars),
-        selected = "Sheet"
-      )
-    }
 
     rawData(f)
 
@@ -623,16 +585,7 @@ server <- function(input, output, session) {
     c("#444444", "#00000000")
   )
 
-  # Incorporate aspect ratio
-  # observe({
-  #   input$aspect.ratio
-  #   current_height <- input$save.height
-  #   updateSliderInput(session,
-  #                     'save.height',
-  #                     value = current_height*input$aspect.ratio)
-  # })
-
-  observe({
+  observeEvent(input$comp,{
     req(input$comp)
 
     vars <- unique(rawData()[[input$comp]])
@@ -664,7 +617,7 @@ server <- function(input, output, session) {
     req(input$variables,
         input$comp,
         input$group,
-        input$comps
+        length(input$comps) > 1
     )
  
     d <- gather(
@@ -713,7 +666,7 @@ server <- function(input, output, session) {
     groups <- unique(dataFrame()[[input$group]])
     comparisons <- unique(dataFrame()[[input$comp]])
     comps <- c(input$comps)
-    
+
     if (input$y.lab == "") {
       y.lab <- NULL
     } else {
@@ -725,7 +678,7 @@ server <- function(input, output, session) {
     if (input$refGroup == T) {
       ref.group <- comps[1]
     }
-
+    
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
       levels = comps
     ))
@@ -737,7 +690,7 @@ server <- function(input, output, session) {
     } else {
       levs <- order(factor(groups), levels = groups)
     }
-
+    
     cols <- c()
     fills <- c()
     shapes <- c()
@@ -751,14 +704,6 @@ server <- function(input, output, session) {
     if (input$trim == "") {
       updateTextInput(session, "trim", value = "none")
     }
-
-    # if (input$run) {
-    #   isolate({
-    #     assign("a", input$console)
-    #     a <- gsub("[“”]", "\"", gsub("[‘’]", "'", a))
-    #     eval(parse(text = a))
-    #   })
-    # }
 
     gplot(
       dataset = dataFrame(),
@@ -774,7 +719,8 @@ server <- function(input, output, session) {
       dodge = input$dodge,
       font_size = input$font,
       ref.group = ref.group,
-      # aspect.ratio = input$aspect.ratio,
+      plotWidth = input$plotWidth,
+      plotHeight = input$plotHeight,
       trans.y = input$trans.y,
       split = input$split,
       trim = input$trim,
@@ -792,17 +738,25 @@ server <- function(input, output, session) {
 
   # Create current plot ####
   currentPlot <- reactive({
-    req(dataFrame)
-    egg::set_panel_size(plotInput(),
-      width = unit(input$save.width, "mm"),
-      height = unit(input$save.height, "mm")
-    )
+    req(!is.null(dataFrame()))
+    lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
+      req(
+        input[[paste0("shape", i)]],
+        input[[paste0("col", i)]],
+        input[[paste0("fill", i)]]
+      )
+    })
+    
+    plotInput()
   })
 
   # Store current plot height ####
   cpHeight <- reactive({
+    if (is.null(dataFrame())) {
+      return(1)
+    }
+    req(currentPlot(), leg)
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
-    leg <- ggpubr::get_legend(plotInput())
     lheight <- ifelse(input$legend != "none", 
                       sum(as.numeric(grid::convertUnit(leg$height, "mm"))),
                       0)
@@ -817,8 +771,11 @@ server <- function(input, output, session) {
 
   # Store current plot width ####
   cpWidth <- reactive({
+    if (is.null(dataFrame())) {
+      return(1)
+    }
+    req(currentPlot(), leg)
     pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
-    leg <- ggpubr::get_legend(plotInput())
     lwidth <- ifelse(input$legend != "none",
                      sum(as.numeric(grid::convertUnit(leg$width, "mm"))),
                      0)
@@ -843,6 +800,10 @@ server <- function(input, output, session) {
     } else {
       levs <- order(factor(groups), levels = groups)
     }
+    
+    levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
+                               levels = comps
+    ))
 
     gplot(
       dataset = dataFrame(),
@@ -852,6 +813,7 @@ server <- function(input, output, session) {
       method = input$method,
       paired = input$paired,
       levs = levs,
+      levs.comps = levs.comps,
       stats = T
     )
   }
@@ -945,7 +907,7 @@ server <- function(input, output, session) {
 
   # Plot the data ####
   output$plot_display <- renderPlot({
-    req(input$geom, input$comps, input$save.height, input$save.width)
+    req(input$geom, input$comps, input$plotHeight, input$plotWidth)
 
     lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
       req(
@@ -956,7 +918,9 @@ server <- function(input, output, session) {
     })
 
     gridExtra::grid.arrange(currentPlot())
-  })
+  },
+  height = function() cpHeight(),
+  width = function() cpWidth())
 
   # Save plot ####
   output$downloadPlot <- downloadHandler(
@@ -978,7 +942,6 @@ server <- function(input, output, session) {
   # Create stats table ####
   output$stat_display <- renderDataTable({
     req(input$variables)
-
     stats()
   })
 
@@ -1080,9 +1043,9 @@ server <- function(input, output, session) {
 
   # Create report ####
   output$contents <- renderPlot({
-    g <- input$plt2rprt
-    r <- input$clear
-    ra <- input$clearAll
+    pltrprt <- input$plt2rprt
+    clearlast <- input$clear
+    clearall <- input$clearAll
 
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
@@ -1101,21 +1064,6 @@ server <- function(input, output, session) {
     )
   })
 
-  # Store plots to be saved in report ####
-  plots <- eventReactive(input$plt2rprt, {
-    req(h, w)
-    g <- input$plt2rprt
-    r <- input$clear
-    ra <- input$clearAll
-    if (length(plist) > 0) {
-      numcol <- floor(sqrt(length(plist) + 1))
-      gridExtra::arrangeGrob(
-        grobs = plist,
-        ncol = numcol
-      )
-    }
-  })
-
   # Download report ####
   output$downloadReport <- downloadHandler(
     filename = function() {
@@ -1127,7 +1075,14 @@ server <- function(input, output, session) {
 
     content = function(file) {
       ggsave(file,
-        plot = plots(),
+        plot = 
+          if (length(plist) > 0) {
+            numcol <- floor(sqrt(length(plist) + 1))
+            gridExtra::arrangeGrob(
+              grobs = plist,
+              ncol = numcol
+            )
+          },
         useDingbats = F,
         height = (h / 3.7795275591),
         width = (w / 3.7795275591),
@@ -1166,6 +1121,9 @@ server <- function(input, output, session) {
   })
 
   # Stop app on close ####
+  session$onSessionEnded(function() {
+    rm("inFile", "leg", envir = globalenv())
+    })
   session$onSessionEnded(stopApp)
 }
 
