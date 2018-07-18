@@ -470,12 +470,11 @@ server <- function(input, output, session) {
   
   observeEvent(input$sampleFile, {
     inFile <<- NULL
-    sheets <- readxl::excel_sheets("iris.xlsx")
     updateSelectInput(session,
       "sheet",
       "Select Sheet",
-      choices = sheets,
-      selected = sheets[1]
+      choices = "iris",
+      selected = "iris"
     )
   })
 
@@ -529,8 +528,10 @@ server <- function(input, output, session) {
     }
 
     if (is.null(inFile)) {
-      f <- readxl::read_excel("iris.xlsx", col_names = T) %>%
-        mutate(Sheet = input$sheet) %>%
+      f <- iris %>%
+        group_by(Species) %>%
+        mutate(Sample = paste0(Species, "_", row_number()),
+               Sheet = input$sheet) %>%
         select(Sheet, everything())
     }
 
