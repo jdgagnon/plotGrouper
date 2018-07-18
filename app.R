@@ -26,7 +26,10 @@ ui <- function(request) {fluidPage(
       fluidPage(
         sidebarPanel(
           tags$style(type = "text/css", "body {padding-top: 140px;}"),
-          fileInput("file",
+          fluidRow(
+            column(2, style = "margin-top: 27px;", 
+                   actionButton("sampleFile", "Iris")),
+            column(10, fileInput("file",
             "Choose info-file to upload",
             accept = c(
               "text/csv",
@@ -38,8 +41,8 @@ ui <- function(request) {fluidPage(
               ".xlsx",
               ".xls"
             )
+          ))
           ),
-
           fluidRow(
             column(8, selectInput("sheet",
               "Select sheet",
@@ -218,7 +221,7 @@ ui <- function(request) {fluidPage(
               min = 0,
               max = 2,
               step = 0.05,
-              value = 0.85
+              value = 0.90
             ))
           ),
 
@@ -242,8 +245,7 @@ ui <- function(request) {fluidPage(
               "Dilution factor",
               value = NULL
             ))
-          ),
-          actionButton("sampleFile", "Iris")
+          )
         ),
 
         mainPanel(
@@ -298,6 +300,36 @@ ui <- function(request) {fluidPage(
               )
             )
           ),
+          
+          fluidRow(
+            column(3, sliderInput("font",
+                                  "Font size",
+                                  min = 8,
+                                  max = 25,
+                                  value = 9,
+                                  step = 0.5
+            )),
+            column(3, sliderInput("size",
+                                  "Point size",
+                                  min = 0.5,
+                                  max = 10,
+                                  value = 1,
+                                  step = 0.5
+            )),
+            column(3, sliderInput("stroke",
+                                  "Stroke size",
+                                  min = 0.25,
+                                  max = 2,
+                                  value = 0.5,
+                                  step = 0.25
+            )),
+            
+            column(3, selectInput("comps",
+                                  "Order of comparisons",
+                                  multiple = T,
+                                  choices = NULL
+            ))
+          ),
 
           hr(),
 
@@ -323,36 +355,6 @@ ui <- function(request) {fluidPage(
             column(4, checkboxInput("lock.shapes", "Lock", F)),
             column(4, checkboxInput("lock.cols", "Lock", F)),
             column(4, checkboxInput("lock.fills", "Lock", F))
-          ),
-
-          selectInput("comps",
-            "Order of comparisons",
-            multiple = T,
-            choices = NULL
-          ),
-
-          fluidRow(
-            column(3, sliderInput("font",
-              "Font size",
-              min = 8,
-              max = 25,
-              value = 9,
-              step = 0.5
-            )),
-            column(3, sliderInput("size",
-              "Point size",
-              min = 0.5,
-              max = 10,
-              value = 1,
-              step = 0.5
-            )),
-            column(3, sliderInput("stroke",
-              "Stroke size",
-              min = 0.25,
-              max = 2,
-              value = 0.5,
-              step = 0.25
-            ))
           )
         )
       )
@@ -529,6 +531,7 @@ server <- function(input, output, session) {
 
     if (is.null(inFile)) {
       f <- iris %>%
+        mutate(Species = as.character(Species)) %>%
         group_by(Species) %>%
         mutate(Sample = paste0(Species, "_", row_number()),
                Sheet = input$sheet) %>%
@@ -793,6 +796,7 @@ server <- function(input, output, session) {
   stats <- function() {
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
+    comps <- c(input$comps)
 
     if (input$group == "variable") {
       levs <- order(factor(unique(dataFrame()[[input$group]]),
