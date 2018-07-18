@@ -34,12 +34,10 @@ devtools::install_github("tidyverse/ggplot2")
 install.packages("tidyverse")
 install.packages("shiny")
 install.packages("Hmisc")
-install.packages("scales")
 install.packages("readxl")
 install.packages("gridExtra")
 install.packages("egg")
 install.packages("ggpubr")
-install.packages("shinyjs")
 install.packages("shinythemes")
 install.packages("colourpicker")
 install.packages("shiny")
@@ -47,7 +45,7 @@ install.packages("shiny")
 
 ### Installing & Running
 
-After installing the `shiny` package, you are ready to run `plotGrouper`.
+After installing these packages, you are ready to run `plotGrouper`.
 
 To initialize the shiny app, paste the following code in your R console and run it.
 
