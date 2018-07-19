@@ -220,7 +220,7 @@ ui <- function(request) {
                 min = 0,
                 max = 2,
                 step = 0.05,
-                value = 0.90
+                value = 0.80
               ))
             ),
 
