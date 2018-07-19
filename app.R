@@ -928,9 +928,9 @@ server <- function(input, output, session) {
     
     # Generate the PNG
     png(outfile, 
-        width = cpWidth()*8, 
-        height = cpHeight()*8,
-        res = 72*8)
+        width = cpWidth()*4, 
+        height = cpHeight()*4,
+        res = 72*4)
     gridExtra::grid.arrange(currentPlot())
     dev.off()
     
@@ -1070,9 +1070,9 @@ server <- function(input, output, session) {
     
     # Generate the PNG
     png(outfile, 
-        width = reportWidth()*8, 
-        height = reportHeight()*8,
-        res = 72*8)
+        width = reportWidth()*4, 
+        height = reportHeight()*4,
+        res = 72*4)
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
       gridExtra::grid.arrange(
