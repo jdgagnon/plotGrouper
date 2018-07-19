@@ -1149,6 +1149,7 @@ server <- function(input, output, session) {
   # Stop app on close ####
   session$onSessionEnded(function() {
     rm("leg", envir = globalenv())
+    graphics.off()
   })
   session$onSessionEnded(stopApp)
 }
