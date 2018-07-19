@@ -8,7 +8,6 @@ library(tidyverse)
 plist <- list() # Initiallize a list of plots to arrange
 wlist <- c() # Initialize a vector of plot width values
 hlist <- c() # Initialize a vector of plot height values
-legend <- NULL
 gplot <- dget("gplot.R") # Load plotting function
 
 # UI ----------------------------------------------------------------------

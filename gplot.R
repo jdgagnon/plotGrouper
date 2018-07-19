@@ -34,7 +34,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
          font_size = 9,
          size = 1,
          width = 0.8,
-         dodge = 0.9,
+         dodge = 0.8,
          plotWidth = 30,
          plotHeight = 40,
          shape.groups = c(19, 21),
@@ -494,7 +494,11 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     )
 
   if (stats == F) {
-    leg <<- ggpubr::get_legend(g)
+    if (leg.pos != "none") {
+      leg <<- ggpubr::get_legend(g)
+    } else {
+      leg <<- "none"
+    }
     egg::set_panel_size(g,
       width = unit(plotWidth, "mm"),
       height = unit(plotHeight, "mm")
