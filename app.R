@@ -119,9 +119,6 @@ ui <- function(request) {
               ))
             ),
 
-            # actionButton('submit', "Save inputs"),
-            # actionButton('load', "Load inputs"),
-
             hr(),
 
             fluidRow(
@@ -335,17 +332,17 @@ ui <- function(request) {
             ),
 
             hr(),
-
+            
             fluidRow(
               column(12,
                 align = "center",
-                plotOutput("plot_display",
-                  width = "auto",
-                  height = "auto"
+                imageOutput("myImage",
+                            height = "100%",
+                            width = "100%"
                 )
               )
             ),
-
+            
             hr(),
 
             fluidRow(
@@ -358,7 +355,9 @@ ui <- function(request) {
               column(4, checkboxInput("lock.shapes", "Lock", F)),
               column(4, checkboxInput("lock.cols", "Lock", F)),
               column(4, checkboxInput("lock.fills", "Lock", F))
-            )
+            ),
+            
+            hr()
           )
         )
       ),
@@ -414,11 +413,14 @@ ui <- function(request) {
                 inline = TRUE
               ))
             ),
-
+            
             fluidRow(
               column(12,
-                align = "center",
-                uiOutput("regPlot")
+                     align = "center",
+                     imageOutput("myReport",
+                                 height = "100%",
+                                 width = "100%"
+                     )
               )
             )
           )
@@ -917,24 +919,28 @@ server <- function(input, output, session) {
       )
     })
   })
-
+  
   # Plot the data ####
-  output$plot_display <- renderPlot({
-    req(input$geom, input$comps, input$plotHeight, input$plotWidth)
-
-    lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
-      req(
-        input[[paste0("shape", i)]],
-        input[[paste0("col", i)]],
-        input[[paste0("fill", i)]]
-      )
-    })
-
+  output$myImage <- renderImage({
+    # A temp file to save the output.
+    # This file will be removed later by renderImage
+    outfile <- tempfile(fileext = '.png')
+    
+    # Generate the PNG
+    png(outfile, 
+        width = cpWidth()*8, 
+        height = cpHeight()*8,
+        res = 72*8)
     gridExtra::grid.arrange(currentPlot())
-  },
-  height = function() cpHeight(),
-  width = function() cpWidth()
-  )
+    dev.off()
+    
+    # Return a list containing the filename
+    list(src = outfile,
+         contentType = 'image/png',
+         width = cpWidth(),
+         height = cpHeight(),
+         alt = "This is alternate text")
+  }, deleteFile = TRUE)
 
   # Save plot ####
   output$downloadPlot <- downloadHandler(
@@ -983,8 +989,8 @@ server <- function(input, output, session) {
 
   # Add current plot to report ####
   observeEvent(input$plt2rprt, {
-    h <<- NULL
-    w <<- NULL
+    h <<- 10
+    w <<- 10
     l <- length(plist)
     prev_numcol <- floor(sqrt(l + 1))
     current_numcol <- floor(sqrt(l + 2))
@@ -1037,8 +1043,8 @@ server <- function(input, output, session) {
     plist <<- list()
     wlist <<- c()
     hlist <<- c()
-    h <<- 800
-    w <<- 600
+    h <<- 10
+    w <<- 10
   })
 
   reportHeight <- reactive({
@@ -1054,13 +1060,19 @@ server <- function(input, output, session) {
     clearall <- input$clearAll
     return(w)
   })
-
+  
   # Create report ####
-  output$contents <- renderPlot({
-    pltrprt <- input$plt2rprt
-    clearlast <- input$clear
-    clearall <- input$clearAll
-
+  output$myReport <- renderImage({
+    
+    # A temp file to save the output.
+    # This file will be removed later by renderImage
+    outfile <- tempfile(fileext = '.png')
+    
+    # Generate the PNG
+    png(outfile, 
+        width = reportWidth()*8, 
+        height = reportHeight()*8,
+        res = 72*8)
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
       gridExtra::grid.arrange(
@@ -1068,15 +1080,15 @@ server <- function(input, output, session) {
         ncol = numcol
       )
     }
-  })
-
-  # Create UI for report ####
-  output$regPlot <- renderUI({
-    plotOutput("contents",
-      height = reportHeight(),
-      width = reportWidth()
-    )
-  })
+    dev.off()
+    
+    # Return a list containing the filename
+    list(src = outfile,
+         contentType = 'image/png',
+         width = reportWidth(),
+         height = reportHeight(),
+         alt = "Nothing added to report yet.")
+  }, deleteFile = TRUE)
 
   # Download report ####
   output$downloadReport <- downloadHandler(
