@@ -13,465 +13,469 @@ gplot <- dget("gplot.R") # Load plotting function
 
 # UI ----------------------------------------------------------------------
 
-ui <- function(request) {fluidPage(
-  title = "plotGrouper",
-  # shinyjs::useShinyjs(),
-  theme = shinythemes::shinytheme("cosmo"),
-  navbarPage(
-    (tags$img(src = "logo_white_small.png", width = "100px", height = "100px")),
-    fluid = T,
-    position = "fixed-top",
-    tabPanel(
-      h2("Plot", style = "margin-top: 30px; margin-bottom: 30px"),
-      fluidPage(
-        sidebarPanel(
-          tags$style(type = "text/css", "body {padding-top: 140px;}"),
-          fluidRow(
-            column(2, style = "margin-top: 27px;", 
-                   actionButton("sampleFile", "Iris")),
-            column(10, fileInput("file",
-            "Choose info-file to upload",
-            accept = c(
-              "text/csv",
-              "text/comma-separated-values",
-              "text/tab-separated-values",
-              "text/plain",
-              ".csv",
-              ".tsv",
-              ".xlsx",
-              ".xls"
-            )
-          ))
-          ),
-          fluidRow(
-            column(8, selectInput("sheet",
-              "Select sheet",
+ui <- function(request) {
+  fluidPage(
+    title = "plotGrouper",
+    # shinyjs::useShinyjs(),
+    theme = shinythemes::shinytheme("cosmo"),
+    navbarPage(
+      (tags$img(src = "logo_white_small.png", width = "100px", height = "100px")),
+      fluid = T,
+      position = "fixed-top",
+      tabPanel(
+        h2("Plot", style = "margin-top: 30px; margin-bottom: 30px"),
+        fluidPage(
+          sidebarPanel(
+            tags$style(type = "text/css", "body {padding-top: 140px;}"),
+            fluidRow(
+              column(2,
+                style = "margin-top: 27px;",
+                actionButton("sampleFile", "Iris")
+              ),
+              column(10, fileInput("file",
+                "Choose info-file to upload",
+                accept = c(
+                  "text/csv",
+                  "text/comma-separated-values",
+                  "text/tab-separated-values",
+                  "text/plain",
+                  ".csv",
+                  ".tsv",
+                  ".xlsx",
+                  ".xls"
+                )
+              ))
+            ),
+            fluidRow(
+              column(8, selectInput("sheet",
+                "Select sheet",
+                multiple = T,
+                choices = NULL
+              )),
+              column(2,
+                style = "margin-top: 25px;",
+                checkboxInput(
+                  "header",
+                  "Header",
+                  value = T
+                )
+              )
+            ),
+
+            selectInput("columns",
+              "Select columns to exclude from gather",
               multiple = T,
               choices = NULL
-            )),
-            column(2,
-              style = "margin-top: 25px;",
-              checkboxInput(
-                "header",
-                "Header",
-                value = T
-              )
-            )
-          ),
+            ),
 
-          selectInput("columns",
-            "Select columns to exclude from gather",
-            multiple = T,
-            choices = NULL
-          ),
-
-          selectInput("variables",
-            "Variables to plot",
-            multiple = T,
-            choices = NULL
-          ),
-
-          fluidRow(
-            column(6, selectInput("comp",
-              "Compare by",
+            selectInput("variables",
+              "Variables to plot",
+              multiple = T,
               choices = NULL
-            )),
-            column(6, selectInput("group",
-              "Group by",
-              choices = NULL
-            ))
-          ),
+            ),
 
-          hr(),
+            fluidRow(
+              column(6, selectInput("comp",
+                "Compare by",
+                choices = NULL
+              )),
+              column(6, selectInput("group",
+                "Group by",
+                choices = NULL
+              ))
+            ),
 
-          fluidRow(
-            column(8, textInput(
-              "filename",
-              "Filename",
-              "Plot1"
-            )),
-            column(4,
-              style = "margin-top: 30px;",
-              downloadButton("downloadPlot",
-                "Save",
-                class = "btn btn-primary btn-sm",
-                style = "color: #fff; 
+            hr(),
+
+            fluidRow(
+              column(8, textInput(
+                "filename",
+                "Filename",
+                "Plot1"
+              )),
+              column(4,
+                style = "margin-top: 30px;",
+                downloadButton("downloadPlot",
+                  "Save",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff; 
                                    background-color: #337ab7; 
                                    border-color: #2e6da4"
+                )
               )
-            )
-          ),
+            ),
 
-          fluidRow(
-            column(6, sliderInput("plotHeight",
-              "Plot height (mm)",
-              min = 20,
-              max = 150,
-              value = 40
-            )),
-            column(6, sliderInput("plotWidth",
-              "Plot width (mm)",
-              min = 20,
-              max = 150,
-              value = 30
-            ))
-          ),
+            fluidRow(
+              column(6, sliderInput("plotHeight",
+                "Plot height (mm)",
+                min = 20,
+                max = 150,
+                value = 40
+              )),
+              column(6, sliderInput("plotWidth",
+                "Plot width (mm)",
+                min = 20,
+                max = 150,
+                value = 30
+              ))
+            ),
 
-          # actionButton('submit', "Save inputs"),
-          # actionButton('load', "Load inputs"),
+            # actionButton('submit', "Save inputs"),
+            # actionButton('load', "Load inputs"),
 
-          hr(),
+            hr(),
 
-          fluidRow(
-            column(8, textInput("y.lab",
-              "Replace y axis label",
-              value = NULL
-            )),
-            column(1.5,
-              style = "margin-top: 25px;",
-              checkboxInput("scientific",
-                "10^x",
-                value = F
-              )
-            )
-          ),
-
-          fluidRow(
-            column(
-              6,
-              textInput("split.on",
-                "Split on text",
+            fluidRow(
+              column(8, textInput("y.lab",
+                "Replace y axis label",
                 value = NULL
+              )),
+              column(1.5,
+                style = "margin-top: 25px;",
+                checkboxInput("scientific",
+                  "10^x",
+                  value = F
+                )
               )
             ),
-            column(3,
-              style = "margin-top: 25px;",
-              checkboxInput(
-                "split",
-                "Split",
-                value = T
+
+            fluidRow(
+              column(
+                6,
+                textInput("split.on",
+                  "Split on text",
+                  value = NULL
+                )
+              ),
+              column(3,
+                style = "margin-top: 25px;",
+                checkboxInput(
+                  "split",
+                  "Split",
+                  value = T
+                )
+              ),
+              column(3,
+                style = "margin-top: 25px;",
+                checkboxInput(
+                  "angle.x",
+                  "Angle",
+                  value = F
+                )
               )
             ),
-            column(3,
-              style = "margin-top: 25px;",
-              checkboxInput(
-                "angle.x",
-                "Angle",
-                value = F
+
+            textInput("trim",
+              "Trim text from right side of group labels",
+              value = "none"
+            ),
+
+            hr(),
+
+            selectInput("trans.y",
+              "Transform y",
+              choices = c("identity", "log2", "log10"),
+              selected = "identity"
+            ),
+
+            selectInput("errortype",
+              "Select errorbar type",
+              choices = c("mean_se", "mean_sdl"),
+              selected = "mean_se"
+            ),
+
+            fluidRow(
+              column(4, selectInput("method",
+                "Stat test",
+                choices = c(
+                  "t.test",
+                  "wilcox.test",
+                  "anova",
+                  "kruskal.test"
+                )
+              )),
+
+              column(4,
+                style = "margin-top: 25px;",
+                checkboxInput("refGroup",
+                  "Reference group",
+                  value = F
+                )
+              ),
+              column(4,
+                style = "margin-top: 25px;",
+                checkboxInput("paired",
+                  "Paired",
+                  value = F
+                )
               )
+            ),
+
+            fluidRow(
+              column(6, sliderInput("width",
+                "Width",
+                min = 0,
+                max = 1,
+                step = 0.05,
+                value = 0.80
+              )),
+              column(6, sliderInput("dodge",
+                "Dodge",
+                min = 0,
+                max = 2,
+                step = 0.05,
+                value = 0.90
+              ))
+            ),
+
+            hr(),
+
+            selectInput("id",
+              "ID column",
+              choices = NULL
+            ),
+
+            checkboxInput("count",
+              "# Beads/dilution factor included in data",
+              value = F
+            ),
+
+            fluidRow(
+              column(6, numericInput("bead",
+                "# Beads/sample",
+                value = NULL
+              )),
+              column(6, numericInput("dilution",
+                "Dilution factor",
+                value = NULL
+              ))
             )
           ),
 
-          textInput("trim",
-            "Trim text from right side of group labels",
-            value = "none"
-          ),
+          mainPanel(
+            fluidRow(
+              column(4, selectInput("geom",
+                "Select geoms to plot",
+                choices = c(
+                  "bar",
+                  "crossbar",
+                  "errorbar",
+                  "point",
+                  "dot",
+                  "stat",
+                  "seg",
+                  "box",
+                  "violin",
+                  "line",
+                  "line_point",
+                  "line_error",
+                  "line_point_stat",
+                  "density"
+                ),
+                selected = c(
+                  "bar",
+                  "errorbar",
+                  "point",
+                  "stat",
+                  "seg"
+                ),
+                multiple = T
+              )),
+              column(4, selectInput("legend",
+                "Select legend position",
+                choices = c(
+                  "top",
+                  "right",
+                  "bottom",
+                  "left",
+                  "none"
+                ),
+                selected = "right"
+              )),
 
-          hr(),
-
-          selectInput("trans.y",
-            "Transform y",
-            choices = c("identity", "log2", "log10"),
-            selected = "identity"
-          ),
-
-          selectInput("errortype",
-            "Select errorbar type",
-            choices = c("mean_se", "mean_sdl"),
-            selected = "mean_se"
-          ),
-
-          fluidRow(
-            column(4, selectInput("method",
-              "Stat test",
-              choices = c(
-                "t.test",
-                "wilcox.test",
-                "anova",
-                "kruskal.test"
-              )
-            )),
-
-            column(4,
-              style = "margin-top: 25px;",
-              checkboxInput("refGroup",
-                "Reference group",
-                value = F
-              )
-            ),
-            column(4,
-              style = "margin-top: 25px;",
-              checkboxInput("paired",
-                "Paired",
-                value = F
-              )
-            )
-          ),
-
-          fluidRow(
-            column(6, sliderInput("width",
-              "Width",
-              min = 0,
-              max = 1,
-              step = 0.05,
-              value = 0.80
-            )),
-            column(6, sliderInput("dodge",
-              "Dodge",
-              min = 0,
-              max = 2,
-              step = 0.05,
-              value = 0.90
-            ))
-          ),
-
-          hr(),
-
-          selectInput("id",
-            "ID column",
-            choices = NULL
-          ),
-          
-          checkboxInput("count", 
-                        "# Beads/dilution factor included in data",
-                        value = F),
-
-          fluidRow(
-            column(6, numericInput("bead",
-              "# Beads/sample",
-              value = NULL
-            )),
-            column(6, numericInput("dilution",
-              "Dilution factor",
-              value = NULL
-            ))
-          )
-        ),
-
-        mainPanel(
-          fluidRow(
-            column(4, selectInput("geom",
-              "Select geoms to plot",
-              choices = c(
-                "bar",
-                "crossbar",
-                "errorbar",
-                "point",
-                "dot",
-                "stat",
-                "seg",
-                "box",
-                "violin",
-                "line",
-                "line_point",
-                "line_error",
-                "line_point_stat",
-                "density"
-              ),
-              selected = c(
-                "bar",
-                "errorbar",
-                "point",
-                "stat",
-                "seg"
-              ),
-              multiple = T
-            )),
-            column(4, selectInput("legend",
-              "Select legend position",
-              choices = c(
-                "top",
-                "right",
-                "bottom",
-                "left",
-                "none"
-              ),
-              selected = "right"
-            )),
-
-            column(4,
-              style = "margin-top: 30px;",
-              actionButton("plt2rprt",
-                label = "Include in report",
-                class = "btn btn-primary btn-sm",
-                style = "color: #fff; 
+              column(4,
+                style = "margin-top: 30px;",
+                actionButton("plt2rprt",
+                  label = "Include in report",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff; 
                                                background-color: #337ab7; 
                                                border-color: #2e6da4"
+                )
               )
-            )
-          ),
-          
-          fluidRow(
-            column(3, sliderInput("font",
-                                  "Font size",
-                                  min = 8,
-                                  max = 25,
-                                  value = 9,
-                                  step = 0.5
-            )),
-            column(3, sliderInput("size",
-                                  "Point size",
-                                  min = 0.5,
-                                  max = 10,
-                                  value = 1,
-                                  step = 0.5
-            )),
-            column(3, sliderInput("stroke",
-                                  "Stroke size",
-                                  min = 0.25,
-                                  max = 2,
-                                  value = 0.5,
-                                  step = 0.25
-            )),
-            
-            column(3, selectInput("comps",
-                                  "Order of comparisons",
-                                  multiple = T,
-                                  choices = NULL
-            ))
-          ),
+            ),
 
-          hr(),
+            fluidRow(
+              column(3, sliderInput("font",
+                "Font size",
+                min = 8,
+                max = 25,
+                value = 9,
+                step = 0.5
+              )),
+              column(3, sliderInput("size",
+                "Point size",
+                min = 0.5,
+                max = 10,
+                value = 1,
+                step = 0.5
+              )),
+              column(3, sliderInput("stroke",
+                "Stroke size",
+                min = 0.25,
+                max = 2,
+                value = 0.5,
+                step = 0.25
+              )),
 
-          fluidRow(
-            column(12,
-              align = "center",
-              plotOutput("plot_display",
-                width = "auto",
-                height = "auto"
+              column(3, selectInput("comps",
+                "Order of comparisons",
+                multiple = T,
+                choices = NULL
+              ))
+            ),
+
+            hr(),
+
+            fluidRow(
+              column(12,
+                align = "center",
+                plotOutput("plot_display",
+                  width = "auto",
+                  height = "auto"
+                )
               )
+            ),
+
+            hr(),
+
+            fluidRow(
+              column(4, h4("Shapes"), uiOutput("shapes")),
+              column(4, h4("Color"), uiOutput("colors")),
+              column(4, h4("Fill"), uiOutput("fills"))
+            ),
+
+            fluidRow(
+              column(4, checkboxInput("lock.shapes", "Lock", F)),
+              column(4, checkboxInput("lock.cols", "Lock", F)),
+              column(4, checkboxInput("lock.fills", "Lock", F))
             )
-          ),
-
-          hr(),
-
-          fluidRow(
-            column(4, h4("Shapes"), uiOutput("shapes")),
-            column(4, h4("Color"), uiOutput("colors")),
-            column(4, h4("Fill"), uiOutput("fills"))
-          ),
-
-          fluidRow(
-            column(4, checkboxInput("lock.shapes", "Lock", F)),
-            column(4, checkboxInput("lock.cols", "Lock", F)),
-            column(4, checkboxInput("lock.fills", "Lock", F))
           )
         )
-      )
-    ),
+      ),
 
-    tabPanel(
-      h2("Report", style = "margin-top: 30px; margin-bottom: 30px"),
-      fluidPage(
-        mainPanel(
-          fluidRow(
-            column(
-              4,
-              actionButton("clear",
-                "Clear last",
-                class = "btn btn-primary btn-md",
-                style = "color: #fff; 
+      tabPanel(
+        h2("Report", style = "margin-top: 30px; margin-bottom: 30px"),
+        fluidPage(
+          mainPanel(
+            fluidRow(
+              column(
+                4,
+                actionButton("clear",
+                  "Clear last",
+                  class = "btn btn-primary btn-md",
+                  style = "color: #fff; 
                                                background-color: #337ab7; 
                                                border-color: #2e6da4"
-              )
-            ),
+                )
+              ),
 
-            column(4, actionButton("clearAll",
-              "Clear All",
-              class = "btn btn-primary btn-md",
-              style = "color: #fff;
+              column(4, actionButton("clearAll",
+                "Clear All",
+                class = "btn btn-primary btn-md",
+                style = "color: #fff;
                                         background-color: #337ab7; 
                                         border-color: #2e6da4"
-            ))
-          ),
+              ))
+            ),
 
-          fluidRow(
-            column(3, textInput(
-              "report",
-              "Filename",
-              "Report1"
-            )),
-            column(3,
-              style = "margin-top: 25px;",
-              downloadButton("downloadReport",
-                "Save",
-                class = "btn btn-primary btn-md",
-                style = "color: #fff; 
+            fluidRow(
+              column(3, textInput(
+                "report",
+                "Filename",
+                "Report1"
+              )),
+              column(3,
+                style = "margin-top: 25px;",
+                downloadButton("downloadReport",
+                  "Save",
+                  class = "btn btn-primary btn-md",
+                  style = "color: #fff; 
                                                  background-color: #337ab7; 
                                                  border-color: #2e6da4"
-              )
-            ),
-            column(4, radioButtons("format",
-              "Document format",
-              choices = c(
-                "PDF",
-                "HTML",
-                "Word"
+                )
               ),
-              inline = TRUE
-            ))
-          ),
+              column(4, radioButtons("format",
+                "Document format",
+                choices = c(
+                  "PDF",
+                  "HTML",
+                  "Word"
+                ),
+                inline = TRUE
+              ))
+            ),
 
-          fluidRow(
-            column(12,
-              align = "center",
-              uiOutput("regPlot")
+            fluidRow(
+              column(12,
+                align = "center",
+                uiOutput("regPlot")
+              )
             )
           )
         )
-      )
-    ),
+      ),
 
-    tabPanel(
-      h2("Statistics", style = "margin-top: 30px; margin-bottom: 30px"),
-      fluidPage(
-        mainPanel(
-          dataTableOutput("stat_display"),
+      tabPanel(
+        h2("Statistics", style = "margin-top: 30px; margin-bottom: 30px"),
+        fluidPage(
+          mainPanel(
+            dataTableOutput("stat_display"),
 
-          downloadButton("save.stat",
-            "Download",
-            style = "color: #fff; 
+            downloadButton("save.stat",
+              "Download",
+              style = "color: #fff; 
                                         background-color: #337ab7; 
                                         border-color: #2e6da4"
+            )
+          )
+        )
+      ),
+
+      tabPanel(
+        h2("Plot Data", style = "margin-top: 30px; margin-bottom: 30px"),
+        fluidPage(
+          mainPanel(
+            dataTableOutput("data_table_display")
+          )
+        )
+      ),
+
+      tabPanel(
+        h2("Raw Data", style = "margin-top: 30px; margin-bottom: 30px"),
+        fluidPage(
+          mainPanel(
+            dataTableOutput("raw_data_table_display")
           )
         )
       )
-    ),
-
-    tabPanel(
-      h2("Plot Data", style = "margin-top: 30px; margin-bottom: 30px"),
-      fluidPage(
-        mainPanel(
-          dataTableOutput("data_table_display")
-        )
-      )
-    ),
-
-    tabPanel(
-      h2("Raw Data", style = "margin-top: 30px; margin-bottom: 30px"),
-      fluidPage(
-        mainPanel(
-          dataTableOutput("raw_data_table_display")
-        )
-      )
-    )
-  ), bookmarkButton()
-)}
+    ), bookmarkButton()
+  )
+}
 
 # Server ------------------------------------------------------------------
 
 
 server <- function(input, output, session) {
-  
   dataFrame <- reactiveVal(NULL)
   rawData <- reactiveVal(NULL)
-  
+  inFile <- reactiveVal(NULL)
+
   nullCheck <- eventReactive(input$file, {
     return(T)
   })
-  
+
   observeEvent(input$sampleFile, {
-    inFile <<- NULL
     updateSelectInput(session,
       "sheet",
       "Select Sheet",
@@ -482,7 +486,7 @@ server <- function(input, output, session) {
 
   # Get file/read sheets ####
   observeEvent(input$file, {
-    inFile <<- input$file
+    inFile(input$file)
     # Identify sheets and use them as choices to load file
     sheets <- readxl::excel_sheets(input$file$datapath)
     updateSelectInput(session,
@@ -500,7 +504,7 @@ server <- function(input, output, session) {
     req(input$sheet)
 
     # Read excel file in
-    if (!is.null(inFile)) {
+    if (!is.null(inFile())) {
       for (i in 1:length(input$sheet)) {
         a <- readxl::read_excel(input$file$datapath,
           sheet = input$sheet[i],
@@ -508,7 +512,7 @@ server <- function(input, output, session) {
         ) %>%
           mutate(Sheet = input$sheet[i]) %>%
           select(Sheet, everything())
-        
+
         column_names <- names(a)
         column_names <- str_replace_all(column_names, c(
           ",Freq. of Parent" = " %",
@@ -517,7 +521,7 @@ server <- function(input, output, session) {
           ",," = "",
           ",Median,<.*>," = " MFI "
         ))
-        
+
         colnames(a) <- column_names
 
         if (i == 1) {
@@ -529,12 +533,14 @@ server <- function(input, output, session) {
       }
     }
 
-    if (is.null(inFile)) {
+    if (is.null(inFile())) {
       f <- iris %>%
         mutate(Species = as.character(Species)) %>%
         group_by(Species) %>%
-        mutate(Sample = paste0(Species, "_", row_number()),
-               Sheet = input$sheet) %>%
+        mutate(
+          Sample = paste0(Species, "_", row_number()),
+          Sheet = input$sheet
+        ) %>%
         select(Sheet, everything())
     }
 
@@ -552,11 +558,12 @@ server <- function(input, output, session) {
       "Total Bead"
     )
     variables <- vars[which(!vars %in% c(
-      columns_select, 
-      "Bead %", 
-      "Bead #", 
+      columns_select,
+      "Bead %",
+      "Bead #",
       "Beads %",
-      "Beads #"))]
+      "Beads #"
+    ))]
     updateSelectInput(session, "columns",
       choices = vars,
       selected = vars[which(vars %in% columns_select)]
@@ -577,9 +584,8 @@ server <- function(input, output, session) {
     )
 
     rawData(f)
-
   }, priority = 2)
-  
+
 
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
@@ -589,7 +595,7 @@ server <- function(input, output, session) {
     c("#444444", "#00000000")
   )
 
-  observeEvent(input$comp,{
+  observeEvent(input$comp, {
     req(input$comp)
 
     vars <- unique(rawData()[[input$comp]])
@@ -618,12 +624,13 @@ server <- function(input, output, session) {
     input$comps
     input$count
   }, {
-    req(input$variables,
-        input$comp,
-        input$group,
-        length(input$comps) > 1
+    req(
+      input$variables,
+      input$comp,
+      input$group,
+      length(input$comps) > 1
     )
- 
+
     d <- gather(
       rawData(),
       variable,
@@ -649,13 +656,13 @@ server <- function(input, output, session) {
       d <- d %>%
         group_by_(input$id) %>%
         mutate(value = ifelse(str_detect(variable, "#"),
-                              (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
-                              value
+          (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
+          value
         )) %>%
         ungroup() %>%
         filter(variable %in% c(input$variables)) %>%
         filter(!grepl("Bead|Ungated", variable))
-      } else {
+    } else {
       d <- d %>%
         filter(variable %in% c(input$variables)) %>%
         filter(!grepl("Bead|Ungated", variable))
@@ -682,7 +689,7 @@ server <- function(input, output, session) {
     if (input$refGroup == T) {
       ref.group <- comps[1]
     }
-    
+
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
       levels = comps
     ))
@@ -694,7 +701,7 @@ server <- function(input, output, session) {
     } else {
       levs <- order(factor(groups), levels = groups)
     }
-    
+
     cols <- c()
     fills <- c()
     shapes <- c()
@@ -750,7 +757,7 @@ server <- function(input, output, session) {
         input[[paste0("fill", i)]]
       )
     })
-    
+
     plotInput()
   })
 
@@ -761,9 +768,10 @@ server <- function(input, output, session) {
     }
     req(currentPlot(), leg)
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
-    lheight <- ifelse(input$legend != "none", 
-                      sum(as.numeric(grid::convertUnit(leg$height, "mm"))),
-                      0)
+    lheight <- ifelse(input$legend != "none",
+      sum(as.numeric(grid::convertUnit(leg$height, "mm"))),
+      0
+    )
     if (input$legend %in% c("top", "bottom")) {
       total.height <- sum(pheight, lheight)
     } else {
@@ -781,8 +789,9 @@ server <- function(input, output, session) {
     req(currentPlot(), leg)
     pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
     lwidth <- ifelse(input$legend != "none",
-                     sum(as.numeric(grid::convertUnit(leg$width, "mm"))),
-                     0)
+      sum(as.numeric(grid::convertUnit(leg$width, "mm"))),
+      0
+    )
     if (input$legend %in% c("top", "bottom")) {
       total.width <- sum(pwidth, c(lwidth - pwidth))
     } else {
@@ -805,9 +814,9 @@ server <- function(input, output, session) {
     } else {
       levs <- order(factor(groups), levels = groups)
     }
-    
+
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
-                               levels = comps
+      levels = comps
     ))
 
     gplot(
@@ -925,7 +934,8 @@ server <- function(input, output, session) {
     gridExtra::grid.arrange(currentPlot())
   },
   height = function() cpHeight(),
-  width = function() cpWidth())
+  width = function() cpWidth()
+  )
 
   # Save plot ####
   output$downloadPlot <- downloadHandler(
@@ -1080,7 +1090,7 @@ server <- function(input, output, session) {
 
     content = function(file) {
       ggsave(file,
-        plot = 
+        plot =
           if (length(plist) > 0) {
             numcol <- floor(sqrt(length(plist) + 1))
             gridExtra::arrangeGrob(
@@ -1096,39 +1106,39 @@ server <- function(input, output, session) {
       )
     }
   )
-  
-  
+
+
   onRestored(function(state) {
     updateSelectInput(session,
-                      "sheet",
-                      selected = state$input$sheet
+      "sheet",
+      selected = state$input$sheet
     )
     updateSelectInput(session,
-                      "columns",
-                      selected = state$input$columns
+      "columns",
+      selected = state$input$columns
     )
     updateSelectInput(session,
-                      "variables",
-                      selected = state$input$variables
+      "variables",
+      selected = state$input$variables
     )
     updateSelectInput(session,
-                      "comp",
-                      selected = state$input$comp
+      "comp",
+      selected = state$input$comp
     )
     updateSelectInput(session,
-                      "id",
-                      selected = state$input$id
+      "id",
+      selected = state$input$id
     )
     updateSelectInput(session,
-                      "group",
-                      selected = state$input$group
+      "group",
+      selected = state$input$group
     )
   })
 
   # Stop app on close ####
   session$onSessionEnded(function() {
-    rm("inFile", "leg", envir = globalenv())
-    })
+    rm("leg", envir = globalenv())
+  })
   session$onSessionEnded(stopApp)
 }
 

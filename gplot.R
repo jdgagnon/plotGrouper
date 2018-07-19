@@ -171,7 +171,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   if (("try-error" %in% class(statOut))) {
     statistics <- tibble("p.signif" = NA)
   }
-  
+
   if (("try-error" %in% class(statistics))) {
     statistics <- tibble("p.signif" = NA)
   }
@@ -201,7 +201,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
         duration = 2
       )
     }
-    
+
     # Function to get shared text among variables being plotted
     # y.labs <- c(as.character(df$variable))
     # intersect2 <- function (x, y)
@@ -275,7 +275,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     y.lim <- c(NA, NA)
     expand.y <- c(0.05, 0.05)
   }
-  
+
   # Assign names to the shape, fill, color, and alpha arguments
 
   for (x in c("shape.groups", "fill.groups", "color.groups")) {
@@ -496,7 +496,8 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   if (stats == F) {
     leg <<- ggpubr::get_legend(g)
     egg::set_panel_size(g,
-                        width = unit(plotWidth, "mm"),
-                        height = unit(plotHeight, "mm"))
+      width = unit(plotWidth, "mm"),
+      height = unit(plotHeight, "mm")
+    )
   }
 }
