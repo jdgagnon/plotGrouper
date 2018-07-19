@@ -26,12 +26,8 @@ ui <- function(request) {
         fluidPage(
           sidebarPanel(
             tags$style(type = "text/css", "body {padding-top: 140px;}"),
-            fluidRow(
-              column(2,
-                style = "margin-top: 27px;",
-                actionButton("sampleFile", "Iris")
-              ),
-              column(10, fileInput("file",
+            actionButton("sampleFile", "Iris"),
+            fileInput("file",
                 "Choose info-file to upload",
                 accept = c(
                   "text/csv",
@@ -43,8 +39,8 @@ ui <- function(request) {
                   ".xlsx",
                   ".xls"
                 )
-              ))
             ),
+            
             fluidRow(
               column(8, selectInput("sheet",
                 "Select sheet",
@@ -336,7 +332,7 @@ ui <- function(request) {
             fluidRow(
               column(12,
                 align = "center",
-                imageOutput("myImage",
+                imageOutput("myPlot",
                             height = "100%",
                             width = "100%"
                 )
@@ -921,7 +917,7 @@ server <- function(input, output, session) {
   })
   
   # Plot the data ####
-  output$myImage <- renderImage({
+  output$myPlot <- renderImage({
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = '.png')
