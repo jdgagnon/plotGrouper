@@ -140,7 +140,7 @@ ui <- function(request) {
               )
             ),
 
-            #### Modify X lables ####
+            #### Modify group lables ####
             fluidRow(
               column(
                 6,
@@ -1136,10 +1136,15 @@ server <- function(input, output, session) {
 
 
   onRestored(function(state) {
+    browser()
     updateSelectInput(session,
       "sheet",
       selected = state$input$sheet
     )
+  })
+  
+  onRestored(function(state) {
+    browser()
     updateSelectInput(session,
       "columns",
       selected = state$input$columns
@@ -1164,7 +1169,6 @@ server <- function(input, output, session) {
 
   #### Stop app on close ####
   session$onSessionEnded(function() {
-    rm("leg", envir = globalenv())
     graphics.off()
   })
   session$onSessionEnded(stopApp)
