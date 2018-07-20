@@ -24,9 +24,13 @@ ui <- function(request) {
       tabPanel(
         h2("Plot", style = "margin-top: 30px; margin-bottom: 30px"),
         fluidPage(
+          
+          ##### Plot sidebarPanel ####
           sidebarPanel(
             tags$style(type = "text/css", "body {padding-top: 140px;}"),
             actionButton("sampleFile", "Iris"),
+            
+            #### File input ####
             fileInput("file",
                 "Choose info-file to upload",
                 accept = c(
@@ -41,6 +45,7 @@ ui <- function(request) {
                 )
             ),
             
+            #### Sheet selection ####
             fluidRow(
               column(8, selectInput("sheet",
                 "Select sheet",
@@ -56,19 +61,20 @@ ui <- function(request) {
                 )
               )
             ),
-
+            
             selectInput("columns",
               "Select columns to exclude from gather",
               multiple = T,
               choices = NULL
             ),
-
+            
             selectInput("variables",
               "Variables to plot",
               multiple = T,
               choices = NULL
             ),
-
+            
+            #### Select omparison and grouping columns ####
             fluidRow(
               column(6, selectInput("comp",
                 "Compare by",
@@ -79,9 +85,10 @@ ui <- function(request) {
                 choices = NULL
               ))
             ),
-
+            
             hr(),
-
+            
+            #### Save plot ####
             fluidRow(
               column(8, textInput(
                 "filename",
@@ -99,7 +106,8 @@ ui <- function(request) {
                 )
               )
             ),
-
+            
+            #### Set plot dimensions ####
             fluidRow(
               column(6, sliderInput("plotHeight",
                 "Plot height (mm)",
@@ -114,9 +122,10 @@ ui <- function(request) {
                 value = 30
               ))
             ),
-
+            
             hr(),
-
+            
+            #### Modify Y label ####
             fluidRow(
               column(8, textInput("y.lab",
                 "Replace y axis label",
@@ -130,7 +139,8 @@ ui <- function(request) {
                 )
               )
             ),
-
+            
+            #### Modify X lables ####
             fluidRow(
               column(
                 6,
@@ -156,26 +166,29 @@ ui <- function(request) {
                 )
               )
             ),
-
+            
             textInput("trim",
               "Trim text from right side of group labels",
               value = "none"
             ),
-
+            
             hr(),
-
+            
+            #### Transform Y axis ####
             selectInput("trans.y",
               "Transform y",
               choices = c("identity", "log2", "log10"),
               selected = "identity"
             ),
-
+            
+            #### Select error type to plot ####
             selectInput("errortype",
               "Select errorbar type",
               choices = c("mean_se", "mean_sdl"),
               selected = "mean_se"
             ),
-
+            
+            #### Select statistical method ####
             fluidRow(
               column(4, selectInput("method",
                 "Stat test",
@@ -186,7 +199,7 @@ ui <- function(request) {
                   "kruskal.test"
                 )
               )),
-
+              
               column(4,
                 style = "margin-top: 25px;",
                 checkboxInput("refGroup",
@@ -202,7 +215,8 @@ ui <- function(request) {
                 )
               )
             ),
-
+            
+            #### Format width and dodge ####
             fluidRow(
               column(6, sliderInput("width",
                 "Width",
@@ -219,9 +233,10 @@ ui <- function(request) {
                 value = 0.80
               ))
             ),
-
+            
             hr(),
-
+            
+            #### Options for transforming counts ####
             selectInput("id",
               "ID column",
               choices = NULL
@@ -243,8 +258,11 @@ ui <- function(request) {
               ))
             )
           ),
-
+          
+          
           mainPanel(
+            
+            #### Plot type & legend options ####
             fluidRow(
               column(4, selectInput("geom",
                 "Select geoms to plot",
@@ -284,7 +302,7 @@ ui <- function(request) {
                 ),
                 selected = "right"
               )),
-
+              
               column(4,
                 style = "margin-top: 30px;",
                 actionButton("plt2rprt",
@@ -296,7 +314,8 @@ ui <- function(request) {
                 )
               )
             ),
-
+            
+            #### Font, point, stroke ####
             fluidRow(
               column(3, sliderInput("font",
                 "Font size",
@@ -326,9 +345,10 @@ ui <- function(request) {
                 choices = NULL
               ))
             ),
-
+            
             hr(),
             
+            #### Plot ####
             fluidRow(
               column(12,
                 align = "center",
@@ -340,13 +360,14 @@ ui <- function(request) {
             ),
             
             hr(),
-
+            
+            #### Shape, color, fill UI ####
             fluidRow(
               column(4, h4("Shapes"), uiOutput("shapes")),
               column(4, h4("Color"), uiOutput("colors")),
               column(4, h4("Fill"), uiOutput("fills"))
             ),
-
+            
             fluidRow(
               column(4, checkboxInput("lock.shapes", "Lock", F)),
               column(4, checkboxInput("lock.cols", "Lock", F)),
@@ -357,11 +378,13 @@ ui <- function(request) {
           )
         )
       ),
-
+      
       tabPanel(
         h2("Report", style = "margin-top: 30px; margin-bottom: 30px"),
         fluidPage(
           mainPanel(
+            
+            #### Clear report objects ####
             fluidRow(
               column(
                 4,
@@ -373,7 +396,7 @@ ui <- function(request) {
                                                border-color: #2e6da4"
                 )
               ),
-
+              
               column(4, actionButton("clearAll",
                 "Clear All",
                 class = "btn btn-primary btn-md",
@@ -382,14 +405,15 @@ ui <- function(request) {
                                         border-color: #2e6da4"
               ))
             ),
-
+            
+            #### Save report ####
             fluidRow(
-              column(3, textInput(
+              column(5, textInput(
                 "report",
                 "Filename",
                 "Report1"
               )),
-              column(3,
+              column(5,
                 style = "margin-top: 25px;",
                 downloadButton("downloadReport",
                   "Save",
@@ -398,18 +422,10 @@ ui <- function(request) {
                                                  background-color: #337ab7; 
                                                  border-color: #2e6da4"
                 )
-              ),
-              column(4, radioButtons("format",
-                "Document format",
-                choices = c(
-                  "PDF",
-                  "HTML",
-                  "Word"
-                ),
-                inline = TRUE
-              ))
+              )
             ),
             
+            #### Display report ####
             fluidRow(
               column(12,
                      align = "center",
@@ -422,23 +438,25 @@ ui <- function(request) {
           )
         )
       ),
-
+      
+      #### Statistics ####
       tabPanel(
-        h2("Statistics", style = "margin-top: 30px; margin-bottom: 30px"),
+        h2("Statistics", style = "margin-top: 30px; margin-bottom: 30px;"),
         fluidPage(
           mainPanel(
             dataTableOutput("stat_display"),
-
+            
             downloadButton("save.stat",
               "Download",
               style = "color: #fff; 
-                                        background-color: #337ab7; 
-                                        border-color: #2e6da4"
+                      background-color: #337ab7; 
+                      border-color: #2e6da4;"
             )
           )
         )
       ),
-
+      
+      #### Table of plotting data ####
       tabPanel(
         h2("Plot Data", style = "margin-top: 30px; margin-bottom: 30px"),
         fluidPage(
@@ -447,7 +465,8 @@ ui <- function(request) {
           )
         )
       ),
-
+      
+      #### Raw import data ####
       tabPanel(
         h2("Raw Data", style = "margin-top: 30px; margin-bottom: 30px"),
         fluidPage(
@@ -481,7 +500,7 @@ server <- function(input, output, session) {
     )
   })
 
-  # Get file/read sheets ####
+  #### Get file/read sheets ####
   observeEvent(input$file, {
     inFile(input$file)
     # Identify sheets and use them as choices to load file
@@ -494,7 +513,7 @@ server <- function(input, output, session) {
     )
   }, priority = 1)
 
-  # Make tibble from file ####
+  #### Make tibble from file ####
   observeEvent({
     input$sheet
   }, {
@@ -609,7 +628,7 @@ server <- function(input, output, session) {
   })
 
 
-  # Filter tibble ####
+  #### Filter tibble ####
   observeEvent({
     input$file
     input$sheet
@@ -668,7 +687,7 @@ server <- function(input, output, session) {
     dataFrame(d)
   }, priority = 3)
 
-  # Create plot object ####
+  #### Create plot object ####
   plotInput <- function() {
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
@@ -744,7 +763,7 @@ server <- function(input, output, session) {
     )
   }
 
-  # Create current plot ####
+  #### Create current plot ####
   currentPlot <- reactive({
     req(!is.null(dataFrame()))
     lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
@@ -758,7 +777,7 @@ server <- function(input, output, session) {
     plotInput()
   })
 
-  # Store current plot height ####
+  #### Store current plot height ####
   cpHeight <- reactive({
     if (is.null(dataFrame())) {
       return(1)
@@ -778,7 +797,7 @@ server <- function(input, output, session) {
     return(total.height * 3.7795275591)
   })
 
-  # Store current plot width ####
+  #### Store current plot width ####
   cpWidth <- reactive({
     if (is.null(dataFrame())) {
       return(1)
@@ -798,7 +817,7 @@ server <- function(input, output, session) {
   })
 
 
-  # Calculate stats ####
+  #### Calculate stats ####
   stats <- function() {
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
@@ -829,7 +848,7 @@ server <- function(input, output, session) {
     )
   }
 
-  # Create shape picker ####
+  #### Create shape picker ####
   output$shapes <- renderUI({
     req(input$variables, input$comp, input$comps, input$group)
     comparison <- c(input$comp)
@@ -860,7 +879,7 @@ server <- function(input, output, session) {
     })
   })
 
-  # Create color picker ####
+  #### Create color picker ####
   output$colors <- renderUI({
     req(input$variables, input$comp, input$comps, input$group)
 
@@ -887,7 +906,7 @@ server <- function(input, output, session) {
     })
   })
 
-  # Create fill picker ####
+  #### Create fill picker ####
   output$fills <- renderUI({
     req(input$variables, input$comp, input$comps, input$group)
 
@@ -916,7 +935,7 @@ server <- function(input, output, session) {
     })
   })
   
-  # Plot the data ####
+  #### Plot the data ####
   output$myPlot <- renderImage({
     # A temp file to save the output.
     # This file will be removed later by renderImage
@@ -924,9 +943,9 @@ server <- function(input, output, session) {
     
     # Generate the PNG
     png(outfile, 
-        width = cpWidth()*4, 
-        height = cpHeight()*4,
-        res = 72*4)
+        width = cpWidth()*3, 
+        height = cpHeight()*3,
+        res = 72*3)
     gridExtra::grid.arrange(currentPlot())
     dev.off()
     
@@ -938,7 +957,7 @@ server <- function(input, output, session) {
          alt = "This is alternate text")
   }, deleteFile = TRUE)
 
-  # Save plot ####
+  #### Save plot ####
   output$downloadPlot <- downloadHandler(
     filename = function() {
       paste0(input$filename, ".pdf")
@@ -955,13 +974,13 @@ server <- function(input, output, session) {
     }
   )
 
-  # Create stats table ####
+  #### Create stats table ####
   output$stat_display <- renderDataTable({
     req(input$variables)
     stats()
   })
 
-  # Save stats table ####
+  #### Save stats table ####
   output$save.stat <- downloadHandler(
     filename = function() {
       paste0(input$filename, "_stats", ".csv")
@@ -971,22 +990,20 @@ server <- function(input, output, session) {
     }
   )
 
-  # Create table of plotted data ####
+  #### Create table of plotted data ####
   output$data_table_display <- renderDataTable({
     req(input$variables)
     dataFrame()
   })
 
-  # Create table with raw data ####
+  #### Create table with raw data ####
   output$raw_data_table_display <- renderDataTable({
     req(input$variables)
     rawData()
   })
 
-  # Add current plot to report ####
+  #### Add current plot to report ####
   observeEvent(input$plt2rprt, {
-    h <<- 10
-    w <<- 10
     l <- length(plist)
     prev_numcol <- floor(sqrt(l + 1))
     current_numcol <- floor(sqrt(l + 2))
@@ -1004,7 +1021,7 @@ server <- function(input, output, session) {
     plist[[l + 1]] <<- currentPlot()
   })
 
-  # Clear last report from report ####
+  #### Clear last report from report ####
   observeEvent(input$clear, {
     l <- length(plist)
     ncols <- length(wlist)
@@ -1032,7 +1049,7 @@ server <- function(input, output, session) {
     }
   })
 
-  # Clear all plots from report ####
+  #### Clear all plots from report ####
   observeEvent({
     input$clearAll
   }, {
@@ -1057,7 +1074,7 @@ server <- function(input, output, session) {
     return(w)
   })
   
-  # Create report ####
+  #### Create report ####
   output$myReport <- renderImage({
     
     # A temp file to save the output.
@@ -1066,9 +1083,9 @@ server <- function(input, output, session) {
     
     # Generate the PNG
     png(outfile, 
-        width = reportWidth()*4, 
-        height = reportHeight()*4,
-        res = 72*4)
+        width = reportWidth()*3, 
+        height = reportHeight()*3,
+        res = 72*3)
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
       gridExtra::grid.arrange(
@@ -1086,13 +1103,10 @@ server <- function(input, output, session) {
          alt = "Nothing added to report yet.")
   }, deleteFile = TRUE)
 
-  # Download report ####
+  #### Download report ####
   output$downloadReport <- downloadHandler(
     filename = function() {
-      paste(input$report,
-        switch(input$format, PDF = "pdf", HTML = "html", Word = "docx"),
-        sep = "."
-      )
+      paste(input$report, "pdf", sep = ".")
     },
 
     content = function(file) {
@@ -1142,7 +1156,7 @@ server <- function(input, output, session) {
     )
   })
 
-  # Stop app on close ####
+  #### Stop app on close ####
   session$onSessionEnded(function() {
     rm("leg", envir = globalenv())
     graphics.off()
