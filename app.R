@@ -776,6 +776,7 @@ server <- function(input, output, session) {
 
   #### Create plot object ####
   plotInput <- function() {
+    print("running plotting function")
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
     comparisons <- unique(dataFrame()[[input$comp]])
@@ -852,7 +853,6 @@ server <- function(input, output, session) {
   #### Create current plot ####
   currentPlot <- reactive({
     req(!is.null(dataFrame()))
-    print("Generating current plot")
     lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
       req(
         input[[paste0("shape", i)]],
@@ -860,6 +860,7 @@ server <- function(input, output, session) {
         input[[paste0("fill", i)]]
       )
     })
+    print("Generating current plot")
     plotInput()
   })
 
@@ -872,9 +873,7 @@ server <- function(input, output, session) {
     
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
     lheight <- ifelse(input$legend != "none",
-      sum(as.numeric(grid::convertUnit(leg$height, "mm"))),
-      0
-    )
+      sum(as.numeric(grid::convertUnit(leg$height, "mm"))), 0)
     if (input$legend %in% c("top", "bottom")) {
       total.height <- sum(pheight, lheight)
     } else {
@@ -907,6 +906,7 @@ server <- function(input, output, session) {
 
   #### Calculate stats ####
   stats <- function() {
+    print("calculating statistics")
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
     comps <- c(input$comps)
@@ -1040,6 +1040,7 @@ server <- function(input, output, session) {
 
   #### Plot the data ####
   output$myPlot <- renderImage({
+    print("rendering plot")
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = ".png")
@@ -1136,6 +1137,7 @@ server <- function(input, output, session) {
                       "loadPlot",
                       choices = reportPlots,
                       selected = reportPlots[l])
+    input_values <<- isolate(reactiveValuesToList(input))
   })
 
   #### Clear last report from report ####
@@ -1147,6 +1149,7 @@ server <- function(input, output, session) {
     
     if (l > 0) {
       plist[[l]] <<- NULL
+      inputs[[as.character(l)]] <- NULL
       new_ncols <- floor(sqrt(l))
       new_nrows <- floor((l) / new_ncols)
       
@@ -1176,13 +1179,16 @@ server <- function(input, output, session) {
   observeEvent(input$clearAll, {
     print("clear all plots from report was clicked")
     plist <<- list()
+    for (i in length(plist):1) {
+      inputs[[as.character(i)]] <- NULL
+    }
     wlist <<- c()
     hlist <<- c()
     reportHeight(10)
     reportWidth(10)
     updateSelectInput(session,
                       "loadPlot",
-                      choices = NULL)
+                      choices = "",)
   })
 
   # reportHeight <- reactive({
@@ -1306,7 +1312,99 @@ server <- function(input, output, session) {
                       "group",
                       selected = inputs[[input$loadPlot]]$group
     )
+    updateSelectInput(session,
+                      "comps",
+                      selected = inputs[[input$loadPlot]]$comps
+    )
   }, priority = -6)
+  
+  observeEvent(input$load, {
+    print("Loading independent inputs")
+    updateTextInput(session,
+                      "y.lab",
+                      value = inputs[[input$loadPlot]]$y.lab
+    )
+    updateSelectInput(session,
+                      "geom",
+                      selected = inputs[[input$loadPlot]]$geom
+    )
+    updateSelectInput(session,
+                      "method",
+                      selected = inputs[[input$loadPlot]]$method
+    )
+    updateSelectInput(session,
+                      "trans.y",
+                      selected = inputs[[input$loadPlot]]$trans.y
+    )
+    updateSelectInput(session,
+                      "legend",
+                      selected = inputs[[input$loadPlot]]$legend
+    )
+    updateSelectInput(session,
+                      "errortype",
+                      selected = inputs[[input$loadPlot]]$errortype
+    )
+    updateSliderInput(session,
+                       "font",
+                       value = inputs[[input$loadPlot]]$font
+    )
+    updateSliderInput(session,
+                       "size",
+                       value = inputs[[input$loadPlot]]$size
+    )
+    updateSliderInput(session,
+                      "stroke",
+                      value = inputs[[input$loadPlot]]$stroke
+    )
+    updateSliderInput(session,
+                       "plotWidth",
+                       value = inputs[[input$loadPlot]]$plotWidth
+    )
+    updateSliderInput(session,
+                       "plotHeight",
+                       value = inputs[[input$loadPlot]]$plotHeight
+    )
+    updateSliderInput(session,
+                       "width",
+                       value = inputs[[input$loadPlot]]$width
+    )
+    updateSliderInput(session,
+                      "dodge",
+                      value = inputs[[input$loadPlot]]$dodge
+    )
+    updateNumericInput(session,
+                       "dilution",
+                       value = inputs[[input$loadPlot]]$dilution
+    )
+    updateNumericInput(session,
+                       "bead",
+                       value = inputs[[input$loadPlot]]$bead
+    )
+    updateTextInput(session,
+                       "trim",
+                       value = inputs[[input$loadPlot]]$trim
+    )
+    updateTextInput(session,
+                    "split.on",
+                    value = inputs[[input$loadPlot]]$split.on
+    )
+    for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
+      updateColourInput(session,
+                        paste0("col", i),
+                        value = inputs[[input$loadPlot]][[paste0("col", i)]]
+      )
+      updateColourInput(session,
+                        paste0("fill", i),
+                        value = inputs[[input$loadPlot]][[paste0("fill", i)]]
+      )
+      updateSelectInput(session,
+                        paste0("shape", i),
+                        selected = inputs[[input$loadPlot]][[paste0("shape", i)]]
+      )
+    }
+  }, priority = -7)
+  
+  
 
 
   onRestored(function(state) {
