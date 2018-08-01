@@ -305,15 +305,20 @@ ui <- function(request) {
                           border-color: #2e6da4"
                 )
               ),
-              column(3,
-                style = "margin-top: 30px;",
-                actionButton("loadLast", 
-                  label = "Load last stored plot",
-                  class = "btn btn-primary btn-sm",
-                  style = "color: #fff; 
-                          background-color: #337ab7; 
-                          border-color: #2e6da4"
-                )
+              column(2,
+                selectInput("loadPlot",
+                            "Load plot",
+                            choices = NULL)
+              ),
+              column(1,
+                     style = "margin-top: 30px;",
+                     actionButton("load",
+                                  label = "Load",
+                                  class = "btn btn-primary btn-sm",
+                                  style = "color: #fff; 
+                                  background-color: #337ab7; 
+                                  border-color: #2e6da4"
+                     )
               )
             ),
 
@@ -488,6 +493,9 @@ server <- function(input, output, session) {
   dataFrame <- reactiveVal(NULL)
   rawData <- reactiveVal(NULL)
   inFile <- reactiveVal(NULL)
+  reportHeight <- reactiveVal()
+  reportWidth <- reactiveVal()
+  inputs <- reactiveValues()
   
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
@@ -725,12 +733,7 @@ server <- function(input, output, session) {
       length(input$comps) > 1
     )
     print("filtering dataframe")
-    print(isolate(input$columns))
-    print(isolate(input$variables))
-    print(isolate(input$comp))
-    print(isolate(input$comps))
-    print(isolate(input$group))
-
+    
     d <- gather(
       rawData(),
       variable,
@@ -769,8 +772,6 @@ server <- function(input, output, session) {
     }
     
     dataFrame(d)
-    print(d)
-    print(dataFrame())
   }, priority = 10)
 
   #### Create plot object ####
@@ -1125,10 +1126,16 @@ server <- function(input, output, session) {
       hlist[length(hlist) + 1] <<- cpHeight()
     }
     
-    h <<- sum(hlist)
-    w <<- sum(wlist)
+    reportHeight(sum(hlist))
+    reportWidth(sum(wlist))
     plist[[l + 1]] <<- currentPlot()
-    inputs <<- isolate(reactiveValuesToList(input))
+    l <- length(plist)
+    inputs[[as.character(l)]] <- isolate(reactiveValuesToList(input))
+    reportPlots <- as.character(1:l)
+    updateSelectInput(session,
+                      "loadPlot",
+                      choices = reportPlots,
+                      selected = reportPlots[l])
   })
 
   #### Clear last report from report ####
@@ -1154,8 +1161,14 @@ server <- function(input, output, session) {
       if (new_nrows < nrows) {
         hlist <<- head(hlist, -1)
       }
-      h <<- sum(hlist)
-      w <<- sum(wlist)
+      reportHeight(sum(hlist))
+      reportWidth(sum(wlist))
+      l <- length(plist)
+      reportPlots <- as.character(1:l)
+      updateSelectInput(session,
+                        "loadPlot",
+                        choices = reportPlots,
+                        selected = reportPlots[l])
     }
   })
 
@@ -1165,25 +1178,28 @@ server <- function(input, output, session) {
     plist <<- list()
     wlist <<- c()
     hlist <<- c()
-    h <<- 10
-    w <<- 10
+    reportHeight(10)
+    reportWidth(10)
+    updateSelectInput(session,
+                      "loadPlot",
+                      choices = NULL)
   })
 
-  reportHeight <- reactive({
-    print("report height changed")
-    pltrprt <- input$plt2rprt
-    clearlast <- input$clear
-    clearall <- input$clearAll
-    return(h)
-  })
-
-  reportWidth <- reactive({
-    print("report width changed")
-    pltrprt <- input$plt2rprt
-    clearlast <- input$clear
-    clearall <- input$clearAll
-    return(w)
-  })
+  # reportHeight <- reactive({
+  #   print("report height changed")
+  #   pltrprt <- input$plt2rprt
+  #   clearlast <- input$clear
+  #   clearall <- input$clearAll
+  #   return(h)
+  # })
+  # 
+  # reportWidth <- reactive({
+  #   print("report width changed")
+  #   pltrprt <- input$plt2rprt
+  #   clearlast <- input$clear
+  #   clearall <- input$clearAll
+  #   return(w)
+  # })
 
   #### Create report ####
   output$myReport <- renderImage({
@@ -1234,66 +1250,66 @@ server <- function(input, output, session) {
             )
           },
         useDingbats = F,
-        height = (h / 3.7795275591),
-        width = (w / 3.7795275591),
+        height = (reportHeight() / 3.7795275591),
+        width = (reportWidth() / 3.7795275591),
         units = "mm",
         device = "pdf"
       )
     }
   )
   
-  observeEvent(input$loadLast, {
+  #### Load plot from report ####
+  observeEvent(input$load, {
     print("Loading last sheet")
     updateSelectInput(session,
                       "sheet",
-                      selected = inputs$sheet
+                      selected = inputs[[input$loadPlot]]$sheet
     )
   }, priority = -1)
   
-  observeEvent(input$loadLast, {
+  observeEvent(input$load, {
     print("Loading last columns")
     updateSelectInput(session,
                       "columns",
-                      selected = inputs$columns
+                      selected = inputs[[input$loadPlot]]$columns
     )
   }, priority = -2)
   
-  observeEvent(input$loadLast, {
+  observeEvent(input$load, {
     print("Loading last variables")
     updateSelectInput(session,
                       "variables",
-                      selected = inputs$variables
+                      selected = inputs[[input$loadPlot]]$variables
     )
   }, priority = -3)
   
-  observeEvent(input$loadLast, {
+  observeEvent(input$load, {
     print("Loading last comparisons")
     updateSelectInput(session,
                       "comp",
-                      selected = inputs$comp
+                      selected = inputs[[input$loadPlot]]$comp
     )
   }, priority = -4)
   
-  observeEvent(input$loadLast, {
+  observeEvent(input$load, {
     
     print("Loading last id")
     updateSelectInput(session,
                       "id",
-                      selected = inputs$id
+                      selected = inputs[[input$loadPlot]]$id
     )
   }, priority = -5)
   
-  observeEvent(input$loadLast, {
+  observeEvent(input$load, {
     print("Loading last group")
     updateSelectInput(session,
                       "group",
-                      selected = inputs$group
+                      selected = inputs[[input$loadPlot]]$group
     )
   }, priority = -6)
 
 
   onRestored(function(state) {
-    browser()
     updateSelectInput(session,
       "sheet",
       selected = state$input$sheet
@@ -1301,7 +1317,6 @@ server <- function(input, output, session) {
   })
   
   onRestored(function(state) {
-    browser()
     updateSelectInput(session,
       "columns",
       selected = state$input$columns
