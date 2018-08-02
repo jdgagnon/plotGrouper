@@ -319,6 +319,16 @@ ui <- function(request) {
                                   background-color: #337ab7; 
                                   border-color: #2e6da4"
                      )
+              ),
+              column(1,
+                     style = "margin-top: 30px;",
+                     actionButton("update",
+                                  label = "Update",
+                                  class = "btn btn-primary btn-sm",
+                                  style = "color: #fff; 
+                                  background-color: #337ab7; 
+                                  border-color: #2e6da4"
+                     )
               )
             ),
 
@@ -1403,6 +1413,14 @@ server <- function(input, output, session) {
       )
     }
   }, priority = -7)
+  
+  
+  #### Update plot in report ####
+  observeEvent(input$update, {
+    print("updating plot in report")
+    plist[[as.numeric(input$loadPlot)]] <<- currentPlot()
+    inputs[[input$loadPlot]] <- isolate(reactiveValuesToList(input))
+  }, priority = 12)
   
   
 
