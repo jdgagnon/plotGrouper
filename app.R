@@ -28,6 +28,7 @@ ui <- function(request) {
           ##### Plot sidebarPanel ####
           sidebarPanel(
             tags$style(type = "text/css", "body {padding-top: 140px;}"),
+            bookmarkButton(),
             actionButton("sampleFile", "Iris"),
 
             #### File input ####
@@ -492,7 +493,7 @@ ui <- function(request) {
           )
         )
       )
-    ), bookmarkButton()
+    )
   )
 }
 
@@ -1198,7 +1199,8 @@ server <- function(input, output, session) {
     reportWidth(10)
     updateSelectInput(session,
                       "loadPlot",
-                      choices = "",)
+                      choices = "",
+                      selected = "")
   })
 
   # reportHeight <- reactive({
@@ -1422,7 +1424,11 @@ server <- function(input, output, session) {
     inputs[[input$loadPlot]] <- isolate(reactiveValuesToList(input))
   }, priority = 12)
   
-  
+  onBookmark(function(state) {
+    state$values$plist <- plist
+    state$values$inputs <- reactiveValuesToList(inputs)
+    state$values$plistLength <- length(plist)
+  })
 
 
   onRestored(function(state) {
@@ -1453,6 +1459,17 @@ server <- function(input, output, session) {
       "group",
       selected = state$input$group
     )
+    plist <- state$values$plist
+    plistLength <- state$values$plistLength
+    plistPlots <- as.character(1:plistLength)
+    updateSelectInput(session,
+                      "loadPlot",
+                      choices = plistPlots,
+                      selected = tail(plistPlots, 1)
+    )
+    for (i in 1:plistLength) {
+      inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
+    }
   })
 
   #### Stop app on close ####
