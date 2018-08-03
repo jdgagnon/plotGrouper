@@ -501,6 +501,14 @@ ui <- function(request) {
 
 
 server <- function(input, output, session) {
+  setBookmarkExclude(c("loadPlot", 
+                       "plt2rprt", 
+                       "sampleFile", 
+                       "clear", 
+                       "clearAll", 
+                       "load",
+                       "update")
+  )
   dataFrame <- reactiveVal(NULL)
   rawData <- reactiveVal(NULL)
   inFile <- reactiveVal(NULL)
@@ -704,7 +712,6 @@ server <- function(input, output, session) {
   
   #### Update comps ####
   observeEvent({
-    input$sheet
     input$comp}, {
     req(input$sheet,
         input$comp)
@@ -956,7 +963,6 @@ server <- function(input, output, session) {
         input$group)
     print("shape picker")
     
-    comparison <- c(input$comp)
     comparisons <- c(input$comps)
     options <- c(19, 21, 17, 24, 15, 22)
     choices <- c(19, 21, 17, 24, 15, 22)
@@ -993,7 +999,6 @@ server <- function(input, output, session) {
         input$group)
     print("color picker")
     
-    comparison <- c(input$comp)
     comparisons <- c(input$comps)
     choices <- palette_cols()
     comps <- input$comps
@@ -1025,7 +1030,6 @@ server <- function(input, output, session) {
         input$group)
     print("fill picker")
     
-    comparison <- c(input$comp)
     comparisons <- c(input$comps)
     comps <- input$comps
     choices <- palette_fills()
@@ -1151,7 +1155,7 @@ server <- function(input, output, session) {
     input_values <<- isolate(reactiveValuesToList(input))
   })
 
-  #### Clear last report from report ####
+  #### Clear last plot from report ####
   observeEvent(input$clear, {
     print("clear last plot from report was clicked")
     l <- length(plist)
@@ -1400,6 +1404,10 @@ server <- function(input, output, session) {
                     "split.on",
                     value = inputs[[input$loadPlot]]$split.on
     )
+  }, priority = -7)
+  
+  observeEvent(input$load, {
+    print("updating colors, fills, shapes")
     for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
       updateColourInput(session,
                         paste0("col", i),
@@ -1414,7 +1422,7 @@ server <- function(input, output, session) {
                         selected = inputs[[input$loadPlot]][[paste0("shape", i)]]
       )
     }
-  }, priority = -7)
+  }, priority = -8)
   
   
   #### Update plot in report ####
@@ -1428,37 +1436,18 @@ server <- function(input, output, session) {
     state$values$plist <- plist
     state$values$inputs <- reactiveValuesToList(inputs)
     state$values$plistLength <- length(plist)
+    state$values$hlist <- hlist
+    state$values$wlist <- wlist
   })
 
 
   onRestored(function(state) {
-    updateSelectInput(session,
-      "sheet",
-      selected = state$input$sheet
-    )
-  })
-  
-  onRestored(function(state) {
-    updateSelectInput(session,
-      "columns",
-      selected = state$input$columns
-    )
-    updateSelectInput(session,
-      "variables",
-      selected = state$input$variables
-    )
-    updateSelectInput(session,
-      "comp",
-      selected = state$input$comp
-    )
-    updateSelectInput(session,
-      "id",
-      selected = state$input$id
-    )
-    updateSelectInput(session,
-      "group",
-      selected = state$input$group
-    )
+    print("Restoring report")
+    # updateSelectInput(session,
+    #   "sheet",
+    #   selected = state$input$sheet
+    # )
+    
     plist <- state$values$plist
     plistLength <- state$values$plistLength
     plistPlots <- as.character(1:plistLength)
@@ -1470,7 +1459,60 @@ server <- function(input, output, session) {
     for (i in 1:plistLength) {
       inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
     }
+    hlist <- state$values$hlist
+    wlist <- state$values$wlist
+    reportHeight(sum(hlist))
+    reportWidth(sum(wlist))
   })
+  
+  # onRestored(function(state) {
+  #   print("Restoring columns")
+  #   updateSelectInput(session,
+  #     "columns",
+  #     selected = state$input$columns
+  #   )
+  # })
+  #   
+  # onRestored(function(state) {
+  #   updateSelectInput(session,
+  #     "variables",
+  #     selected = state$input$variables
+  #   )
+  # })
+  # 
+  # onRestored(function(state) {
+  #   print("restoring comp, group, id")
+  #   updateSelectInput(session,
+  #                     "comp",
+  #                     selected = state$input$comp
+  #   )
+  #   updateSelectInput(session,
+  #                     "group",
+  #                     selected = state$input$group
+  #   )
+  #   updateSelectInput(session,
+  #                     "id",
+  #                     selected = state$input$id
+  #   )
+  # })
+  # 
+  # onRestored(function(state) {
+  #   print("Restoring colors, fills, and shapes")
+  #   for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
+  #     updateColourInput(session,
+  #                       paste0("col", i),
+  #                       value = inputs[[input$loadPlot]][[paste0("col", i)]]
+  #     )
+  #     updateColourInput(session,
+  #                       paste0("fill", i),
+  #                       value = inputs[[input$loadPlot]][[paste0("fill", i)]]
+  #     )
+  #     updateSelectInput(session,
+  #                       paste0("shape", i),
+  #                       selected = inputs[[input$loadPlot]][[paste0("shape", i)]]
+  #     )
+  #   }
+  # })
 
   #### Stop app on close ####
   session$onSessionEnded(function() {
