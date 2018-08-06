@@ -104,15 +104,15 @@ ui <- function(request) {
             fluidRow(
               column(6, sliderInput("plotHeight",
                 "Plot height (mm)",
-                min = 20,
+                min = 10,
                 max = 150,
-                value = 40
+                value = 30
               )),
               column(6, sliderInput("plotWidth",
                 "Plot width (mm)",
-                min = 20,
+                min = 10,
                 max = 150,
-                value = 30
+                value = 20
               ))
             ),
 
@@ -339,7 +339,7 @@ ui <- function(request) {
                 "Font size",
                 min = 8,
                 max = 25,
-                value = 9,
+                value = 8,
                 step = 0.5
               )),
               column(3, sliderInput("size",
@@ -352,8 +352,8 @@ ui <- function(request) {
               column(3, sliderInput("stroke",
                 "Stroke size",
                 min = 0.25,
-                max = 2,
-                value = 0.5,
+                max = 1,
+                value = 0.25,
                 step = 0.25
               )),
 
@@ -712,6 +712,7 @@ server <- function(input, output, session) {
   
   #### Update comps ####
   observeEvent({
+    input$sheet
     input$comp}, {
     req(input$sheet,
         input$comp)
@@ -1456,13 +1457,14 @@ server <- function(input, output, session) {
                       choices = plistPlots,
                       selected = tail(plistPlots, 1)
     )
-    for (i in 1:plistLength) {
-      inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
-    }
     hlist <- state$values$hlist
     wlist <- state$values$wlist
     reportHeight(sum(hlist))
     reportWidth(sum(wlist))
+    for (i in 1:plistLength) {
+      inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
+    }
+
   })
   
   # onRestored(function(state) {
