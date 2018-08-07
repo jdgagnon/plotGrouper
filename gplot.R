@@ -499,9 +499,58 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     } else {
       leg <<- "none"
     }
-    egg::set_panel_size(g,
+    gt <- egg::set_panel_size(g,
       width = unit(plotWidth, "mm"),
       height = unit(plotHeight, "mm")
     )
+    
+    gt$layout$clip[gt$layout$name == "panel"] <- "off"
+    
+    # rect grobs such as those created by geom_bar() have "height" / "width" measurements,
+    # while point & text grobs have "y" / "x" measurements, & we look for both
+    max.grob.heights <- sapply(gt$grob[[which(gt$layout$name == "panel")]]$children,
+                               function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
+                                                  max(as.numeric(x$height), na.rm = T),
+                                                  ifelse(!is.null(x$y) & "unit" %in% class(x$y),
+                                                         max(as.numeric(x$y)),
+                                                         0)))
+    max.grob.heights = max(max.grob.heights, na.rm = T)
+    
+    min.grob.heights <- sapply(gt$grob[[which(gt$layout$name == "panel")]]$children,
+                               function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
+                                                  min(as.numeric(x$height), na.rm = T),
+                                                  ifelse(!is.null(x$y) & "unit" %in% class(x$y),
+                                                         min(as.numeric(x$y)),
+                                                         0)))
+    min.grob.heights = min(min.grob.heights, na.rm = T)
+    
+    # identify panel row & calculate panel height
+    panel.row <- gt$layout[gt$layout$name == "panel", "t"] # = 7
+    panel.height <- as.numeric(grid::convertUnit(gt$heights[panel.row],"mm"))
+    
+    # calculate height of all the grobs above the panel
+    height.above.panel <- gt$heights[1:(panel.row - 1)]
+    height.above.panel <- sum(as.numeric(grid::convertUnit(height.above.panel, "mm")), na.rm = T)
+    
+    # check whether the out-of-bound object (if any) exceeds this height, & replace if necessary
+    if(max.grob.heights > 1){
+      oob.height.above.panel <- (max.grob.heights - 1) * panel.height
+      height.above.panel <- max(height.above.panel, oob.height.above.panel, na.rm = T)
+    }
+    
+    # as above, calculate the height of all the grobs below the panel
+    height.below.panel <- gt$heights[(panel.row + 1):length(gt$heights)]
+    height.below.panel <- sum(as.numeric(grid::convertUnit(height.below.panel, "mm")), na.rm = T)
+    
+    # as above
+    if(min.grob.heights < 0){
+      oob.height.below.panel <- abs(min.grob.heights) * panel.height
+      height.below.panel <- max(height.below.panel, oob.height.below.panel, na.rm = T)
+    }
+    
+    # sum the result
+    pheight <- height.above.panel + panel.height + height.below.panel
+    gt <- gtable::gtable_add_padding(gt, padding = unit(c(height.above.panel,0,0,0),"mm"))
+    return(gt)
   }
 }

@@ -789,7 +789,6 @@ server <- function(input, output, session) {
         filter(variable %in% c(input$variables)) %>%
         filter(!grepl("Bead|Ungated", variable))
     }
-    
     dataFrame(d)
   }, priority = 10)
 
@@ -898,6 +897,7 @@ server <- function(input, output, session) {
     } else {
       total.height <- pheight
     }
+    
     # return total height in pixels
     return(total.height * 3.7795275591)
   })
@@ -1089,7 +1089,7 @@ server <- function(input, output, session) {
       ggsave(file,
         plot = currentPlot(),
         useDingbats = F,
-        height = sum((cpHeight() / 3.7795275591), 15),
+        height = cpHeight() / 3.7795275591,
         width = cpWidth() / 3.7795275591,
         units = "mm",
         device = "pdf"
@@ -1238,6 +1238,7 @@ server <- function(input, output, session) {
       height = reportHeight() * 3,
       res = 72 * 3
     )
+    
     if (length(plist) > 0) {
       numcol <- floor(sqrt(length(plist) + 1))
       gridExtra::grid.arrange(
@@ -1449,7 +1450,7 @@ server <- function(input, output, session) {
     #   selected = state$input$sheet
     # )
     
-    plist <- state$values$plist
+    plist <<- state$values$plist
     plistLength <- state$values$plistLength
     plistPlots <- as.character(1:plistLength)
     updateSelectInput(session,
@@ -1457,14 +1458,13 @@ server <- function(input, output, session) {
                       choices = plistPlots,
                       selected = tail(plistPlots, 1)
     )
-    hlist <- state$values$hlist
-    wlist <- state$values$wlist
+    hlist <<- state$values$hlist
+    wlist <<- state$values$wlist
     reportHeight(sum(hlist))
     reportWidth(sum(wlist))
     for (i in 1:plistLength) {
       inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
     }
-
   })
   
   # onRestored(function(state) {
