@@ -17,7 +17,8 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
          y.lim = NULL,
          y.lab = NULL,
          trans.y = "identity",
-         x.lim = NULL,
+         x.lim = c(NA, NA),
+         expand.y = c(0, 0),
          x.lab = NULL,
          trans.x = "identity",
          sci = F,
@@ -47,13 +48,13 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     group.labs <- function(x) {
       x
     }
-  } else if (is.null(group.labs) & split == T) {
+  } else if (is.null(group.labs) & split == T & is.null(split_str)) {
     group.labs <- function(x) {
       sapply(str_remove(word(str_remove(x, trim), -1, sep = "/"), " %| #|% |# "), "[", 1)
     }
-  } else if (is.null(group.labs) & split == T & !is.null(split.str)) {
+  } else if (is.null(group.labs) & split == T & !is.null(split_str)) {
     group.labs <- function(x) {
-      sapply(strsplit(str_remove(x, trim), split = split.str, fixed = TRUE), "[", 2)
+      sapply(strsplit(str_remove(x, trim), split = split_str, fixed = TRUE), "[", 2)
     }
   } else {
     group.labs <- group.labs
@@ -77,7 +78,14 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     df[, group.by] <- factor(df[[group.by]], levels = unique(df[[group.by]])[levs])
     scale.x <- scale_x_discrete(labels = group.labs, breaks = unique(df[[group.by]]))
   } else {
-    scale.x <- scale_x_continuous(breaks = df[[group.by]], labels = formatC(df[[group.by]], drop0trailing = T), trans = trans.x)
+    scale.x <- scale_x_continuous(
+      breaks = df[[group.by]],
+      labels = formatC(df[[group.by]],
+        drop0trailing = T
+      ),
+      trans = trans.x,
+      limits = x.lim
+    )
   }
 
   df <- arrange_(df, comparison) # Arrange tibble according to levels of comparison
@@ -93,10 +101,9 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     ungroup() %>%
     arrange_(group.by))
 
-  if (is.null(y.lim)) {
+  if (all(is.na(y.lim))) {
     # y.lim <- c(0,NA)
     y.lim <- c(0, max(dmax[, c("value", "error_max")], na.rm = T) * 1.08)
-    expand.y <- c(0, 0)
   }
 
   # If no comparisons are specified, perform all comparisons
@@ -184,8 +191,8 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     logBase <- parse_number(trans.y)
     statistics <- statistics %>%
       mutate(
-        h.p = h.p^logBase,
-        h.s = h.s^logBase
+        h.p = h.p * logBase,
+        h.s = h.s * logBase
       )
   }
 
@@ -272,7 +279,9 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       labs.y <- scales::trans_format(trans.y, scales::math_format(10^.x))
     }
 
-    y.lim <- c(NA, NA)
+    if (statist) {
+      y.lim <- c(NA, NA)
+    }
     expand.y <- c(0.05, 0.05)
   }
 
@@ -419,7 +428,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   })
 
   suppressWarnings(if (geom %in% "density") {
-    scale.x <- scale_x_continuous()
+    scale.x <- scale_x_continuous(expand = c(0, 0), limits = x.lim)
     y.lim <- c(0, NA)
   })
 
@@ -446,7 +455,6 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     scale_fill_manual(values = fill.groups) +
     scale_alpha_manual(values = alpha.groups) +
     scale_color_manual(values = color.groups) +
-    coord_cartesian(clip = "off") +
     lapply(geom, function(x) get(x)) +
     theme(
       line = element_line(
@@ -460,7 +468,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       ),
       rect = element_blank(),
       panel.grid = element_blank(),
-      aspect.ratio = aspect.ratio,
+      # aspect.ratio = aspect.ratio,
       legend.position = leg.pos,
       legend.title = element_text(
         family = "Helvetica",
@@ -503,54 +511,62 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       width = unit(plotWidth, "mm"),
       height = unit(plotHeight, "mm")
     )
-    
+
     gt$layout$clip[gt$layout$name == "panel"] <- "off"
-    
+
     # rect grobs such as those created by geom_bar() have "height" / "width" measurements,
     # while point & text grobs have "y" / "x" measurements, & we look for both
-    max.grob.heights <- sapply(gt$grob[[which(gt$layout$name == "panel")]]$children,
-                               function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
-                                                  max(as.numeric(x$height), na.rm = T),
-                                                  ifelse(!is.null(x$y) & "unit" %in% class(x$y),
-                                                         max(as.numeric(x$y)),
-                                                         0)))
-    max.grob.heights = max(max.grob.heights, na.rm = T)
-    
-    min.grob.heights <- sapply(gt$grob[[which(gt$layout$name == "panel")]]$children,
-                               function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
-                                                  min(as.numeric(x$height), na.rm = T),
-                                                  ifelse(!is.null(x$y) & "unit" %in% class(x$y),
-                                                         min(as.numeric(x$y)),
-                                                         0)))
-    min.grob.heights = min(min.grob.heights, na.rm = T)
-    
+    max.grob.heights <- sapply(
+      gt$grob[[which(gt$layout$name == "panel")]]$children,
+      function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
+          max(as.numeric(x$height), na.rm = T),
+          ifelse(!is.null(x$y) & "unit" %in% class(x$y),
+            max(as.numeric(x$y)),
+            0
+          )
+        )
+    )
+    max.grob.heights <- max(max.grob.heights, na.rm = T)
+
+    min.grob.heights <- sapply(
+      gt$grob[[which(gt$layout$name == "panel")]]$children,
+      function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
+          min(as.numeric(x$height), na.rm = T),
+          ifelse(!is.null(x$y) & "unit" %in% class(x$y),
+            min(as.numeric(x$y)),
+            0
+          )
+        )
+    )
+    min.grob.heights <- min(min.grob.heights, na.rm = T)
+
     # identify panel row & calculate panel height
     panel.row <- gt$layout[gt$layout$name == "panel", "t"] # = 7
-    panel.height <- as.numeric(grid::convertUnit(gt$heights[panel.row],"mm"))
-    
+    panel.height <- as.numeric(grid::convertUnit(gt$heights[panel.row], "mm"))
+
     # calculate height of all the grobs above the panel
     height.above.panel <- gt$heights[1:(panel.row - 1)]
     height.above.panel <- sum(as.numeric(grid::convertUnit(height.above.panel, "mm")), na.rm = T)
-    
+
     # check whether the out-of-bound object (if any) exceeds this height, & replace if necessary
-    if(max.grob.heights > 1){
+    if (max.grob.heights > 1) {
       oob.height.above.panel <- (max.grob.heights - 1) * panel.height
       height.above.panel <- max(height.above.panel, oob.height.above.panel, na.rm = T)
     }
-    
+
     # as above, calculate the height of all the grobs below the panel
     height.below.panel <- gt$heights[(panel.row + 1):length(gt$heights)]
     height.below.panel <- sum(as.numeric(grid::convertUnit(height.below.panel, "mm")), na.rm = T)
-    
+
     # as above
-    if(min.grob.heights < 0){
+    if (min.grob.heights < 0) {
       oob.height.below.panel <- abs(min.grob.heights) * panel.height
       height.below.panel <- max(height.below.panel, oob.height.below.panel, na.rm = T)
     }
-    
+
     # sum the result
     pheight <- height.above.panel + panel.height + height.below.panel
-    gt <- gtable::gtable_add_padding(gt, padding = unit(c(height.above.panel,0,0,0),"mm"))
+    gt <- gtable::gtable_add_padding(gt, padding = unit(c(height.above.panel, 0, 0, 0), "mm"))
     return(gt)
   }
 }

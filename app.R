@@ -167,10 +167,29 @@ ui <- function(request) {
             hr(),
 
             #### Transform Y axis ####
-            selectInput("trans.y",
-              "Transform y",
-              choices = c("identity", "log2", "log10"),
-              selected = "identity"
+            fluidRow(
+              column(
+                6,
+                selectInput("trans.y",
+                  "Transform y",
+                  choices = c("identity", "log2", "log10"),
+                  selected = "identity"
+                )
+              ),
+              column(
+                3,
+                numericInput("y.max",
+                  "Y max",
+                  value = NULL
+                )
+              ),
+              column(
+                3,
+                numericInput("y.min",
+                  "Y min",
+                  value = NULL
+                )
+              )
             ),
 
             #### Select error type to plot ####
@@ -305,30 +324,32 @@ ui <- function(request) {
                           border-color: #2e6da4"
                 )
               ),
-              column(2,
+              column(
+                2,
                 selectInput("loadPlot",
-                            "Load plot",
-                            choices = NULL)
+                  "Load plot",
+                  choices = NULL
+                )
               ),
               column(1,
-                     style = "margin-top: 30px;",
-                     actionButton("load",
-                                  label = "Load",
-                                  class = "btn btn-primary btn-sm",
-                                  style = "color: #fff; 
+                style = "margin-top: 30px;",
+                actionButton("load",
+                  label = "Load",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff; 
                                   background-color: #337ab7; 
                                   border-color: #2e6da4"
-                     )
+                )
               ),
               column(1,
-                     style = "margin-top: 30px;",
-                     actionButton("update",
-                                  label = "Update",
-                                  class = "btn btn-primary btn-sm",
-                                  style = "color: #fff; 
+                style = "margin-top: 30px;",
+                actionButton("update",
+                  label = "Update",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff; 
                                   background-color: #337ab7; 
                                   border-color: #2e6da4"
-                     )
+                )
               )
             ),
 
@@ -500,16 +521,17 @@ ui <- function(request) {
 
 
 server <- function(input, output, session) {
-  options(shiny.maxRequestSize=50*1024^2)
-  setBookmarkExclude(c("file",
-                       "loadPlot", 
-                       "plt2rprt", 
-                       "sampleFile", 
-                       "clear", 
-                       "clearAll", 
-                       "load",
-                       "update")
-  )
+  options(shiny.maxRequestSize = 50 * 1024^2)
+  setBookmarkExclude(c(
+    "file",
+    "loadPlot",
+    "plt2rprt",
+    "sampleFile",
+    "clear",
+    "clearAll",
+    "load",
+    "update"
+  ))
   dataFrame <- reactiveVal(NULL)
   rawData <- reactiveVal(NULL)
   inFile <- reactiveVal(NULL)
@@ -518,19 +540,23 @@ server <- function(input, output, session) {
   inputs <- reactiveValues()
   plotList <- reactiveValues()
   plotListLength <- reactiveVal(0)
-  
+  sheets <- reactiveVal(NULL)
+
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
   )
-  
+
   palette_fills <- reactiveVal(
     c("#444444", "#00000000")
   )
-  
+
   observeEvent(input$sampleFile, {
-    updateSelectInput(session,
-      "sheet",
-      "Select Sheet",
+    print("updating sheet with iris")
+    inFile(NULL)
+    updateSelectInput(
+      session = session,
+      inputId = "sheet",
+      label = "Select Sheet",
       choices = "iris",
       selected = "iris"
     )
@@ -538,25 +564,28 @@ server <- function(input, output, session) {
 
   #### Get file/read sheets ####
   observeEvent({
-    input$file}, {
+    input$file
+  }, {
     print("File input changed")
     inFile(input$file)
     # Identify sheets and use them as choices to load file
-    sheets <- readxl::excel_sheets(input$file$datapath)
-    updateSelectInput(session,
-      "sheet",
-      "Select Sheet",
-      choices = sheets,
-      selected = sheets[1]
+    sheets(readxl::excel_sheets(input$file$datapath))
+    updateSelectInput(
+      session = session,
+      inputId = "sheet",
+      label = "Select Sheet",
+      choices = isolate(sheets()),
+      selected = isolate(sheets())[1]
     )
   }, priority = 4)
-  
+
   #### Make tibble from file ####
   observeEvent({
-    input$sheet}, {
+    input$sheet
+  }, {
     req(input$sheet)
     print("Sheet changed")
-    
+
     # Use iris data
     if (is.null(inFile())) {
       print("using iris data")
@@ -569,7 +598,7 @@ server <- function(input, output, session) {
         ) %>%
         select(Sheet, everything())
     }
-    
+
     # Read excel file in
     if (!is.null(inFile())) {
       for (i in 1:length(input$sheet)) {
@@ -579,7 +608,7 @@ server <- function(input, output, session) {
         ) %>%
           mutate(Sheet = input$sheet[i]) %>%
           select(Sheet, everything())
-        
+
         column_names <- names(a)
         column_names <- str_replace_all(column_names, c(
           ",Freq. of Parent" = " %",
@@ -588,9 +617,9 @@ server <- function(input, output, session) {
           ",," = "",
           ",Median,<.*>," = " MFI "
         ))
-        
+
         colnames(a) <- column_names
-        
+
         if (i == 1) {
           f <- a
         } else {
@@ -600,9 +629,9 @@ server <- function(input, output, session) {
       }
     }
     print("dataframe created")
-    
+
     rawData(f)
-    
+
     vars <- names(f)
     columns_select <- c(
       "Experiment",
@@ -623,109 +652,111 @@ server <- function(input, output, session) {
       "Beads %",
       "Beads #"
     ))]
-    
+
     current_columns <- input$columns
-    
+
     if (is.null(input$columns)) {
       current_columns <- "empty"
     }
-    
+
     if (!all(current_columns %in% vars)) {
       print("updating columns")
-      updateSelectInput(session, 
-                        "columns",
-                        choices = vars,
-                        selected = vars[which(vars %in% columns_select)]
+      updateSelectInput(session,
+        "columns",
+        choices = vars,
+        selected = vars[which(vars %in% columns_select)]
       )
     }
-    
+
     current_variables <- input$variables
-    
+
     if (is.null(input$variables)) {
       current_variables <- "empty"
     }
-    
+
     if (!all(current_variables %in% variables)) {
       print("variables empty")
       updateSelectInput(session,
-                        "variables",
-                        choices = variables,
-                        selected = variables[1]
+        "variables",
+        choices = variables,
+        selected = variables[1]
       )
     }
-    
+
     if (all(current_variables %in% variables)) {
       print("updating variable choices; keeping selected")
       updateSelectInput(session,
-                        "variables",
-                        choices = variables,
-                        selected = input$variables
+        "variables",
+        choices = variables,
+        selected = input$variables
       )
     }
-    
+
     current_comp <- input$comp
-    
+
     if (is.null(input$comp)) {
       current_comp <- "empty"
     }
-    
+
     if (!current_comp %in% vars) {
       print("updating comp")
-      updateSelectInput(session, 
-                        "comp",
-                        choices = vars,
-                        selected = vars[which(vars %in% c(
-                          "Genotype", 
-                          "Condition", 
-                          "Species"
-                          ))]
+      updateSelectInput(session,
+        "comp",
+        choices = vars,
+        selected = vars[which(vars %in% c(
+          "Genotype",
+          "Condition",
+          "Species"
+        ))]
       )
     }
-    
+
     current_id <- input$id
-    
+
     if (is.null(input$id)) {
       current_id <- "empty"
     }
-    
+
     if (!current_id %in% vars) {
       print("updating id")
-      updateSelectInput(session, 
-                        "id", 
-                        choices = vars, 
-                        selected = "Sample"
+      updateSelectInput(session,
+        "id",
+        choices = vars,
+        selected = "Sample"
       )
     }
-    
+
     current_group <- input$group
-    
+
     if (is.null(input$group)) {
       current_group <- "empty"
     }
-    
+
     if (!current_group %in% vars) {
       print("updating group")
-      updateSelectInput(session, 
-                        "group",
-                        choices = c("variable", vars),
-                        selected = "variable"
+      updateSelectInput(session,
+        "group",
+        choices = c("variable", vars),
+        selected = "variable"
       )
     }
   }, priority = 3)
-  
+
   #### Update comps ####
   observeEvent({
-    input$sheet
-    input$comp}, {
-    req(input$sheet,
-        input$comp)
+    input$comp
+  }, {
+    req(
+      input$sheet,
+      input$comp
+    )
     print("updating comps")
     vars <- unique(rawData()[[input$comp]])
-    
+
     if (is.null(vars)) {
       vars <- character(0)
     }
-    
+
     updateSelectInput(session,
       "comps",
       choices = vars,
@@ -755,7 +786,7 @@ server <- function(input, output, session) {
       length(input$comps) > 1
     )
     print("filtering dataframe")
-    
+
     d <- gather(
       rawData(),
       variable,
@@ -763,7 +794,7 @@ server <- function(input, output, session) {
       -c(input$columns)
     ) %>%
       filter(get(input$comp) %in% c(input$comps))
-    
+
     if (!is.na(input$bead) &
       !is.na(input$dilution) &
       str_detect(c(input$variables)[1], "#")) {
@@ -793,7 +824,7 @@ server <- function(input, output, session) {
         filter(!grepl("Bead|Ungated", variable))
     }
     dataFrame(d)
-  }, priority = 10)
+  }, priority = 1)
 
   #### Create plot object ####
   plotInput <- function() {
@@ -802,19 +833,30 @@ server <- function(input, output, session) {
     groups <- unique(dataFrame()[[input$group]])
     comparisons <- unique(dataFrame()[[input$comp]])
     comps <- c(input$comps)
-    
+
+    y.min <- ifelse(is.null(input$y.min), NA, input$y.min)
+    y.max <- ifelse(is.null(input$y.max), NA, input$y.max)
+
+    y.lim <- c(y.min, y.max)
+
+    if (input$split.on == "") {
+      split_str <- NULL
+    } else {
+      split_str <- input$split.on
+    }
+
     if (input$y.lab == "") {
       y.lab <- NULL
     } else {
       y.lab <- input$y.lab
     }
-    
+
     ref.group <- NULL
-    
+
     if (input$refGroup == T) {
       ref.group <- comps[1]
     }
-    
+
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
       levels = comps
     ))
@@ -826,7 +868,7 @@ server <- function(input, output, session) {
     } else {
       levs <- order(factor(groups), levels = groups)
     }
-    
+
     cols <- c()
     fills <- c()
     shapes <- c()
@@ -835,11 +877,11 @@ server <- function(input, output, session) {
       fills[i] <<- input[[paste0("fill", i)]]
       shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
     })
-    
+
     if (input$trim == "") {
       updateTextInput(session, "trim", value = "none")
     }
-    
+
     gplot(
       dataset = dataFrame(),
       comparison = input$comp,
@@ -857,7 +899,9 @@ server <- function(input, output, session) {
       plotWidth = input$plotWidth,
       plotHeight = input$plotHeight,
       trans.y = input$trans.y,
+      y.lim = y.lim,
       split = input$split,
+      split_str = split_str,
       trim = input$trim,
       angle = input$angle.x,
       y.lab = y.lab,
@@ -873,6 +917,7 @@ server <- function(input, output, session) {
 
   #### Create current plot ####
   currentPlot <- reactive({
+    print("currentPlot triggered")
     req(!is.null(dataFrame()))
     lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
       req(
@@ -887,14 +932,16 @@ server <- function(input, output, session) {
 
   #### Store current plot height ####
   cpHeight <- reactive({
+    print("calculating plot height")
     if (is.null(dataFrame())) {
       return(1)
     }
     req(currentPlot(), leg)
-    
+
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
     lheight <- ifelse(input$legend != "none",
-      sum(as.numeric(grid::convertUnit(leg$height, "mm"))), 0)
+      sum(as.numeric(grid::convertUnit(leg$height, "mm"))), 0
+    )
     if (input$legend %in% c("top", "bottom")) {
       total.height <- sum(pheight, lheight)
     } else {
@@ -906,11 +953,12 @@ server <- function(input, output, session) {
 
   #### Store current plot width ####
   cpWidth <- reactive({
+    print("calculating plot width")
     if (is.null(dataFrame())) {
       return(1)
     }
     req(currentPlot(), leg)
-    
+
     pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
     lwidth <- ifelse(input$legend != "none",
       sum(as.numeric(grid::convertUnit(leg$width, "mm"))),
@@ -931,7 +979,7 @@ server <- function(input, output, session) {
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
     comps <- c(input$comps)
-    
+
     if (input$group == "variable") {
       levs <- order(factor(unique(dataFrame()[[input$group]]),
         levels = variables
@@ -939,11 +987,11 @@ server <- function(input, output, session) {
     } else {
       levs <- order(factor(groups), levels = groups)
     }
-    
+
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
       levels = comps
     ))
-    
+
     gplot(
       dataset = dataFrame(),
       comparison = input$comp,
@@ -959,27 +1007,28 @@ server <- function(input, output, session) {
 
   #### Create shape picker ####
   output$shapes <- renderUI({
-    req(input$sheet,
-        input$variables, 
-        input$comp, 
-        length(input$comps) > 1,
-        input$group)
+    req(
+      input$sheet,
+      input$comp,
+      length(input$comps) > 1,
+      input$group
+    )
     print("shape picker")
-    
+
     comparisons <- c(input$comps)
     options <- c(19, 21, 17, 24, 15, 22)
     choices <- c(19, 21, 17, 24, 15, 22)
     comps <- input$comps
-    
+
     if (input$lock.shapes) {
       choices <- c()
       lapply(1:length(comparisons), function(i) {
         choices[i] <<- as.numeric(input[[paste0("shape", i)]])
       })
     }
-    
+
     selection <- rep(choices[1:length(comparisons)], length(comparisons))
-    
+
     lapply(1:length(comparisons), function(i) {
       tags$div(
         style = "margin-bottom:25px;",
@@ -995,26 +1044,27 @@ server <- function(input, output, session) {
 
   #### Create color picker ####
   output$colors <- renderUI({
-    req(input$sheet,
-        input$variables, 
-        input$comp, 
-        length(input$comps) > 1,
-        input$group)
+    req(
+      input$sheet,
+      input$comp,
+      length(input$comps) > 1,
+      input$group
+    )
     print("color picker")
-    
+
     comparisons <- c(input$comps)
     choices <- palette_cols()
     comps <- input$comps
-    
+
     if (input$lock.cols) {
       choices <- c()
       lapply(1:length(comparisons), function(i) {
         choices[i] <<- input[[paste0("col", i)]]
       })
     }
-    
+
     selection <- rep(choices, length(comparisons))
-    
+
     lapply(1:length(comparisons), function(i) {
       colourpicker::colourInput(
         inputId = paste0("col", i),
@@ -1026,26 +1076,27 @@ server <- function(input, output, session) {
 
   #### Create fill picker ####
   output$fills <- renderUI({
-    req(input$sheet, 
-        input$variables, 
-        input$comp, 
-        length(input$comps) > 1,
-        input$group)
+    req(
+      input$sheet,
+      input$comp,
+      length(input$comps) > 1,
+      input$group
+    )
     print("fill picker")
-    
+
     comparisons <- c(input$comps)
     comps <- input$comps
     choices <- palette_fills()
-    
+
     if (input$lock.fills) {
       choices <- c()
       lapply(1:length(comparisons), function(i) {
         choices[i] <<- input[[paste0("fill", i)]]
       })
     }
-    
+
     selection <- rep(choices, length(comparisons))
-    
+
     lapply(1:length(comparisons), function(i) {
       colourpicker::colourInput(
         inputId = paste0("fill", i),
@@ -1057,12 +1108,16 @@ server <- function(input, output, session) {
   })
 
   #### Plot the data ####
+  # output$myPlot <- renderPlot({
+  #   gridExtra::grid.arrange(currentPlot())
+  # }, height = function() cpHeight(), width = function() cpWidth())
+
   output$myPlot <- renderImage({
     print("rendering plot")
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = ".png")
-    
+
     # Generate the PNG
     png(outfile,
       width = cpWidth() * 3,
@@ -1071,13 +1126,13 @@ server <- function(input, output, session) {
     )
     gridExtra::grid.arrange(currentPlot())
     dev.off()
-    
+
     # Return a list containing the filename
     list(
       src = outfile,
       contentType = "image/png",
-      width = cpWidth(),
-      height = cpHeight(),
+      width = isolate(cpWidth()),
+      height = isolate(cpHeight()),
       alt = "This is alternate text"
     )
   }, deleteFile = TRUE)
@@ -1089,10 +1144,10 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       ggsave(file,
-        plot = currentPlot(),
+        plot = isolate(currentPlot()),
         useDingbats = F,
-        height = cpHeight() / 3.7795275591,
-        width = cpWidth() / 3.7795275591,
+        height = isolate(cpHeight()) / 3.7795275591,
+        width = isolate(cpWidth()) / 3.7795275591,
         units = "mm",
         device = "pdf"
       )
@@ -1140,23 +1195,28 @@ server <- function(input, output, session) {
       print("updating height and width")
       wlist[previous_plotListLength + 1] <<- isolate(cpWidth())
       hlist[previous_plotListLength + 1] <<- isolate(cpHeight())
-    } else if (current_numcol > prev_numcol) {
-      wlist[length(wlist) + 1] <<- cpWidth()
+    }
+    if (current_numcol > prev_numcol) {
+      wlist[length(wlist) + 1] <<- isolate(cpWidth())
+      # hlist[length(hlist)] <<- isolate(cpHeight())
       print("updating width")
-    } else {
-      hlist[length(hlist) + 1] <<- cpHeight()
+    }
+    if (current_numcol == prev_numcol) {
+      hlist[length(hlist) + 1] <<- isolate(cpHeight())
+      # wlist[length(wlist)] <<- isolate(cpWidth())
       print("updating height")
     }
     plotListLength(previous_plotListLength + 1)
     reportHeight(sum(hlist))
     reportWidth(sum(wlist))
-    plotList[[as.character(isolate(plotListLength()))]] <- currentPlot()
+    plotList[[as.character(isolate(plotListLength()))]] <- isolate(currentPlot())
     inputs[[as.character(isolate(plotListLength()))]] <- isolate(reactiveValuesToList(input))
     reportPlots <- as.character(1:isolate(plotListLength()))
     updateSelectInput(session,
-                      "loadPlot",
-                      choices = reportPlots,
-                      selected = reportPlots[isolate(plotListLength())])
+      "loadPlot",
+      choices = reportPlots,
+      selected = reportPlots[isolate(plotListLength())]
+    )
   })
 
   #### Clear last plot from report ####
@@ -1165,21 +1225,21 @@ server <- function(input, output, session) {
     ncols <- length(wlist)
     nrows <- length(hlist)
     previous_plotListLength <- isolate(plotListLength())
-    
+
     if (previous_plotListLength > 0) {
       plotList[[as.character(previous_plotListLength)]] <- grid::nullGrob()
       inputs[[as.character(previous_plotListLength)]] <- NULL
       new_ncols <- floor(sqrt(previous_plotListLength))
       new_nrows <- floor((previous_plotListLength) / new_ncols)
-      
+
       if (isolate(plotListLength()) == 2) {
         hlist <<- head(hlist, -1)
       }
-      
+
       if (new_ncols < ncols) {
         wlist <<- head(wlist, -1)
       }
-      
+
       if (new_nrows < nrows) {
         hlist <<- head(hlist, -1)
       }
@@ -1189,9 +1249,10 @@ server <- function(input, output, session) {
       reportWidth(sum(wlist))
       reportPlots <- as.character(1:isolate(plotListLength()))
       updateSelectInput(session,
-                        "loadPlot",
-                        choices = reportPlots,
-                        selected = reportPlots[isolate(plotListLength())])
+        "loadPlot",
+        choices = reportPlots,
+        selected = reportPlots[isolate(plotListLength())]
+      )
     }
     print("testing")
   })
@@ -1210,19 +1271,20 @@ server <- function(input, output, session) {
     reportHeight(10)
     reportWidth(10)
     updateSelectInput(session,
-                      "loadPlot",
-                      choices = "",
-                      selected = "")
+      "loadPlot",
+      choices = "",
+      selected = ""
+    )
   })
 
   #### Create report ####
   output$myReport <- renderImage({
     print("rendering report image")
-    
+
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = ".png")
-    
+
     # Generate the PNG
     png(outfile,
       width = reportWidth() * 3,
@@ -1242,8 +1304,8 @@ server <- function(input, output, session) {
     list(
       src = outfile,
       contentType = "image/png",
-      width = reportWidth(),
-      height = reportHeight(),
+      width = isolate(reportWidth()),
+      height = isolate(reportHeight()),
       alt = "Nothing added to report yet."
     )
   }, deleteFile = TRUE)
@@ -1264,146 +1326,145 @@ server <- function(input, output, session) {
             )
           },
         useDingbats = F,
-        height = (reportHeight() / 3.7795275591),
-        width = (reportWidth() / 3.7795275591),
+        height = (isolate(reportHeight()) / 3.7795275591),
+        width = (isolate(reportWidth()) / 3.7795275591),
         units = "mm",
         device = "pdf"
       )
     }
   )
-  
+
   #### Update plot in report ####
   observeEvent(input$update, {
     print("updating plot in report")
-    plotList[[input$loadPlot]] <- currentPlot()
+    plotList[[input$loadPlot]] <- isolate(currentPlot())
     inputs[[input$loadPlot]] <- isolate(reactiveValuesToList(input))
     reportHeight(sum(hlist))
     reportWidth(sum(wlist))
   })
-  
+
   #### Load plot from report ####
   observeEvent(input$load, {
     print("Loading last sheet")
     updateSelectInput(session,
-                      "sheet",
-                      selected = inputs[[input$loadPlot]]$sheet
+      "sheet",
+      selected = inputs[[input$loadPlot]]$sheet
     )
   }, priority = -1)
-  
+
   observeEvent(input$load, {
     print("Loading last columns")
     updateSelectInput(session,
-                      "columns",
-                      selected = inputs[[input$loadPlot]]$columns
+      "columns",
+      selected = inputs[[input$loadPlot]]$columns
     )
   }, priority = -2)
-  
+
   observeEvent(input$load, {
     print("Loading last variables")
     updateSelectInput(session,
-                      "variables",
-                      selected = inputs[[input$loadPlot]]$variables
+      "variables",
+      selected = inputs[[input$loadPlot]]$variables
     )
   }, priority = -3)
-  
+
   observeEvent(input$load, {
     print("Loading last comparisons")
     updateSelectInput(session,
-                      "comp",
-                      selected = inputs[[input$loadPlot]]$comp
+      "comp",
+      selected = inputs[[input$loadPlot]]$comp
     )
   }, priority = -4)
-  
+
   observeEvent(input$load, {
-    
     print("Loading last id")
     updateSelectInput(session,
-                      "id",
-                      selected = inputs[[input$loadPlot]]$id
+      "id",
+      selected = inputs[[input$loadPlot]]$id
     )
   }, priority = -5)
-  
+
   observeEvent(input$load, {
     print("Loading last group")
     updateSelectInput(session,
-                      "group",
-                      selected = inputs[[input$loadPlot]]$group
+      "group",
+      selected = inputs[[input$loadPlot]]$group
     )
     updateSelectInput(session,
-                      "comps",
-                      selected = inputs[[input$loadPlot]]$comps
+      "comps",
+      selected = inputs[[input$loadPlot]]$comps
     )
   }, priority = -6)
-  
+
   observeEvent(input$load, {
     print("Loading independent inputs")
     updateTextInput(session,
-                      "y.lab",
-                      value = inputs[[input$loadPlot]]$y.lab
+      "y.lab",
+      value = inputs[[input$loadPlot]]$y.lab
     )
     updateSelectInput(session,
-                      "geom",
-                      selected = inputs[[input$loadPlot]]$geom
+      "geom",
+      selected = inputs[[input$loadPlot]]$geom
     )
     updateSelectInput(session,
-                      "method",
-                      selected = inputs[[input$loadPlot]]$method
+      "method",
+      selected = inputs[[input$loadPlot]]$method
     )
     updateSelectInput(session,
-                      "trans.y",
-                      selected = inputs[[input$loadPlot]]$trans.y
+      "trans.y",
+      selected = inputs[[input$loadPlot]]$trans.y
     )
     updateSelectInput(session,
-                      "legend",
-                      selected = inputs[[input$loadPlot]]$legend
+      "legend",
+      selected = inputs[[input$loadPlot]]$legend
     )
     updateSelectInput(session,
-                      "errortype",
-                      selected = inputs[[input$loadPlot]]$errortype
+      "errortype",
+      selected = inputs[[input$loadPlot]]$errortype
     )
     updateSliderInput(session,
-                       "font",
-                       value = inputs[[input$loadPlot]]$font
+      "font",
+      value = inputs[[input$loadPlot]]$font
     )
     updateSliderInput(session,
-                       "size",
-                       value = inputs[[input$loadPlot]]$size
+      "size",
+      value = inputs[[input$loadPlot]]$size
     )
     updateSliderInput(session,
-                      "stroke",
-                      value = inputs[[input$loadPlot]]$stroke
+      "stroke",
+      value = inputs[[input$loadPlot]]$stroke
     )
     updateSliderInput(session,
-                       "plotWidth",
-                       value = inputs[[input$loadPlot]]$plotWidth
+      "plotWidth",
+      value = inputs[[input$loadPlot]]$plotWidth
     )
     updateSliderInput(session,
-                       "plotHeight",
-                       value = inputs[[input$loadPlot]]$plotHeight
+      "plotHeight",
+      value = inputs[[input$loadPlot]]$plotHeight
     )
     updateSliderInput(session,
-                       "width",
-                       value = inputs[[input$loadPlot]]$width
+      "width",
+      value = inputs[[input$loadPlot]]$width
     )
     updateSliderInput(session,
-                      "dodge",
-                      value = inputs[[input$loadPlot]]$dodge
+      "dodge",
+      value = inputs[[input$loadPlot]]$dodge
     )
     updateNumericInput(session,
-                       "dilution",
-                       value = inputs[[input$loadPlot]]$dilution
+      "dilution",
+      value = inputs[[input$loadPlot]]$dilution
     )
     updateNumericInput(session,
-                       "bead",
-                       value = inputs[[input$loadPlot]]$bead
+      "bead",
+      value = inputs[[input$loadPlot]]$bead
     )
     updateTextInput(session,
-                       "trim",
-                       value = inputs[[input$loadPlot]]$trim
+      "trim",
+      value = inputs[[input$loadPlot]]$trim
     )
     updateTextInput(session,
-                    "split.on",
-                    value = inputs[[input$loadPlot]]$split.on
+      "split.on",
+      value = inputs[[input$loadPlot]]$split.on
     )
     # updateCheckboxInput(session,
     #                     "lock.fills",
@@ -1418,58 +1479,58 @@ server <- function(input, output, session) {
     #                     value = inputs[[input$loadPlot]]$lock.shapes
     # )
     updateCheckboxInput(session,
-                        "split",
-                        value = inputs[[input$loadPlot]]$split
+      "split",
+      value = inputs[[input$loadPlot]]$split
     )
     updateCheckboxInput(session,
-                        "count",
-                        value = inputs[[input$loadPlot]]$count
+      "count",
+      value = inputs[[input$loadPlot]]$count
     )
     updateCheckboxInput(session,
-                        "angle.x",
-                        value = inputs[[input$loadPlot]]$angle.x
+      "angle.x",
+      value = inputs[[input$loadPlot]]$angle.x
     )
     updateCheckboxInput(session,
-                        "refGroup",
-                        value = inputs[[input$loadPlot]]$refGroup
+      "refGroup",
+      value = inputs[[input$loadPlot]]$refGroup
     )
     updateCheckboxInput(session,
-                        "paired",
-                        value = inputs[[input$loadPlot]]$paired
+      "paired",
+      value = inputs[[input$loadPlot]]$paired
     )
     updateCheckboxInput(session,
-                        "dilution",
-                        value = inputs[[input$loadPlot]]$dilution
+      "dilution",
+      value = inputs[[input$loadPlot]]$dilution
     )
     updateCheckboxInput(session,
-                        "scientific",
-                        value = inputs[[input$loadPlot]]$scientific
+      "scientific",
+      value = inputs[[input$loadPlot]]$scientific
     )
     updateCheckboxInput(session,
-                        "bead",
-                        value = inputs[[input$loadPlot]]$bead
+      "bead",
+      value = inputs[[input$loadPlot]]$bead
     )
   }, priority = -7)
-  
+
   observeEvent(input$load, {
     print("updating colors, fills, shapes")
     for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
       updateColourInput(session,
-                        paste0("col", i),
-                        value = inputs[[input$loadPlot]][[paste0("col", i)]]
+        paste0("col", i),
+        value = inputs[[input$loadPlot]][[paste0("col", i)]]
       )
       updateColourInput(session,
-                        paste0("fill", i),
-                        value = inputs[[input$loadPlot]][[paste0("fill", i)]]
+        paste0("fill", i),
+        value = inputs[[input$loadPlot]][[paste0("fill", i)]]
       )
       updateSelectInput(session,
-                        paste0("shape", i),
-                        selected = inputs[[input$loadPlot]][[paste0("shape", i)]]
+        paste0("shape", i),
+        selected = inputs[[input$loadPlot]][[paste0("shape", i)]]
       )
     }
   }, priority = -8)
-  
-  
+
+
   #### Refresh report ####
   observeEvent(input$refreshReport, {
     print("refreshing report data")
@@ -1481,16 +1542,16 @@ server <- function(input, output, session) {
         -c(input$columns)
       ) %>%
         filter(get(input$comp) %in% c(input$comps))
-      
+
       if (!is.na(input$bead) &
-          !is.na(input$dilution) &
-          str_detect(c(input$variables)[1], "#")) {
+        !is.na(input$dilution) &
+        str_detect(c(input$variables)[1], "#")) {
         d <- d %>%
           group_by_(input$id) %>%
           mutate(value = ifelse(str_detect(variable, "#") &
-                                  !is.na(input$bead),
-                                value / value[variable == "Bead #"] * input$bead * input$dilution,
-                                value
+            !is.na(input$bead),
+          value / value[variable == "Bead #"] * input$bead * input$dilution,
+          value
           )) %>%
           ungroup() %>%
           filter(variable %in% c(input$variables)) %>%
@@ -1499,8 +1560,8 @@ server <- function(input, output, session) {
         d <- d %>%
           group_by_(input$id) %>%
           mutate(value = ifelse(str_detect(variable, "#"),
-                                (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
-                                value
+            (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
+            value
           )) %>%
           ungroup() %>%
           filter(variable %in% c(input$variables)) %>%
@@ -1510,39 +1571,38 @@ server <- function(input, output, session) {
           filter(variable %in% c(input$variables)) %>%
           filter(!grepl("Bead|Ungated", variable))
       }
-      
     }
-    
-    
+
+
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
     comparisons <- unique(dataFrame()[[input$comp]])
     comps <- c(input$comps)
-    
+
     if (input$y.lab == "") {
       y.lab <- NULL
     } else {
       y.lab <- input$y.lab
     }
-    
+
     ref.group <- NULL
-    
+
     if (input$refGroup == T) {
       ref.group <- comps[1]
     }
-    
+
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
-                               levels = comps
+      levels = comps
     ))
-    
+
     if (input$group == "variable") {
       levs <- order(factor(unique(dataFrame()[[input$group]]),
-                           levels = variables
+        levels = variables
       ))
     } else {
       levs <- order(factor(groups), levels = groups)
     }
-    
+
     cols <- c()
     fills <- c()
     shapes <- c()
@@ -1551,11 +1611,11 @@ server <- function(input, output, session) {
       fills[i] <<- input[[paste0("fill", i)]]
       shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
     })
-    
+
     if (input$trim == "") {
       updateTextInput(session, "trim", value = "none")
     }
-    
+
     gplot(
       dataset = dataFrame(),
       comparison = input$comp,
@@ -1585,12 +1645,11 @@ server <- function(input, output, session) {
       shape.groups = shapes,
       sci = input$scientific
     )
-    
   })
-  
-  
 
-  
+
+
+
   onBookmark(function(state) {
     state$values$plotList <- reactiveValuesToList(plotList)
     state$values$inputs <- reactiveValuesToList(inputs)
@@ -1609,9 +1668,9 @@ server <- function(input, output, session) {
     }
     plotListPlots <- as.character(1:isolate(plotListLength()))
     updateSelectInput(session,
-                      "loadPlot",
-                      choices = plotListPlots,
-                      selected = tail(plotListPlots, 1)
+      "loadPlot",
+      choices = plotListPlots,
+      selected = tail(plotListPlots, 1)
     )
     hlist <<- state$values$hlist
     wlist <<- state$values$wlist
