@@ -1515,11 +1515,11 @@ server <- function(input, output, session) {
   observeEvent(input$load, {
     print("updating colors, fills, shapes")
     for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
-      updateColourInput(session,
+      colourpicker::updateColourInput(session,
         paste0("col", i),
         value = inputs[[input$loadPlot]][[paste0("col", i)]]
       )
-      updateColourInput(session,
+      colourpicker::updateColourInput(session,
         paste0("fill", i),
         value = inputs[[input$loadPlot]][[paste0("fill", i)]]
       )
