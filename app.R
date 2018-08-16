@@ -617,9 +617,9 @@ server <- function(input, output, session) {
           ",," = "",
           ",Median,<.*>," = " MFI "
         ))
-
+        
         colnames(a) <- column_names
-
+        
         if (i == 1) {
           f <- a
         } else {
@@ -629,9 +629,9 @@ server <- function(input, output, session) {
       }
     }
     print("dataframe created")
-
+    
     rawData(f)
-
+    
     vars <- names(f)
     columns_select <- c(
       "Experiment",
@@ -861,13 +861,9 @@ server <- function(input, output, session) {
       levels = comps
     ))
 
-    if (input$group == "variable") {
-      levs <- order(factor(unique(dataFrame()[[input$group]]),
+    levs <- order(factor(unique(dataFrame()[[input$group]]),
         levels = variables
       ))
-    } else {
-      levs <- order(factor(groups), levels = groups)
-    }
 
     cols <- c()
     fills <- c()
