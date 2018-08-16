@@ -100,10 +100,15 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     select_(group.by, "value", "error_max") %>%
     ungroup() %>%
     arrange_(group.by))
-
+  
   if (all(is.na(y.lim))) {
-    # y.lim <- c(0,NA)
     y.lim <- c(0, max(dmax[, c("value", "error_max")], na.rm = T) * 1.08)
+  }
+  if (!is.na(y.lim[1]) & is.na(y.lim[2])) {
+    y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")], na.rm = T) * 1.08)
+  }
+  if (!is.na(y.lim[2] & is.na(y.lim[1]))) {
+    y.lim <- c(0, y.lim[2])
   }
 
   # If no comparisons are specified, perform all comparisons
@@ -278,10 +283,6 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     } else {
       labs.y <- scales::trans_format(trans.y, scales::math_format(10^.x))
     }
-
-    if (statist) {
-      y.lim <- c(NA, NA)
-    }
     expand.y <- c(0.05, 0.05)
   }
 
@@ -448,8 +449,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       expand = expand.y,
       labels = labs.y,
       trans = trans.y,
-      oob = function(x, ...) x
-    ) +
+      oob = scales::rescale_none) +
     scale.x +
     scale_shape_manual(values = shape.groups) +
     scale_fill_manual(values = fill.groups) +

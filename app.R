@@ -103,12 +103,14 @@ ui <- function(request) {
             fluidRow(
               column(6, sliderInput("plotHeight",
                 "Plot height (mm)",
+                step = 2.5,
                 min = 10,
                 max = 150,
                 value = 30
               )),
               column(6, sliderInput("plotWidth",
                 "Plot width (mm)",
+                step = 2.5,
                 min = 10,
                 max = 150,
                 value = 20
@@ -169,7 +171,7 @@ ui <- function(request) {
             #### Transform Y axis ####
             fluidRow(
               column(
-                6,
+                4,
                 selectInput("trans.y",
                   "Transform y",
                   choices = c("identity", "log2", "log10"),
@@ -177,16 +179,16 @@ ui <- function(request) {
                 )
               ),
               column(
-                3,
-                numericInput("y.max",
-                  "Y max",
+                4,
+                numericInput("y.min",
+                  "Y min",
                   value = NULL
                 )
               ),
               column(
-                3,
-                numericInput("y.min",
-                  "Y min",
+                4,
+                numericInput("y.max",
+                  "Y max",
                   value = NULL
                 )
               )
@@ -1409,6 +1411,14 @@ server <- function(input, output, session) {
     updateSelectInput(session,
       "trans.y",
       selected = inputs[[input$loadPlot]]$trans.y
+    )
+    updateNumericInput(session,
+      "y.min",
+      selected = inputs[[input$loadPlot]]$y.min
+    )
+    updateNumericInput(session,
+      "y.max",
+      selected = inputs[[input$loadPlot]]$y.max
     )
     updateSelectInput(session,
       "legend",
