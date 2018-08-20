@@ -198,7 +198,7 @@ ui <- function(request) {
             selectInput("errortype",
               "Select errorbar type",
               choices = c("mean_se", "mean_sdl"),
-              selected = "mean_se"
+              selected = "mean_sdl"
             ),
 
             #### Select statistical method ####
