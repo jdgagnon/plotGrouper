@@ -8,8 +8,9 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
          levs = T,
          val = "value", # If your tibble is not 'tidy', and there are multiple value columns, specify the one you want to plot
          geom = c("bar", "errorbar", "point", "stat", "seg"), # Define the list of geoms you want to plot
-         p = "p.signif", # Specify representation of pvalue ('p.signif' = *; 'p.format' = 'p = 0.05')
+         p = "p.signif", # Specify representation of pvalue ('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)
          ref.group = NULL,
+         p.adjust.method = "holm",
          comparisons = NULL,
          method = "t.test",
          paired = F,
@@ -125,7 +126,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
   statOut <- try(ggpubr::compare_means(
     formula = formula(paste("value", "~", comparison)),
     data = df, method = method, group.by = group.by, ref.group = ref.group,
-    paired = paired, symnum.args = symnum.args
+    paired = paired, symnum.args = symnum.args, p.adjust.method = p.adjust.method
   ))
 
   if (method %in% c("t.test", "wilcox.test")) {
@@ -368,7 +369,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     fun.args = list(mult = 1),
     geom = "errorbar",
     color = "black",
-    width = width,
+    width = 0.25 * width,
     size = stroke
   )
 
@@ -404,7 +405,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
     stat <- geom_text(
       data = statistics, aes(x.pos, na.omit(h.p)),
       label = statistics[[p]],
-      family = "Helvetica",
+      # family = "Helvetica",
       size = font_size / (1 / 0.35),
       inherit.aes = F,
       na.rm = T
@@ -462,7 +463,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
         size = stroke
       ),
       text = element_text(
-        family = "Helvetica",
+        # family = "Helvetica",
         size = font_size,
         colour = "black"
       ),
@@ -471,12 +472,12 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       # aspect.ratio = aspect.ratio,
       legend.position = leg.pos,
       legend.title = element_text(
-        family = "Helvetica",
+        # family = "Helvetica",
         size = font_size,
         colour = "black"
       ),
       legend.text = element_text(
-        family = "Helvetica",
+        # family = "Helvetica",
         size = font_size,
         colour = "black"
       ),
@@ -485,7 +486,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
       axis.line.y = element_line(colour = "black", size = stroke),
       axis.ticks.x = element_blank(),
       axis.text.x = element_text(
-        family = "Helvetica",
+        # family = "Helvetica",
         size = font_size,
         colour = "black",
         angle = angle,
@@ -493,7 +494,7 @@ function(dataset = NULL, # Define your data set which should be a gathered tibbl
         hjust = hjust
       ),
       axis.text = element_text(
-        family = "Helvetica",
+        # family = "Helvetica",
         size = font_size,
         colour = "black"
       ),

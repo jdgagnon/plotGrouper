@@ -73,7 +73,7 @@ ui <- function(request) {
                 choices = NULL
               )),
               column(6, selectInput("group",
-                "Group by",
+                "Independent variable",
                 choices = NULL
               ))
             ),
@@ -634,6 +634,7 @@ server <- function(input, output, session) {
     
     rawData(f)
     
+    
     vars <- names(f)
     columns_select <- c(
       "Experiment",
@@ -747,6 +748,7 @@ server <- function(input, output, session) {
   #### Update comps ####
   observeEvent({
     input$comp
+    input$sheet
   }, {
     req(
       input$sheet,
@@ -1327,7 +1329,8 @@ server <- function(input, output, session) {
         height = (isolate(reportHeight()) / 3.7795275591),
         width = (isolate(reportWidth()) / 3.7795275591),
         units = "mm",
-        device = "pdf"
+        device = "pdf", 
+        limitsize = F
       )
     }
   )
@@ -1411,14 +1414,6 @@ server <- function(input, output, session) {
     updateSelectInput(session,
       "trans.y",
       selected = inputs[[input$loadPlot]]$trans.y
-    )
-    updateNumericInput(session,
-      "y.min",
-      selected = inputs[[input$loadPlot]]$y.min
-    )
-    updateNumericInput(session,
-      "y.max",
-      selected = inputs[[input$loadPlot]]$y.max
     )
     updateSelectInput(session,
       "legend",
