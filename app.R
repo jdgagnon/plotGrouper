@@ -1139,7 +1139,7 @@ server <- function(input, output, session) {
 
   #### Save plot ####
   output$downloadPlot <- downloadHandler(
-    filename = function() {
+    file = function() {
       paste0(input$filename, ".pdf")
     },
     content = function(file) {
@@ -1163,8 +1163,8 @@ server <- function(input, output, session) {
 
   #### Save stats table ####
   output$save.stat <- downloadHandler(
-    filename = function() {
-      paste0(input$filename, "_stats", ".csv")
+    file = function() {
+      paste0(input$file, "_stats", ".csv")
     },
     content = function(file) {
       write_csv(stats(), file, col_names = T)
@@ -1312,7 +1312,7 @@ server <- function(input, output, session) {
 
   #### Download report ####
   output$downloadReport <- downloadHandler(
-    filename = function() {
+    file = function() {
       paste(input$report, "pdf", sep = ".")
     },
     content = function(file) {
