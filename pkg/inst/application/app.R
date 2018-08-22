@@ -649,6 +649,14 @@ server <- function(input, output, session) {
         selected = vars[which(vars %in% columns_select)]
       )
     }
+    if (all(current_columns %in% vars)) {
+      print("updating column choices; keeping selected")
+      updateSelectInput(session,
+                        "columns",
+                        choices = vars,
+                        selected = input$columns
+      )
+    }
 
     current_variables <- input$variables
     if (is.null(input$variables)) {
