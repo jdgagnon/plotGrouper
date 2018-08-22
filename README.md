@@ -30,17 +30,7 @@ Finally, open RStudio and paste the following code in your R console and run it 
 
 ```
 install.packages("devtools")
-devtools::install_github("tidyverse/ggplot2")
-install.packages("tidyverse")
-install.packages("shiny")
-install.packages("Hmisc")
-install.packages("readxl")
-install.packages("gridExtra")
-install.packages("egg")
-install.packages("ggpubr")
-install.packages("shinythemes")
-install.packages("colourpicker")
-install.packages("shiny")
+devtools::install_github("jdgagnon/plotGrouper")
 ```
 
 ### Installing & Running
@@ -50,7 +40,7 @@ After installing these packages, you are ready to run `plotGrouper`.
 To initialize the shiny app, paste the following code in your R console and run it.
 
 ```
-shiny::runGitHub("plotGrouper", "jdgagnon")
+plotGrouper::plotGrouper()
 ```
 
 Once the web app opens, you can access the `iris` dataset by clicking the iris button to learn how to use the app.
@@ -65,7 +55,3 @@ Once the web app opens, you can access the `iris` dataset by clicking the iris b
 GNU GPL-3.0-or-later
 
 [licence](https://www.gnu.org/licenses/gpl.txt)
-
-## Acknowledgments
-
-Logo designed by Jarrett Dow
