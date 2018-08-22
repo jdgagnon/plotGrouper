@@ -317,8 +317,10 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       # }
       if (trans.y == "log2") {
         labs.y <- scales::trans_format(trans.y, scales::math_format(2^.x))
+        y.lim <- c(NA,NA)
       } else {
         labs.y <- scales::trans_format(trans.y, scales::math_format(10^.x))
+        y.lim <- c(NA,NA)
       }
       expand.y <- c(0.05, 0.05)
     }
@@ -460,7 +462,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       )
     }
 
-    suppressWarnings(if (geom == "line_point_stat") {
+    suppressWarnings(if ("line_point_stat" %in% geom) {
       geom <- c("line", "line_error", "line_point", "stat")
     })
 

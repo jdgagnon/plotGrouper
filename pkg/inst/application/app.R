@@ -1235,6 +1235,7 @@ server <- function(input, output, session) {
   #### Update plot in report ####
   observeEvent(input$update, {
     print("updating plot in report")
+    req(plotListLength() >= 1)
     comparisons <- unique(dataFrame()[[input$comp]])
     current_plotListLength <- plotListLength()
     current_numcol <- floor(sqrt(current_plotListLength))
@@ -1326,6 +1327,7 @@ server <- function(input, output, session) {
 
   #### Load plot from report ####
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("Loading last sheet")
     updateSelectInput(session,
       "sheet",
@@ -1334,6 +1336,7 @@ server <- function(input, output, session) {
   }, priority = -1)
 
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("Loading last columns")
     updateSelectInput(session,
       "columns",
@@ -1342,6 +1345,7 @@ server <- function(input, output, session) {
   }, priority = -2)
 
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("Loading last variables")
     updateSelectInput(session,
       "variables",
@@ -1350,6 +1354,7 @@ server <- function(input, output, session) {
   }, priority = -3)
 
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("Loading last comparisons")
     updateSelectInput(session,
       "comp",
@@ -1358,6 +1363,7 @@ server <- function(input, output, session) {
   }, priority = -4)
 
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("Loading last id")
     updateSelectInput(session,
       "id",
@@ -1366,6 +1372,7 @@ server <- function(input, output, session) {
   }, priority = -5)
 
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("Loading last group")
     updateSelectInput(session,
       "group",
@@ -1378,6 +1385,7 @@ server <- function(input, output, session) {
   }, priority = -6)
 
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("Loading independent inputs")
     updateTextInput(session,
       "y.lab",
@@ -1482,6 +1490,7 @@ server <- function(input, output, session) {
   }, priority = -7)
 
   observeEvent(input$load, {
+    req(plotListLength() >= 1)
     print("updating colors, fills, shapes")
     for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
       colourpicker::updateColourInput(session,
@@ -1501,6 +1510,7 @@ server <- function(input, output, session) {
 
   #### Refresh plots in report ####
   observeEvent(input$refresh, {
+    req(plotListLength() >= 1)
     for (i in as.character(1:plotListLength())) {
       print(paste0("refreshing plot: ", i))
 
