@@ -30,7 +30,7 @@ Finally, open RStudio and paste the following code in your R console and run it 
 
 ```
 install.packages("devtools")
-devtools::install_github("jdgagnon/plotGrouper")
+devtools::install_github("jdgagnon/plotGrouper", subdir = "pkg")
 ```
 
 ### Installing & Running
