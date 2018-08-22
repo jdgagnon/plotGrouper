@@ -4,11 +4,6 @@
 
 library(tidyverse)
 
-
-wlist <- c() # Initialize a vector of plot width values
-hlist <- c() # Initialize a vector of plot height values
-gplot <- dget("gplot.R") # Load plotting function
-
 # UI ----------------------------------------------------------------------
 
 ui <- function(request) {
@@ -17,7 +12,7 @@ ui <- function(request) {
     # shinyjs::useShinyjs(),
     theme = shinythemes::shinytheme("cosmo"),
     navbarPage(
-      (tags$img(src = "logo_white_small.png", width = "100px", height = "100px")),
+      (shiny::tags$img(src = "logo_white_small.png", width = "100px", height = "100px")),
       fluid = T,
       position = "fixed-top",
       tabPanel(
@@ -26,7 +21,7 @@ ui <- function(request) {
 
           ##### Plot sidebarPanel ####
           sidebarPanel(
-            tags$style(type = "text/css", "body {padding-top: 140px;}"),
+            shiny::tags$style(type = "text/css", "body {padding-top: 140px;}"),
             bookmarkButton(),
             actionButton("sampleFile", "Iris"),
 
@@ -92,8 +87,8 @@ ui <- function(request) {
                 downloadButton("downloadPlot",
                   "Save",
                   class = "btn btn-primary btn-sm",
-                  style = "color: #fff; 
-                                   background-color: #337ab7; 
+                  style = "color: #fff;
+                                   background-color: #337ab7;
                                    border-color: #2e6da4"
                 )
               )
@@ -321,8 +316,8 @@ ui <- function(request) {
                 actionButton("plt2rprt",
                   label = "Include in report",
                   class = "btn btn-primary btn-sm",
-                  style = "color: #fff; 
-                          background-color: #337ab7; 
+                  style = "color: #fff;
+                          background-color: #337ab7;
                           border-color: #2e6da4"
                 )
               ),
@@ -338,8 +333,8 @@ ui <- function(request) {
                 actionButton("load",
                   label = "Load",
                   class = "btn btn-primary btn-sm",
-                  style = "color: #fff; 
-                                  background-color: #337ab7; 
+                  style = "color: #fff;
+                                  background-color: #337ab7;
                                   border-color: #2e6da4"
                 )
               ),
@@ -348,8 +343,8 @@ ui <- function(request) {
                 actionButton("update",
                   label = "Update",
                   class = "btn btn-primary btn-sm",
-                  style = "color: #fff; 
-                                  background-color: #337ab7; 
+                  style = "color: #fff;
+                                  background-color: #337ab7;
                                   border-color: #2e6da4"
                 )
               )
@@ -431,20 +426,28 @@ ui <- function(request) {
                 actionButton("clear",
                   "Clear last",
                   class = "btn btn-primary btn-md",
-                  style = "color: #fff; 
-                                               background-color: #337ab7; 
+                  style = "color: #fff;
+                                               background-color: #337ab7;
                                                border-color: #2e6da4"
                 )
               ),
-
               column(4, actionButton("clearAll",
-                "Clear All",
+                "Clear all",
                 class = "btn btn-primary btn-md",
                 style = "color: #fff;
-                                        background-color: #337ab7; 
+                                        background-color: #337ab7;
                                         border-color: #2e6da4"
-              ))
-            ),
+                )
+              ),
+              column(4, actionButton("refresh",
+                "Refresh plots",
+                class = "btn btn-primary btn-md",
+                style = "color: #fff;
+                                        background-color: #337ab7;
+                                        border-color: #2e6da4"
+              )
+            )
+          ),
 
             #### Save report ####
             fluidRow(
@@ -458,8 +461,8 @@ ui <- function(request) {
                 downloadButton("downloadReport",
                   "Save",
                   class = "btn btn-primary btn-md",
-                  style = "color: #fff; 
-                                                 background-color: #337ab7; 
+                  style = "color: #fff;
+                                                 background-color: #337ab7;
                                                  border-color: #2e6da4"
                 )
               )
@@ -488,8 +491,8 @@ ui <- function(request) {
 
             downloadButton("save.stat",
               "Download",
-              style = "color: #fff; 
-                      background-color: #337ab7; 
+              style = "color: #fff;
+                      background-color: #337ab7;
                       border-color: #2e6da4;"
             )
           )
@@ -543,6 +546,8 @@ server <- function(input, output, session) {
   plotList <- reactiveValues()
   plotListLength <- reactiveVal(0)
   sheets <- reactiveVal(NULL)
+  wlist <- reactiveValues()
+  hlist <- reactiveValues()
 
   palette_cols <- reactiveVal(
     c("#000000", "#000000")
@@ -576,10 +581,10 @@ server <- function(input, output, session) {
       session = session,
       inputId = "sheet",
       label = "Select Sheet",
-      choices = isolate(sheets()),
-      selected = isolate(sheets())[1]
+      choices = sheets(),
+      selected = sheets()[1]
     )
-  }, priority = 4)
+  })
 
   #### Make tibble from file ####
   observeEvent({
@@ -603,38 +608,12 @@ server <- function(input, output, session) {
 
     # Read excel file in
     if (!is.null(inFile())) {
-      for (i in 1:length(input$sheet)) {
-        a <- readxl::read_excel(input$file$datapath,
-          sheet = input$sheet[i],
-          col_names = T
-        ) %>%
-          mutate(Sheet = input$sheet[i]) %>%
-          select(Sheet, everything())
-
-        column_names <- names(a)
-        column_names <- str_replace_all(column_names, c(
-          ",Freq. of Parent" = " %",
-          ",Count" = " #",
-          "—" = "-",
-          ",," = "",
-          ",Median,<.*>," = " MFI "
-        ))
-        
-        colnames(a) <- column_names
-        
-        if (i == 1) {
-          f <- a
-        } else {
-          f <- bind_rows(f, a)
-        }
-        rm(a)
-      }
+      f <- readData(sheet = input$sheet,
+                    file = input$file$datapath)
     }
     print("dataframe created")
-    
     rawData(f)
-    
-    
+
     vars <- names(f)
     columns_select <- c(
       "Experiment",
@@ -648,6 +627,7 @@ server <- function(input, output, session) {
       "Dilution",
       "Total Bead"
     )
+
     variables <- vars[which(!vars %in% c(
       columns_select,
       "Bead %",
@@ -657,11 +637,9 @@ server <- function(input, output, session) {
     ))]
 
     current_columns <- input$columns
-
     if (is.null(input$columns)) {
       current_columns <- "empty"
     }
-
     if (!all(current_columns %in% vars)) {
       print("updating columns")
       updateSelectInput(session,
@@ -672,20 +650,17 @@ server <- function(input, output, session) {
     }
 
     current_variables <- input$variables
-
     if (is.null(input$variables)) {
       current_variables <- "empty"
     }
-
     if (!all(current_variables %in% variables)) {
-      print("variables empty")
+      print("updating variables")
       updateSelectInput(session,
         "variables",
         choices = variables,
         selected = variables[1]
       )
     }
-
     if (all(current_variables %in% variables)) {
       print("updating variable choices; keeping selected")
       updateSelectInput(session,
@@ -696,11 +671,9 @@ server <- function(input, output, session) {
     }
 
     current_comp <- input$comp
-
     if (is.null(input$comp)) {
       current_comp <- "empty"
     }
-
     if (!current_comp %in% vars) {
       print("updating comp")
       updateSelectInput(session,
@@ -715,11 +688,9 @@ server <- function(input, output, session) {
     }
 
     current_id <- input$id
-
     if (is.null(input$id)) {
       current_id <- "empty"
     }
-
     if (!current_id %in% vars) {
       print("updating id")
       updateSelectInput(session,
@@ -730,11 +701,9 @@ server <- function(input, output, session) {
     }
 
     current_group <- input$group
-
     if (is.null(input$group)) {
       current_group <- "empty"
     }
-
     if (!current_group %in% vars) {
       print("updating group")
       updateSelectInput(session,
@@ -745,10 +714,11 @@ server <- function(input, output, session) {
     }
   }, priority = 3)
 
+
   #### Update comps ####
   observeEvent({
-    input$comp
     input$sheet
+    input$comp
   }, {
     req(
       input$sheet,
@@ -756,11 +726,9 @@ server <- function(input, output, session) {
     )
     print("updating comps")
     vars <- unique(rawData()[[input$comp]])
-
     if (is.null(vars)) {
       vars <- character(0)
     }
-
     updateSelectInput(session,
       "comps",
       choices = vars,
@@ -789,44 +757,16 @@ server <- function(input, output, session) {
       input$group,
       length(input$comps) > 1
     )
-    print("filtering dataframe")
-
-    d <- gather(
-      rawData(),
-      variable,
-      value,
-      -c(input$columns)
-    ) %>%
-      filter(get(input$comp) %in% c(input$comps))
-
-    if (!is.na(input$bead) &
-      !is.na(input$dilution) &
-      str_detect(c(input$variables)[1], "#")) {
-      d <- d %>%
-        group_by_(input$id) %>%
-        mutate(value = ifelse(str_detect(variable, "#") &
-          !is.na(input$bead),
-        value / value[variable == "Bead #"] * input$bead * input$dilution,
-        value
-        )) %>%
-        ungroup() %>%
-        filter(variable %in% c(input$variables)) %>%
-        filter(!grepl("Bead|Ungated", variable))
-    } else if (input$count == T) {
-      d <- d %>%
-        group_by_(input$id) %>%
-        mutate(value = ifelse(str_detect(variable, "#"),
-          (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
-          value
-        )) %>%
-        ungroup() %>%
-        filter(variable %in% c(input$variables)) %>%
-        filter(!grepl("Bead|Ungated", variable))
-    } else {
-      d <- d %>%
-        filter(variable %in% c(input$variables)) %>%
-        filter(!grepl("Bead|Ungated", variable))
-    }
+    print("organizing dataframe")
+    d <- organizeData(data = rawData(),
+                      exclude = input$columns,
+                      comp = input$comp,
+                      comps = input$comps,
+                      variables = input$variables,
+                      id = input$id,
+                      bead = input$bead,
+                      dilution = input$dilution,
+                      count = input$count)
     dataFrame(d)
   }, priority = 1)
 
@@ -877,6 +817,7 @@ server <- function(input, output, session) {
       fills[i] <<- input[[paste0("fill", i)]]
       shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
     })
+
 
     if (input$trim == "") {
       updateTextInput(session, "trim", value = "none")
@@ -936,19 +877,10 @@ server <- function(input, output, session) {
     if (is.null(dataFrame())) {
       return(1)
     }
-    req(currentPlot(), leg)
-
+    req(currentPlot())
     pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
-    lheight <- ifelse(input$legend != "none",
-      sum(as.numeric(grid::convertUnit(leg$height, "mm"))), 0
-    )
-    if (input$legend %in% c("top", "bottom")) {
-      total.height <- sum(pheight, lheight)
-    } else {
-      total.height <- pheight
-    }
     # return total height in pixels
-    return(total.height * 3.7795275591)
+    return(pheight * 3.7795275591)
   })
 
   #### Store current plot width ####
@@ -957,19 +889,9 @@ server <- function(input, output, session) {
     if (is.null(dataFrame())) {
       return(1)
     }
-    req(currentPlot(), leg)
-
+    req(currentPlot())
     pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
-    lwidth <- ifelse(input$legend != "none",
-      sum(as.numeric(grid::convertUnit(leg$width, "mm"))),
-      0
-    )
-    if (input$legend %in% c("top", "bottom")) {
-      total.width <- sum(pwidth, c(lwidth - pwidth))
-    } else {
-      total.width <- sum(pwidth, lwidth)
-    }
-    return(total.width * 3.7795275591)
+    return(pwidth * 3.7795275591)
   })
 
 
@@ -1030,7 +952,7 @@ server <- function(input, output, session) {
     selection <- rep(choices[1:length(comparisons)], length(comparisons))
 
     lapply(1:length(comparisons), function(i) {
-      tags$div(
+      shiny::tags$div(
         style = "margin-bottom:25px;",
         selectInput(
           inputId = paste0("shape", i),
@@ -1131,8 +1053,8 @@ server <- function(input, output, session) {
     list(
       src = outfile,
       contentType = "image/png",
-      width = isolate(cpWidth()),
-      height = isolate(cpHeight()),
+      width = cpWidth(),
+      height = cpHeight(),
       alt = "This is alternate text"
     )
   }, deleteFile = TRUE)
@@ -1187,87 +1109,111 @@ server <- function(input, output, session) {
 
   #### Add current plot to report ####
   observeEvent(input$plt2rprt, {
+    req(input$sheet)
     print("plt2rprt was clicked")
-    previous_plotListLength <- isolate(plotListLength())
-    prev_numcol <- floor(sqrt(previous_plotListLength + 1))
-    current_numcol <- floor(sqrt(previous_plotListLength + 2))
-    if (previous_plotListLength + 1 == 1) {
-      print("updating height and width")
-      wlist[previous_plotListLength + 1] <<- isolate(cpWidth())
-      hlist[previous_plotListLength + 1] <<- isolate(cpHeight())
-    }
-    if (current_numcol > prev_numcol) {
-      wlist[length(wlist) + 1] <<- isolate(cpWidth())
-      # hlist[length(hlist)] <<- isolate(cpHeight())
-      print("updating width")
-    }
-    if (current_numcol == prev_numcol) {
-      hlist[length(hlist) + 1] <<- isolate(cpHeight())
-      # wlist[length(wlist)] <<- isolate(cpWidth())
-      print("updating height")
-    }
+    comparisons <- unique(dataFrame()[[input$comp]])
+    previous_plotListLength <- plotListLength()
     plotListLength(previous_plotListLength + 1)
-    reportHeight(sum(hlist))
-    reportWidth(sum(wlist))
-    plotList[[as.character(isolate(plotListLength()))]] <- isolate(currentPlot())
-    inputs[[as.character(isolate(plotListLength()))]] <- isolate(reactiveValuesToList(input))
-    reportPlots <- as.character(1:isolate(plotListLength()))
+    current_plotListLength <- previous_plotListLength + 1
+    prev_numcol <- ifelse(previous_plotListLength == 0, 1, floor(sqrt(previous_plotListLength)))
+    current_numcol <- floor(sqrt(current_plotListLength))
+    prev_numrow <- ifelse(previous_plotListLength == 0, 1, ceiling(previous_plotListLength/prev_numcol))
+    current_numrow <- ceiling(current_plotListLength/current_numcol)
+    wlist[[as.character(current_plotListLength)]] <- cpWidth()
+    hlist[[as.character(current_plotListLength)]] <- cpHeight()
+    widths <-unlist(reactiveValuesToList(wlist), use.names = F)
+    heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    widths[is.na(widths)] <- 0
+    heights[is.na(heights)] <- 0
+    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
+      mutate(rowSums = rowSums(., na.rm = T))
+    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
+    reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
+    reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
+    plotList[[as.character(current_plotListLength)]] <- isolate(currentPlot())
+    inputs[[as.character(current_plotListLength)]] <- isolate(reactiveValuesToList(input))
+    reportPlots <- as.character(1:current_plotListLength)
+    cols <- c()
+    fills <- c()
+    shapes <- c()
+    lapply(1:length(comparisons), function(i) {
+      cols[i] <<- input[[paste0("col", i)]]
+      fills[i] <<- input[[paste0("fill", i)]]
+      shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
+    })
+    inputs[[as.character(current_plotListLength)]]$cols <- cols
+    inputs[[as.character(current_plotListLength)]]$fills <- fills
+    inputs[[as.character(current_plotListLength)]]$shapes <- shapes
     updateSelectInput(session,
       "loadPlot",
       choices = reportPlots,
-      selected = reportPlots[isolate(plotListLength())]
+      selected = reportPlots[current_plotListLength]
     )
   })
 
   #### Clear last plot from report ####
   observeEvent(input$clear, {
     print("clear last plot from report was clicked")
-    ncols <- length(wlist)
-    nrows <- length(hlist)
-    previous_plotListLength <- isolate(plotListLength())
 
-    if (previous_plotListLength > 0) {
-      plotList[[as.character(previous_plotListLength)]] <- grid::nullGrob()
+    previous_plotListLength <- plotListLength()
+    if (previous_plotListLength > 1) {
+      current_plotListLength <- previous_plotListLength - 1
+      plotListLength(current_plotListLength)
+      prev_numcol <- floor(sqrt(previous_plotListLength))
+      current_numcol <- floor(sqrt(current_plotListLength))
+      prev_numrow <- ceiling(previous_plotListLength/prev_numcol)
+      current_numrow <- ceiling(current_plotListLength/current_numcol)
+      wlist[[as.character(previous_plotListLength)]] <- NULL
+      hlist[[as.character(previous_plotListLength)]] <- NULL
+      plotList[[as.character(previous_plotListLength)]] <- grid::nullGrob(vp = NULL)
       inputs[[as.character(previous_plotListLength)]] <- NULL
-      new_ncols <- floor(sqrt(previous_plotListLength))
-      new_nrows <- floor((previous_plotListLength) / new_ncols)
-
-      if (isolate(plotListLength()) == 2) {
-        hlist <<- head(hlist, -1)
-      }
-
-      if (new_ncols < ncols) {
-        wlist <<- head(wlist, -1)
-      }
-
-      if (new_nrows < nrows) {
-        hlist <<- head(hlist, -1)
-      }
-      plotListLength(previous_plotListLength - 1)
-      print(isolate(plotListLength()))
-      reportHeight(sum(hlist))
-      reportWidth(sum(wlist))
-      reportPlots <- as.character(1:isolate(plotListLength()))
+      widths <-unlist(reactiveValuesToList(wlist), use.names = F)
+      heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+      length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
+      length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+      widths[is.na(widths)] <- 0
+      heights[is.na(heights)] <- 0
+      wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
+        mutate(rowSums = rowSums(., na.rm = T))
+      hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
+      reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
+      reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
+      reportPlots <- as.character(1:current_plotListLength)
       updateSelectInput(session,
         "loadPlot",
         choices = reportPlots,
-        selected = reportPlots[isolate(plotListLength())]
+        selected = reportPlots[current_plotListLength]
       )
     }
-    print("testing")
+    if (previous_plotListLength == 1) {
+      plotList[[as.character(1)]] <- grid::nullGrob(vp = NULL)
+      inputs[[as.character(1)]] <- NULL
+      wlist[[as.character(1)]] <- NULL
+      hlist[[as.character(1)]] <- NULL
+      plotListLength(0)
+      reportHeight(10)
+      reportWidth(10)
+      updateSelectInput(session,
+                        "loadPlot",
+                        choices = "",
+                        selected = ""
+      )
+    }
   })
 
   #### Clear all plots from report ####
   observeEvent(input$clearAll, {
     print("clear all plots from report was clicked")
-    previous_plotListLength <- isolate(plotListLength())
+    previous_plotListLength <- plotListLength()
     for (i in previous_plotListLength:1) {
-      plotList[[as.character(i)]] <- grid::nullGrob()
+      plotList[[as.character(i)]] <- grid::nullGrob(vp = NULL)
       inputs[[as.character(i)]] <- NULL
+      wlist[[as.character(i)]] <- NULL
+      hlist[[as.character(i)]] <- NULL
     }
     plotListLength(0)
-    wlist <<- c()
-    hlist <<- c()
     reportHeight(10)
     reportWidth(10)
     updateSelectInput(session,
@@ -1277,10 +1223,44 @@ server <- function(input, output, session) {
     )
   })
 
+  #### Update plot in report ####
+  observeEvent(input$update, {
+    print("updating plot in report")
+    comparisons <- unique(dataFrame()[[input$comp]])
+    current_plotListLength <- plotListLength()
+    current_numcol <- floor(sqrt(current_plotListLength))
+    wlist[[as.character(input$loadPlot)]] <- cpWidth()
+    hlist[[as.character(input$loadPlot)]] <- cpHeight()
+    widths <-unlist(reactiveValuesToList(wlist), use.names = F)
+    heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    widths[is.na(widths)] <- 0
+    heights[is.na(heights)] <- 0
+    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
+      mutate(rowSums = rowSums(., na.rm = T))
+    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
+    reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
+    reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
+    plotList[[input$loadPlot]] <- isolate(currentPlot())
+    inputs[[input$loadPlot]] <- isolate(reactiveValuesToList(input))
+    cols <- c()
+    fills <- c()
+    shapes <- c()
+    lapply(1:length(comparisons), function(i) {
+      cols[i] <<- input[[paste0("col", i)]]
+      fills[i] <<- input[[paste0("fill", i)]]
+      shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
+    })
+    inputs[[input$loadPlot]]$cols <- cols
+    inputs[[input$loadPlot]]$fills <- fills
+    inputs[[input$loadPlot]]$shapes <- shapes
+  })
+
   #### Create report ####
   output$myReport <- renderImage({
     print("rendering report image")
-
+    current_plotListLength <- plotListLength()
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = ".png")
@@ -1291,10 +1271,10 @@ server <- function(input, output, session) {
       height = reportHeight() * 3,
       res = 72 * 3
     )
-    if (isolate(plotListLength()) > 0) {
-      numcol <- floor(sqrt(isolate(plotListLength()) + 1))
+    if (current_plotListLength > 0) {
+      numcol <- floor(sqrt(current_plotListLength))
       gridExtra::grid.arrange(
-        grobs = reactiveValuesToList(plotList),
+        grobs = reactiveValuesToList(plotList)[1:current_plotListLength],
         ncol = numcol
       )
     }
@@ -1304,8 +1284,8 @@ server <- function(input, output, session) {
     list(
       src = outfile,
       contentType = "image/png",
-      width = isolate(reportWidth()),
-      height = isolate(reportHeight()),
+      width = reportWidth(),
+      height = reportHeight(),
       alt = "Nothing added to report yet."
     )
   }, deleteFile = TRUE)
@@ -1318,31 +1298,22 @@ server <- function(input, output, session) {
     content = function(file) {
       ggsave(file,
         plot =
-          if (isolate(plotListLength()) > 0) {
-            numcol <- floor(sqrt(isolate(plotListLength()) + 1))
+          if (plotListLength() > 0) {
+            numcol <- floor(sqrt(plotListLength()))
             gridExtra::arrangeGrob(
-              grobs = reactiveValuesToList(plotList),
+              grobs = reactiveValuesToList(plotList)[1:isolate(plotListLength())],
               ncol = numcol
             )
           },
         useDingbats = F,
-        height = (isolate(reportHeight()) / 3.7795275591),
-        width = (isolate(reportWidth()) / 3.7795275591),
+        height = reportHeight() / 3.7795275591,
+        width = reportWidth() / 3.7795275591,
         units = "mm",
-        device = "pdf", 
+        device = "pdf",
         limitsize = F
       )
     }
   )
-
-  #### Update plot in report ####
-  observeEvent(input$update, {
-    print("updating plot in report")
-    plotList[[input$loadPlot]] <- isolate(currentPlot())
-    inputs[[input$loadPlot]] <- isolate(reactiveValuesToList(input))
-    reportHeight(sum(hlist))
-    reportWidth(sum(wlist))
-  })
 
   #### Load plot from report ####
   observeEvent(input$load, {
@@ -1467,18 +1438,6 @@ server <- function(input, output, session) {
       "split.on",
       value = inputs[[input$loadPlot]]$split.on
     )
-    # updateCheckboxInput(session,
-    #                     "lock.fills",
-    #                     value = inputs[[input$loadPlot]]$lock.fills
-    # )
-    # updateCheckboxInput(session,
-    #                     "lock.cols",
-    #                     value = inputs[[input$loadPlot]]$lock.col
-    # )
-    # updateCheckboxInput(session,
-    #                     "lock.shapes",
-    #                     value = inputs[[input$loadPlot]]$lock.shapes
-    # )
     updateCheckboxInput(session,
       "split",
       value = inputs[[input$loadPlot]]$split
@@ -1531,126 +1490,112 @@ server <- function(input, output, session) {
     }
   }, priority = -8)
 
+  #### Refresh plots in report ####
+  observeEvent(input$refresh, {
+    for (i in as.character(1:plotListLength())) {
+      print(paste0("refreshing plot: ", i))
 
-  #### Refresh report ####
-  observeEvent(input$refreshReport, {
-    print("refreshing report data")
-    for (i in 1:isolate(plotListLength())) {
-      d <- gather(
-        rawData(),
-        variable,
-        value,
-        -c(input$columns)
-      ) %>%
-        filter(get(input$comp) %in% c(input$comps))
+      rData <- readData(
+        sheet = inputs[[i]]$sheet,
+        file = input$file$datapath)
 
-      if (!is.na(input$bead) &
-        !is.na(input$dilution) &
-        str_detect(c(input$variables)[1], "#")) {
-        d <- d %>%
-          group_by_(input$id) %>%
-          mutate(value = ifelse(str_detect(variable, "#") &
-            !is.na(input$bead),
-          value / value[variable == "Bead #"] * input$bead * input$dilution,
-          value
-          )) %>%
-          ungroup() %>%
-          filter(variable %in% c(input$variables)) %>%
-          filter(!grepl("Bead|Ungated", variable))
-      } else if (input$count == T) {
-        d <- d %>%
-          group_by_(input$id) %>%
-          mutate(value = ifelse(str_detect(variable, "#"),
-            (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
-            value
-          )) %>%
-          ungroup() %>%
-          filter(variable %in% c(input$variables)) %>%
-          filter(!grepl("Bead|Ungated", variable))
+      oData <- organizeData(
+        data = rData,
+        exclude = inputs[[i]]$columns,
+        comp = inputs[[i]]$comp,
+        comps = inputs[[i]]$comps,
+        variables = inputs[[i]]$variables,
+        id = inputs[[i]]$id,
+        bead = inputs[[i]]$bead,
+        dilution = inputs[[i]]$dilution,
+        count = inputs[[i]]$count)
+
+      if (inputs[[i]]$split.on == "") {
+        split_str <- NULL
       } else {
-        d <- d %>%
-          filter(variable %in% c(input$variables)) %>%
-          filter(!grepl("Bead|Ungated", variable))
+        split_str <- inputs[[i]]$split.on
       }
-    }
 
+      if (inputs[[i]]$y.lab == "") {
+        y.lab <- NULL
+      } else {
+        y.lab <- inputs[[i]]$y.lab
+      }
 
-    variables <- c(input$variables)
-    groups <- unique(dataFrame()[[input$group]])
-    comparisons <- unique(dataFrame()[[input$comp]])
-    comps <- c(input$comps)
+      ref.group <- NULL
 
-    if (input$y.lab == "") {
-      y.lab <- NULL
-    } else {
-      y.lab <- input$y.lab
-    }
+      if (inputs[[i]]$refGroup == T) {
+        ref.group <- inputs[[i]]$comps[1]
+      }
 
-    ref.group <- NULL
-
-    if (input$refGroup == T) {
-      ref.group <- comps[1]
-    }
-
-    levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
-      levels = comps
-    ))
-
-    if (input$group == "variable") {
-      levs <- order(factor(unique(dataFrame()[[input$group]]),
-        levels = variables
+      levs.comps <- order(factor(unique(oData[[inputs[[i]]$comp]]),
+                                 levels = inputs[[i]]$comps
       ))
-    } else {
-      levs <- order(factor(groups), levels = groups)
-    }
 
-    cols <- c()
-    fills <- c()
-    shapes <- c()
-    lapply(1:length(comparisons), function(i) {
-      cols[i] <<- input[[paste0("col", i)]]
-      fills[i] <<- input[[paste0("fill", i)]]
-      shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
+      levs <- order(factor(unique(oData[[inputs[[i]]$group]]),
+                           levels = inputs[[i]]$variables
+      ))
+
+      cols <- inputs[[i]]$cols
+      fills <- inputs[[i]]$fills
+      shapes <- inputs[[i]]$shapes
+
+      if (inputs[[i]]$trim == "") {
+        updateTextInput(session, "trim", value = "none")
+      }
+
+      cPlot <- gplot(
+        dataset = oData,
+        comparison = inputs[[i]]$comp,
+        group.by = inputs[[i]]$group,
+        geom = inputs[[i]]$geom,
+        errortype = inputs[[i]]$errortype,
+        method = inputs[[i]]$method,
+        paired = inputs[[i]]$paired,
+        size = inputs[[i]]$size,
+        stroke = inputs[[i]]$stroke,
+        width = inputs[[i]]$width,
+        dodge = inputs[[i]]$dodge,
+        font_size = inputs[[i]]$font,
+        ref.group = ref.group,
+        plotWidth = inputs[[i]]$plotWidth,
+        plotHeight = inputs[[i]]$plotHeight,
+        trans.y = inputs[[i]]$trans.y,
+        split = inputs[[i]]$split,
+        split_str = split_str,
+        trim = inputs[[i]]$trim,
+        angle = inputs[[i]]$angle.x,
+        y.lab = y.lab,
+        leg.pos = inputs[[i]]$legend,
+        levs = levs,
+        levs.comps = levs.comps,
+        color.groups = cols,
+        fill.groups = fills,
+        shape.groups = shapes,
+        sci = inputs[[i]]$scientific
+      )
+      pheight <- sum(as.numeric(grid::convertUnit(cPlot$heights, "mm"))) * 3.7795275591
+      pwidth <- sum(as.numeric(grid::convertUnit(cPlot$widths, "mm"))) * 3.7795275591
+      wlist[[i]] <- pwidth
+      hlist[[i]] <- pheight
+      plotList[[i]] <- cPlot
+    }
+    current_plotListLength <- plotListLength()
+    current_numcol <- floor(sqrt(current_plotListLength))
+    widths <-unlist(reactiveValuesToList(wlist), use.names = F)
+    heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    widths[is.na(widths)] <- 0
+    heights[is.na(heights)] <- 0
+    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
+      mutate(rowSums = rowSums(., na.rm = T))
+    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
+    reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
+    reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
     })
 
-    if (input$trim == "") {
-      updateTextInput(session, "trim", value = "none")
-    }
-
-    gplot(
-      dataset = dataFrame(),
-      comparison = input$comp,
-      group.by = input$group,
-      geom = input$geom,
-      errortype = input$errortype,
-      method = input$method,
-      paired = input$paired,
-      size = input$size,
-      stroke = input$stroke,
-      width = input$width,
-      dodge = input$dodge,
-      font_size = input$font,
-      ref.group = ref.group,
-      plotWidth = input$plotWidth,
-      plotHeight = input$plotHeight,
-      trans.y = input$trans.y,
-      split = input$split,
-      trim = input$trim,
-      angle = input$angle.x,
-      y.lab = y.lab,
-      leg.pos = input$legend,
-      levs = levs,
-      levs.comps = levs.comps,
-      color.groups = cols,
-      fill.groups = fills,
-      shape.groups = shapes,
-      sci = input$scientific
-    )
-  })
-
-
-
-
+  #### Bookmarking values ####
   onBookmark(function(state) {
     state$values$plotList <- reactiveValuesToList(plotList)
     state$values$inputs <- reactiveValuesToList(inputs)
@@ -1659,7 +1604,7 @@ server <- function(input, output, session) {
     state$values$wlist <- wlist
   })
 
-
+  #### Restoring values ####
   onRestored(function(state) {
     print("Restoring report")
     plotListLength(state$values$plotListLength)
@@ -1681,7 +1626,6 @@ server <- function(input, output, session) {
 
   #### Stop app on close ####
   session$onSessionEnded(function() {
-    rm("leg", envir = globalenv())
     graphics.off()
   })
   session$onSessionEnded(stopApp)
