@@ -1517,7 +1517,8 @@ server <- function(input, output, session) {
 
   #### Refresh plots in report ####
   observeEvent(input$refresh, {
-    req(plotListLength() >= 1)
+    req(input$file,
+        plotListLength() >= 1)
     for (i in as.character(1:plotListLength())) {
       print(paste0("refreshing plot: ", i))
 
