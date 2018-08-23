@@ -6,13 +6,6 @@
 \usage{
 plotGrouper(...)
 }
-\arguments{
-\item{...}{Takes any arguments that can be called with shiny::runApp()}
-}
 \description{
 This function allows you to run the app
 }
-\examples{
-plotGrouper()
-}
-\keyword{plotGrouper}

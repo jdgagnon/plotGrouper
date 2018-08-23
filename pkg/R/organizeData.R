@@ -34,14 +34,14 @@ organizeData <- function(data,
     filter(get(comp) %in% comps)
 
   if (!is.na(bead) &
-      !is.na(dilution) &
-      str_detect(variables[1], "#")) {
+    !is.na(dilution) &
+    str_detect(variables[1], "#")) {
     d <- d %>%
       group_by_(id) %>%
       mutate(value = ifelse(str_detect(variable, "#") &
-                              !is.na(bead),
-                            value / value[variable == "Bead #"] * bead * dilution,
-                            value
+        !is.na(bead),
+      value / value[variable == "Bead #"] * bead * dilution,
+      value
       )) %>%
       ungroup() %>%
       filter(variable %in% variables) %>%
@@ -50,8 +50,8 @@ organizeData <- function(data,
     d <- d %>%
       group_by_(input$id) %>%
       mutate(value = ifelse(str_detect(variable, "#"),
-                            (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
-                            value
+        (value / value[variable == "Bead #"] * `Total Bead` * `Dilution`),
+        value
       )) %>%
       ungroup() %>%
       filter(variable %in% variables) %>%

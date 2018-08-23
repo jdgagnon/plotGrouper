@@ -2,9 +2,6 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-library(tidyverse)
-library(shiny)
-
 # UI ----------------------------------------------------------------------
 
 ui <- function(request) {
@@ -93,24 +90,6 @@ ui <- function(request) {
                                    border-color: #2e6da4"
                 )
               )
-            ),
-
-            #### Set plot dimensions ####
-            fluidRow(
-              column(6, sliderInput("plotHeight",
-                "Plot height (mm)",
-                step = 2.5,
-                min = 10,
-                max = 150,
-                value = 30
-              )),
-              column(6, sliderInput("plotWidth",
-                "Plot width (mm)",
-                step = 2.5,
-                min = 10,
-                max = 150,
-                value = 20
-              ))
             ),
 
             hr(),
@@ -268,12 +247,24 @@ ui <- function(request) {
             )
           ),
 
-
           mainPanel(
-
             #### Plot type & legend options ####
             fluidRow(
-              column(3, selectInput("geom",
+              column(3, sliderInput("plotHeight",
+                "Plot height (mm)",
+                step = 2.5,
+                min = 10,
+                max = 150,
+                value = 30
+              )),
+              column(3, sliderInput("plotWidth",
+                "Plot width (mm)",
+                step = 2.5,
+                min = 10,
+                max = 150,
+                value = 20
+              )),
+              column(2, selectInput("geom",
                 "Select geoms to plot",
                 choices = c(
                   "bar",
@@ -300,7 +291,7 @@ ui <- function(request) {
                 ),
                 multiple = T
               )),
-              column(3, selectInput("legend",
+              column(2, selectInput("legend",
                 "Select legend position",
                 choices = c(
                   "top",
@@ -312,10 +303,23 @@ ui <- function(request) {
                 selected = "right"
               )),
 
-              column(3,
+              column(2,
+                style = "margin-top: 30px;",
+                actionButton("refreshData",
+                  label = "Refresh current plot",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff;
+                  background-color: #337ab7;
+                  border-color: #2e6da4"
+                )
+              )
+            ),
+
+            fluidRow(
+              column(2,
                 style = "margin-top: 30px;",
                 actionButton("plt2rprt",
-                  label = "Include in report",
+                  label = "Add plot to report",
                   class = "btn btn-primary btn-sm",
                   style = "color: #fff;
                           background-color: #337ab7;
@@ -325,24 +329,24 @@ ui <- function(request) {
               column(
                 2,
                 selectInput("loadPlot",
-                  "Load plot",
+                  "Report plot #",
                   choices = NULL
                 )
               ),
-              column(1,
+              column(2,
                 style = "margin-top: 30px;",
                 actionButton("load",
-                  label = "Load",
+                  label = "Load plot from report",
                   class = "btn btn-primary btn-sm",
                   style = "color: #fff;
                                   background-color: #337ab7;
                                   border-color: #2e6da4"
                 )
               ),
-              column(1,
+              column(2,
                 style = "margin-top: 30px;",
                 actionButton("update",
-                  label = "Update",
+                  label = "Update plot in report",
                   class = "btn btn-primary btn-sm",
                   style = "color: #fff;
                                   background-color: #337ab7;
@@ -438,17 +442,15 @@ ui <- function(request) {
                 style = "color: #fff;
                                         background-color: #337ab7;
                                         border-color: #2e6da4"
-                )
-              ),
+              )),
               column(4, actionButton("refresh",
                 "Refresh plots",
                 class = "btn btn-primary btn-md",
                 style = "color: #fff;
                                         background-color: #337ab7;
                                         border-color: #2e6da4"
-              )
-            )
-          ),
+              ))
+            ),
 
             #### Save report ####
             fluidRow(
@@ -568,7 +570,7 @@ server <- function(input, output, session) {
       choices = "iris",
       selected = "iris"
     )
-  })
+  }, priority = 100)
 
   #### Get file/read sheets ####
   observeEvent({
@@ -585,7 +587,7 @@ server <- function(input, output, session) {
       choices = sheets(),
       selected = sheets()[1]
     )
-  })
+  }, priority = 1)
 
   #### Make tibble from file ####
   observeEvent({
@@ -609,8 +611,10 @@ server <- function(input, output, session) {
 
     # Read excel file in
     if (!is.null(inFile())) {
-      f <- readData(sheet = input$sheet,
-                    file = input$file$datapath)
+      f <- readData(
+        sheet = input$sheet,
+        file = input$file$datapath
+      )
     }
     print("dataframe created")
     rawData(f)
@@ -652,9 +656,9 @@ server <- function(input, output, session) {
     if (all(current_columns %in% vars)) {
       print("updating column choices; keeping selected")
       updateSelectInput(session,
-                        "columns",
-                        choices = vars,
-                        selected = input$columns
+        "columns",
+        choices = vars,
+        selected = input$columns
       )
     }
 
@@ -748,7 +752,8 @@ server <- function(input, output, session) {
 
   #### Filter tibble ####
   observeEvent({
-    rawData()
+    # rawData()
+    input$refreshData
     input$columns
     input$variables
     input$bead
@@ -767,15 +772,17 @@ server <- function(input, output, session) {
       length(input$comps) > 1
     )
     print("organizing dataframe")
-    d <- organizeData(data = rawData(),
-                      exclude = input$columns,
-                      comp = input$comp,
-                      comps = input$comps,
-                      variables = input$variables,
-                      id = input$id,
-                      bead = input$bead,
-                      dilution = input$dilution,
-                      count = input$count)
+    d <- organizeData(
+      data = rawData(),
+      exclude = input$columns,
+      comp = input$comp,
+      comps = input$comps,
+      variables = input$variables,
+      id = input$id,
+      bead = input$bead,
+      dilution = input$dilution,
+      count = input$count
+    )
     dataFrame(d)
   }, priority = 1)
 
@@ -815,8 +822,8 @@ server <- function(input, output, session) {
     ))
 
     levs <- order(factor(unique(dataFrame()[[input$group]]),
-        levels = variables
-      ))
+      levels = variables
+    ))
 
     cols <- c()
     fills <- c()
@@ -1126,12 +1133,12 @@ server <- function(input, output, session) {
     current_plotListLength <- previous_plotListLength + 1
     prev_numcol <- ifelse(previous_plotListLength == 0, 1, floor(sqrt(previous_plotListLength)))
     current_numcol <- floor(sqrt(current_plotListLength))
-    prev_numrow <- ifelse(previous_plotListLength == 0, 1, ceiling(previous_plotListLength/prev_numcol))
-    current_numrow <- ceiling(current_plotListLength/current_numcol)
+    prev_numrow <- ifelse(previous_plotListLength == 0, 1, ceiling(previous_plotListLength / prev_numcol))
+    current_numrow <- ceiling(current_plotListLength / current_numcol)
     wlist[[as.character(current_plotListLength)]] <- cpWidth()
     hlist[[as.character(current_plotListLength)]] <- cpHeight()
-    widths <-unlist(reactiveValuesToList(wlist), use.names = F)
-    heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+    widths <- unlist(reactiveValuesToList(wlist), use.names = F)
+    heights <- unlist(reactiveValuesToList(hlist), use.names = F)
     length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
@@ -1172,14 +1179,14 @@ server <- function(input, output, session) {
       plotListLength(current_plotListLength)
       prev_numcol <- floor(sqrt(previous_plotListLength))
       current_numcol <- floor(sqrt(current_plotListLength))
-      prev_numrow <- ceiling(previous_plotListLength/prev_numcol)
-      current_numrow <- ceiling(current_plotListLength/current_numcol)
+      prev_numrow <- ceiling(previous_plotListLength / prev_numcol)
+      current_numrow <- ceiling(current_plotListLength / current_numcol)
       wlist[[as.character(previous_plotListLength)]] <- NULL
       hlist[[as.character(previous_plotListLength)]] <- NULL
       plotList[[as.character(previous_plotListLength)]] <- grid::nullGrob(vp = NULL)
       inputs[[as.character(previous_plotListLength)]] <- NULL
-      widths <-unlist(reactiveValuesToList(wlist), use.names = F)
-      heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+      widths <- unlist(reactiveValuesToList(wlist), use.names = F)
+      heights <- unlist(reactiveValuesToList(hlist), use.names = F)
       length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
       length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
       widths[is.na(widths)] <- 0
@@ -1205,9 +1212,9 @@ server <- function(input, output, session) {
       reportHeight(10)
       reportWidth(10)
       updateSelectInput(session,
-                        "loadPlot",
-                        choices = "",
-                        selected = ""
+        "loadPlot",
+        choices = "",
+        selected = ""
       )
     }
   })
@@ -1241,8 +1248,8 @@ server <- function(input, output, session) {
     current_numcol <- floor(sqrt(current_plotListLength))
     wlist[[as.character(input$loadPlot)]] <- cpWidth()
     hlist[[as.character(input$loadPlot)]] <- cpHeight()
-    widths <-unlist(reactiveValuesToList(wlist), use.names = F)
-    heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+    widths <- unlist(reactiveValuesToList(wlist), use.names = F)
+    heights <- unlist(reactiveValuesToList(hlist), use.names = F)
     length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
@@ -1516,7 +1523,8 @@ server <- function(input, output, session) {
 
       rData <- readData(
         sheet = inputs[[i]]$sheet,
-        file = input$file$datapath)
+        file = input$file$datapath
+      )
 
       oData <- organizeData(
         data = rData,
@@ -1527,7 +1535,8 @@ server <- function(input, output, session) {
         id = inputs[[i]]$id,
         bead = inputs[[i]]$bead,
         dilution = inputs[[i]]$dilution,
-        count = inputs[[i]]$count)
+        count = inputs[[i]]$count
+      )
 
       if (inputs[[i]]$split.on == "") {
         split_str <- NULL
@@ -1548,11 +1557,11 @@ server <- function(input, output, session) {
       }
 
       levs.comps <- order(factor(unique(oData[[inputs[[i]]$comp]]),
-                                 levels = inputs[[i]]$comps
+        levels = inputs[[i]]$comps
       ))
 
       levs <- order(factor(unique(oData[[inputs[[i]]$group]]),
-                           levels = inputs[[i]]$variables
+        levels = inputs[[i]]$variables
       ))
 
       cols <- inputs[[i]]$cols
@@ -1601,8 +1610,8 @@ server <- function(input, output, session) {
     }
     current_plotListLength <- plotListLength()
     current_numcol <- floor(sqrt(current_plotListLength))
-    widths <-unlist(reactiveValuesToList(wlist), use.names = F)
-    heights <-unlist(reactiveValuesToList(hlist), use.names = F)
+    widths <- unlist(reactiveValuesToList(wlist), use.names = F)
+    heights <- unlist(reactiveValuesToList(hlist), use.names = F)
     length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
@@ -1612,7 +1621,7 @@ server <- function(input, output, session) {
     hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
-    })
+  })
 
   #### Bookmarking values ####
   onBookmark(function(state) {

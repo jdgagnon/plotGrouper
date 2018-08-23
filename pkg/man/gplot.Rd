@@ -99,7 +99,3 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL, levs = T,
 \description{
 This function allows you to organize a dataframe and create a plot.
 }
-\examples{
-gplot()
-}
-\keyword{gplot}
