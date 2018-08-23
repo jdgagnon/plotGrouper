@@ -84,7 +84,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
                   plotHeight = 40,
                   shape.groups = c(19, 21),
                   color.groups = c("black", "black"),
-                  fill.groups = c("#444444", NA)) {
+                  fill.groups = c("#444444", NA, "#A33838")) {
   df <- droplevels(dataset)
 
   # Assign labels to the groups
