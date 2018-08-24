@@ -4,6 +4,8 @@
 #' A function to organize a dataframe and create a plot.
 #'
 #' This function allows you to organize a dataframe and create a plot.
+#' @import magrittr
+#' @import shiny
 #' @param dataset Define your data set which should be a gathered tibble
 #' @param comparison Specify the comparison you would like to make (e.g., Genotype)
 #' @param group.by Specify the variable to group by (e.g., Tissue)
