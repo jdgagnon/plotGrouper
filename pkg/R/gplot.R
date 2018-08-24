@@ -5,8 +5,7 @@
 #'
 #' This function allows you to organize a dataframe and create a plot.
 #' @import magrittr
-#' @importFrom shiny tags
-#' @importFrom shiny shinyApp
+#' @import shiny
 #' @import tidyverse
 #' @import gridExtra
 #' @import shinythemes
@@ -258,7 +257,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
 
     if (length(y.lab) > 1) {
       y.lab <- y.lab[1]
-      showNotification(
+      shiny::showNotification(
         ui = "Plotting of multiple variables may
                               result in incorrect y-axis label.",
         type = "message",

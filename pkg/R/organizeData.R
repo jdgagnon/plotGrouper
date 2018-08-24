@@ -2,7 +2,6 @@
 #' A function to organize the raw data to be plotted
 #'
 #' This function will organize the data and perform count calculations if appropriate
-#' @import magrittr
 #' @param data Takes a tibble
 #' @param exclude Takes list of columns to exclude from gather
 #' @param comp Takes name of comparison column

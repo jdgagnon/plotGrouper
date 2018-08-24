@@ -2,7 +2,6 @@
 #' A function to read the data to be plotted into the app
 #'
 #' This function will read each sheet listed and return a tibble
-#' @import magrittr
 #' @param sheet Takes a vector of sheets to be read
 #' @param file Takes an excel file to be read from
 #' @keywords readData
