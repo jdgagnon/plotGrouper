@@ -13,7 +13,7 @@ readData <- function(sheet, file) {
   for (i in 1:length(sheet)) {
     a <- readxl::read_excel(file,
       sheet = sheet[i],
-      col_names = T
+      col_names = TRUE
     ) %>%
       mutate(Sheet = sheet[i]) %>%
       select(Sheet, everything())

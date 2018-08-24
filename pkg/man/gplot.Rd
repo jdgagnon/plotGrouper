@@ -4,18 +4,20 @@
 \alias{gplot}
 \title{A function to organize a dataframe and create a plot.}
 \usage{
-gplot(dataset = NULL, comparison = NULL, group.by = NULL, levs = T,
-  val = "value", geom = c("bar", "errorbar", "point", "stat", "seg"),
-  p = "p.signif", ref.group = NULL, p.adjust.method = "holm",
-  comparisons = NULL, method = "t.test", paired = F,
-  errortype = "mean_sdl", y.lim = NULL, y.lab = NULL,
-  trans.y = "identity", x.lim = c(NA, NA), expand.y = c(0, 0),
-  x.lab = NULL, trans.x = "identity", sci = F, angle.x = F,
-  levs.comps = T, group.labs = NULL, stats = F, split = T,
-  split_str = NULL, trim = "none", leg.pos = "top", stroke = 0.25,
-  font_size = 9, size = 1, width = 0.8, dodge = 0.8,
-  plotWidth = 30, plotHeight = 40, shape.groups = c(19, 21),
-  color.groups = c("black", "black"), fill.groups = c("#444444", NA))
+gplot(dataset = NULL, comparison = NULL, group.by = NULL,
+  levs = TRUE, val = "value", geom = c("bar", "errorbar", "point",
+  "stat", "seg"), p = "p.signif", ref.group = NULL,
+  p.adjust.method = "holm", comparisons = NULL, method = "t.test",
+  paired = FALSE, errortype = "mean_sdl", y.lim = NULL,
+  y.lab = NULL, trans.y = "identity", x.lim = c(NA, NA),
+  expand.y = c(0, 0), x.lab = NULL, trans.x = "identity",
+  sci = FALSE, angle.x = FALSE, levs.comps = TRUE,
+  group.labs = NULL, stats = FALSE, split = TRUE, split_str = NULL,
+  trim = "none", leg.pos = "top", stroke = 0.25, font_size = 9,
+  size = 1, width = 0.8, dodge = 0.8, plotWidth = 30,
+  plotHeight = 40, shape.groups = c(19, 21),
+  color.groups = c("black", "black"), fill.groups = c("#444444", NA,
+  "#A33838"))
 }
 \arguments{
 \item{dataset}{Define your data set which should be a gathered tibble}

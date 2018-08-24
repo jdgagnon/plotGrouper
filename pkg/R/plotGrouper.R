@@ -10,5 +10,5 @@ plotGrouper <- function(...)
   if (appDir == "") {
     stop("Could not find directory. Try re-installing `plotGrouper`.", call. = FALSE)
   }
-  shiny::runApp(appDir, launch.browser = T, ...)
+  shiny::runApp(appDir, launch.browser = TRUE, ...)
 }

@@ -49,7 +49,7 @@
 gplot <- function(dataset = NULL, # Define your data set which should be a gathered tibble
                   comparison = NULL, # Specify the comparison you would like to make (e.g., Genotype)
                   group.by = NULL, # Specify the variable to group by (e.g., Tissue)
-                  levs = T,
+                  levs =TRUE,
                   val = "value", # If your tibble is not 'tidy', and there are multiple value columns, specify the one you want to plot
                   geom = c("bar", "errorbar", "point", "stat", "seg"), # Define the list of geoms you want to plot
                   p = "p.signif", # Specify representation of pvalue ('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)
@@ -57,7 +57,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
                   p.adjust.method = "holm",
                   comparisons = NULL,
                   method = "t.test",
-                  paired = F,
+                  paired = FALSE,
                   errortype = "mean_sdl",
                   y.lim = NULL,
                   y.lab = NULL,
@@ -66,12 +66,12 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
                   expand.y = c(0, 0),
                   x.lab = NULL,
                   trans.x = "identity",
-                  sci = F,
-                  angle.x = F,
-                  levs.comps = T,
+                  sci = FALSE,
+                  angle.x = FALSE,
+                  levs.comps = TRUE,
                   group.labs = NULL,
-                  stats = F,
-                  split = T,
+                  stats = FALSE,
+                  split = TRUE,
                   split_str = NULL,
                   trim = "none",
                   leg.pos = "top",
@@ -88,15 +88,15 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   df <- droplevels(dataset)
 
   # Assign labels to the groups
-  suppressWarnings(if (is.null(group.labs) & split == F) {
+  suppressWarnings(if (is.null(group.labs) & split == FALSE) {
     group.labs <- function(x) {
       x
     }
-  } else if (is.null(group.labs) & split == T & is.null(split_str)) {
+  } else if (is.null(group.labs) & split == TRUE & is.null(split_str)) {
     group.labs <- function(x) {
       sapply(str_remove(word(str_remove(x, trim), -1, sep = "/"), " %| #|% |# "), "[", 1)
     }
-  } else if (is.null(group.labs) & split == T & !is.null(split_str)) {
+  } else if (is.null(group.labs) & split == TRUE & !is.null(split_str)) {
     group.labs <- function(x) {
       sapply(strsplit(str_remove(x, trim), split = split_str, fixed = TRUE), "[", 2)
     }
@@ -125,7 +125,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     scale.x <- scale_x_continuous(
       breaks = df[[group.by]],
       labels = formatC(df[[group.by]],
-        drop0trailing = T
+        drop0trailing = TRUE
       ),
       trans = trans.x,
       limits = x.lim
@@ -137,7 +137,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   # Create a tibble of max values by group for assigning height of p values
   dmax <- droplevels(df %>%
     group_by_(group.by, comparison) %>%
-    mutate(error_max = max(get(errortype)(value, mult = 1), na.rm = T)) %>%
+    mutate(error_max = max(get(errortype)(value, mult = 1), na.rm = TRUE)) %>%
     ungroup() %>%
     group_by_(group.by) %>%
     slice(which.max(value)) %>%
@@ -146,10 +146,10 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     arrange_(group.by))
 
   if (all(is.na(y.lim))) {
-    y.lim <- c(0, max(dmax[, c("value", "error_max")], na.rm = T) * 1.08)
+    y.lim <- c(0, max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[1]) & is.na(y.lim[2])) {
-    y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")], na.rm = T) * 1.08)
+    y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[2] & is.na(y.lim[1]))) {
     y.lim <- c(0, y.lim[2])
@@ -175,7 +175,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   if (method %in% c("t.test", "wilcox.test")) {
     statistics <- try(left_join(statOut, dmax, by = group.by) %>%
       filter(group1 %in% comparisons | group2 %in% comparisons) %>%
-      mutate(max = max(c(value, error_max), na.rm = T) * 0.05) %>%
+      mutate(max = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
       group_by_(group.by) %>%
       mutate(
         n = row_number(),
@@ -202,7 +202,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       ))
   } else {
     statistics <- try(left_join(statOut, dmax, by = group.by) %>%
-      mutate(max = max(c(value, error_max), na.rm = T) * 0.05) %>%
+      mutate(max = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
       group_by_(group.by) %>%
       mutate(
         n = row_number(),
@@ -232,7 +232,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     statistics <- tibble("p.signif" = NA)
   }
 
-  if (stats == T) {
+  if (stats == TRUE) {
     return(statOut)
   }
 
@@ -265,7 +265,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       dmax$value,
       dmax$error_max
     )),
-    scientific = T
+    scientific = TRUE
     ),
     pattern = "e\\+"
   )[[1]][2])
@@ -287,10 +287,10 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       )
     }
 
-    format(l2, trim = F)
+    format(l2, trim = FALSE)
   }
 
-  if (angle.x == T) {
+  if (angle.x == TRUE) {
     angle <- 45
     vjust <- 1
     hjust <- 1
@@ -371,14 +371,14 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     geom = "bar",
     width = width,
     position = position_dodge(dodge),
-    show.legend = T
+    show.legend = TRUE
   )
 
   violin <- geom_violin(aes(
     fill = get(comparison),
     color = get(comparison)
   ),
-  show.legend = T,
+  show.legend = TRUE,
   position = position_dodge(dodge)
   )
 
@@ -386,7 +386,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     color = get(comparison),
     fill = get(comparison)
   ),
-  show.legend = T,
+  show.legend = TRUE,
   position = position_dodge(dodge)
   )
 
@@ -431,7 +431,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     fill = get(comparison),
     x = value
   ),
-  inherit.aes = F
+  inherit.aes = FALSE
   )
 
   if (all(is.na(statOut$p.signif))) {
@@ -441,8 +441,8 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       data = statistics, aes(x.pos, na.omit(h.p)),
       label = statistics[[p]],
       size = font_size / (1 / 0.35),
-      inherit.aes = F,
-      na.rm = T
+      inherit.aes = FALSE,
+      na.rm = TRUE
     )
 
     seg <- geom_segment(
@@ -454,8 +454,8 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
         yend = h.s
       ),
       size = stroke,
-      inherit.aes = F,
-      na.rm = T
+      inherit.aes = FALSE,
+      na.rm = TRUE
     )
   }
 
@@ -529,7 +529,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       plot.margin = margin(5, 0, 5, 0, "mm"),
       legend.margin = margin(0, 0, 0, 0, "mm")
     )
-  if (stats == F) {
+  if (stats == FALSE) {
     if (leg.pos %in% c("top", "bottom")) {
       leg <- ggpubr::get_legend(g)
       lwidth <- sum(as.numeric(grid::convertUnit(leg$width, "mm")))
@@ -546,26 +546,26 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     max.grob.heights <- sapply(
       gt$grob[[which(gt$layout$name == "panel")]]$children,
       function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
-          max(as.numeric(x$height), na.rm = T),
+          max(as.numeric(x$height), na.rm = TRUE),
           ifelse(!is.null(x$y) & "unit" %in% class(x$y),
             max(as.numeric(x$y)),
             0
           )
         )
     )
-    max.grob.heights <- max(max.grob.heights, na.rm = T)
+    max.grob.heights <- max(max.grob.heights, na.rm = TRUE)
 
     min.grob.heights <- sapply(
       gt$grob[[which(gt$layout$name == "panel")]]$children,
       function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
-          min(as.numeric(x$height), na.rm = T),
+          min(as.numeric(x$height), na.rm = TRUE),
           ifelse(!is.null(x$y) & "unit" %in% class(x$y),
             min(as.numeric(x$y)),
             0
           )
         )
     )
-    min.grob.heights <- min(min.grob.heights, na.rm = T)
+    min.grob.heights <- min(min.grob.heights, na.rm = TRUE)
 
     # identify panel row & calculate panel height
     panel.row <- gt$layout[gt$layout$name == "panel", "t"] # = 7
@@ -573,22 +573,22 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
 
     # calculate height of all the grobs above the panel
     height.above.panel <- gt$heights[1:(panel.row - 1)]
-    height.above.panel <- sum(as.numeric(grid::convertUnit(height.above.panel, "mm")), na.rm = T)
+    height.above.panel <- sum(as.numeric(grid::convertUnit(height.above.panel, "mm")), na.rm = TRUE)
 
     # check whether the out-of-bound object (if any) exceeds this height, & replace if necessary
     if (max.grob.heights > 1) {
       oob.height.above.panel <- (max.grob.heights - 1) * panel.height
-      height.above.panel <- max(height.above.panel, oob.height.above.panel, na.rm = T)
+      height.above.panel <- max(height.above.panel, oob.height.above.panel, na.rm = TRUE)
     }
 
     # as above, calculate the height of all the grobs below the panel
     height.below.panel <- gt$heights[(panel.row + 1):length(gt$heights)]
-    height.below.panel <- sum(as.numeric(grid::convertUnit(height.below.panel, "mm")), na.rm = T)
+    height.below.panel <- sum(as.numeric(grid::convertUnit(height.below.panel, "mm")), na.rm = TRUE)
 
     # as above
     if (min.grob.heights < 0) {
       oob.height.below.panel <- abs(min.grob.heights) * panel.height
-      height.below.panel <- max(height.below.panel, oob.height.below.panel, na.rm = T)
+      height.below.panel <- max(height.below.panel, oob.height.below.panel, na.rm = TRUE)
     }
 
     # sum the result

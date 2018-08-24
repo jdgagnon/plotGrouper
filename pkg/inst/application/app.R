@@ -11,7 +11,7 @@ ui <- function(request) {
     theme = shinythemes::shinytheme("cosmo"),
     navbarPage(
       (shiny::tags$img(src = "logo_white_small.png", width = "100px", height = "100px")),
-      fluid = T,
+      fluid = TRUE,
       position = "fixed-top",
       tabPanel(
         h2("Plot", style = "margin-top: 30px; margin-bottom: 30px"),
@@ -42,20 +42,20 @@ ui <- function(request) {
             fluidRow(
               column(8, selectInput("sheet",
                 "Select sheet",
-                multiple = T,
+                multiple = TRUE,
                 choices = NULL
               ))
             ),
 
             selectInput("columns",
               "Select columns to exclude from gather",
-              multiple = T,
+              multiple = TRUE,
               choices = NULL
             ),
 
             selectInput("variables",
               "Variables to plot",
-              multiple = T,
+              multiple = TRUE,
               choices = NULL
             ),
 
@@ -104,7 +104,7 @@ ui <- function(request) {
                 style = "margin-top: 25px;",
                 checkboxInput("scientific",
                   "10^x",
-                  value = F
+                  value = FALSE
                 )
               )
             ),
@@ -123,7 +123,7 @@ ui <- function(request) {
                 checkboxInput(
                   "split",
                   "Split",
-                  value = T
+                  value = TRUE
                 )
               ),
               column(3,
@@ -131,7 +131,7 @@ ui <- function(request) {
                 checkboxInput(
                   "angle.x",
                   "Angle",
-                  value = F
+                  value = FALSE
                 )
               )
             ),
@@ -192,14 +192,14 @@ ui <- function(request) {
                 style = "margin-top: 25px;",
                 checkboxInput("refGroup",
                   "Reference group",
-                  value = F
+                  value = FALSE
                 )
               ),
               column(4,
                 style = "margin-top: 25px;",
                 checkboxInput("paired",
                   "Paired",
-                  value = F
+                  value = FALSE
                 )
               )
             ),
@@ -232,7 +232,7 @@ ui <- function(request) {
 
             checkboxInput("count",
               "# Beads/dilution factor included in data",
-              value = F
+              value = FALSE
             ),
 
             fluidRow(
@@ -289,7 +289,7 @@ ui <- function(request) {
                   "stat",
                   "seg"
                 ),
-                multiple = T
+                multiple = TRUE
               )),
               column(2, selectInput("legend",
                 "Select legend position",
@@ -381,7 +381,7 @@ ui <- function(request) {
 
               column(3, selectInput("comps",
                 "Order of comparisons",
-                multiple = T,
+                multiple = TRUE,
                 choices = NULL
               ))
             ),
@@ -409,9 +409,9 @@ ui <- function(request) {
             ),
 
             fluidRow(
-              column(4, checkboxInput("lock.shapes", "Lock", F)),
-              column(4, checkboxInput("lock.cols", "Lock", F)),
-              column(4, checkboxInput("lock.fills", "Lock", F))
+              column(4, checkboxInput("lock.shapes", "Lock", FALSE)),
+              column(4, checkboxInput("lock.cols", "Lock", FALSE)),
+              column(4, checkboxInput("lock.fills", "Lock", FALSE))
             ),
 
             hr()
@@ -813,7 +813,7 @@ server <- function(input, output, session) {
 
     ref.group <- NULL
 
-    if (input$refGroup == T) {
+    if (input$refGroup == TRUE) {
       ref.group <- comps[1]
     }
 
@@ -939,7 +939,7 @@ server <- function(input, output, session) {
       paired = input$paired,
       levs = levs,
       levs.comps = levs.comps,
-      stats = T
+      stats = TRUE
     )
   }
 
@@ -1040,7 +1040,7 @@ server <- function(input, output, session) {
         inputId = paste0("fill", i),
         label = comparisons[i],
         value = selection[i],
-        allowTransparent = T
+        allowTransparent = TRUE
       )
     })
   })
@@ -1083,7 +1083,7 @@ server <- function(input, output, session) {
     content = function(file) {
       ggsave(file,
         plot = isolate(currentPlot()),
-        useDingbats = F,
+        useDingbats = FALSE,
         height = isolate(cpHeight()) / 3.7795275591,
         width = isolate(cpWidth()) / 3.7795275591,
         units = "mm",
@@ -1105,7 +1105,7 @@ server <- function(input, output, session) {
       paste0(input$file, "_stats", ".csv")
     },
     content = function(file) {
-      write_csv(stats(), file, col_names = T)
+      write_csv(stats(), file, col_names = TRUE)
     }
   )
 
@@ -1137,17 +1137,17 @@ server <- function(input, output, session) {
     current_numrow <- ceiling(current_plotListLength / current_numcol)
     wlist[[as.character(current_plotListLength)]] <- cpWidth()
     hlist[[as.character(current_plotListLength)]] <- cpHeight()
-    widths <- unlist(reactiveValuesToList(wlist), use.names = F)
-    heights <- unlist(reactiveValuesToList(hlist), use.names = F)
+    widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
+    heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
     length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
-      mutate(rowSums = rowSums(., na.rm = T))
-    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
-    reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
-    reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
+    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+      mutate(rowSums = rowSums(., na.rm = TRUE))
+    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
+    reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[as.character(current_plotListLength)]] <- isolate(currentPlot())
     inputs[[as.character(current_plotListLength)]] <- isolate(reactiveValuesToList(input))
     reportPlots <- as.character(1:current_plotListLength)
@@ -1185,17 +1185,17 @@ server <- function(input, output, session) {
       hlist[[as.character(previous_plotListLength)]] <- NULL
       plotList[[as.character(previous_plotListLength)]] <- grid::nullGrob(vp = NULL)
       inputs[[as.character(previous_plotListLength)]] <- NULL
-      widths <- unlist(reactiveValuesToList(wlist), use.names = F)
-      heights <- unlist(reactiveValuesToList(hlist), use.names = F)
+      widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
+      heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
       length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
       length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
       widths[is.na(widths)] <- 0
       heights[is.na(heights)] <- 0
-      wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
-        mutate(rowSums = rowSums(., na.rm = T))
-      hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
-      reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
-      reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
+      wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+        mutate(rowSums = rowSums(., na.rm = TRUE))
+      hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+      reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
+      reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
       reportPlots <- as.character(1:current_plotListLength)
       updateSelectInput(session,
         "loadPlot",
@@ -1248,17 +1248,17 @@ server <- function(input, output, session) {
     current_numcol <- floor(sqrt(current_plotListLength))
     wlist[[as.character(input$loadPlot)]] <- cpWidth()
     hlist[[as.character(input$loadPlot)]] <- cpHeight()
-    widths <- unlist(reactiveValuesToList(wlist), use.names = F)
-    heights <- unlist(reactiveValuesToList(hlist), use.names = F)
+    widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
+    heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
     length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
-      mutate(rowSums = rowSums(., na.rm = T))
-    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
-    reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
-    reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
+    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+      mutate(rowSums = rowSums(., na.rm = TRUE))
+    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
+    reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[input$loadPlot]] <- isolate(currentPlot())
     inputs[[input$loadPlot]] <- isolate(reactiveValuesToList(input))
     cols <- c()
@@ -1322,12 +1322,12 @@ server <- function(input, output, session) {
               ncol = numcol
             )
           },
-        useDingbats = F,
+        useDingbats = FALSE,
         height = reportHeight() / 3.7795275591,
         width = reportWidth() / 3.7795275591,
         units = "mm",
         device = "pdf",
-        limitsize = F
+        limitsize = FALSE
       )
     }
   )
@@ -1553,7 +1553,7 @@ server <- function(input, output, session) {
 
       ref.group <- NULL
 
-      if (inputs[[i]]$refGroup == T) {
+      if (inputs[[i]]$refGroup == TRUE) {
         ref.group <- inputs[[i]]$comps[1]
       }
 
@@ -1611,17 +1611,17 @@ server <- function(input, output, session) {
     }
     current_plotListLength <- plotListLength()
     current_numcol <- floor(sqrt(current_plotListLength))
-    widths <- unlist(reactiveValuesToList(wlist), use.names = F)
-    heights <- unlist(reactiveValuesToList(hlist), use.names = F)
+    widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
+    heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
     length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = T)) %>%
-      mutate(rowSums = rowSums(., na.rm = T))
-    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = T))
-    reportWidth(ceiling(max(wdims$rowSums, na.rm = T)))
-    reportHeight(ceiling(max(colSums(hdims, na.rm = T), na.rm = T)))
+    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+      mutate(rowSums = rowSums(., na.rm = TRUE))
+    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
+    reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })
 
   #### Bookmarking values ####
