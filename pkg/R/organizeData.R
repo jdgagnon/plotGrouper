@@ -46,7 +46,7 @@ organizeData <- function(data,
       ungroup() %>%
       filter(variable %in% variables) %>%
       filter(!grepl("Bead|Ungated", variable))
-  } else if (count == T) {
+  } else if (count == TRUE) {
     d <- d %>%
       group_by_(input$id) %>%
       mutate(value = ifelse(str_detect(variable, "#"),
