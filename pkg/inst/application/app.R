@@ -591,6 +591,7 @@ server <- function(input, output, session) {
   #### Make tibble from file ####
   observeEvent({
     input$sheet
+    input$refreshData
   }, {
     req(input$sheet)
     print("Sheet changed")
@@ -752,6 +753,7 @@ server <- function(input, output, session) {
   #### Filter tibble ####
   observeEvent({
     # rawData()
+    input$sheet
     input$refreshData
     input$columns
     input$variables
