@@ -752,7 +752,6 @@ server <- function(input, output, session) {
   #### Filter tibble ####
   observeEvent({
     # rawData()
-    input$sheet
     input$refreshData
     input$columns
     input$variables
