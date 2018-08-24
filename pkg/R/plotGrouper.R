@@ -2,6 +2,11 @@
 #' A function to run the shiny app
 #'
 #' This function allows you to run the app
+#' @import magrittr
+#' @import shiny
+#' @import tidyverse
+#' @import gridExtra
+#' @import shinythemes
 #' @export
 plotGrouper <- function(...)
 {
