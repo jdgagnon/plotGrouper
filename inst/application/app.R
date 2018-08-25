@@ -172,7 +172,7 @@ ui <- function(request) {
             selectInput("errortype",
               "Select errorbar type",
               choices = c("SE", "SD"),
-              selected = "mean_sdl"
+              selected = "SD"
             ),
 
             #### Select statistical method ####
@@ -206,14 +206,14 @@ ui <- function(request) {
             #### Format width and dodge ####
             fluidRow(
               column(6, sliderInput("width",
-                "Width",
+                "Group width",
                 min = 0,
                 max = 1,
                 step = 0.05,
                 value = 0.80
               )),
               column(6, sliderInput("dodge",
-                "Dodge",
+                "Comparison Dodge",
                 min = 0,
                 max = 2,
                 step = 0.05,
@@ -224,23 +224,38 @@ ui <- function(request) {
             hr(),
 
             #### Options for transforming counts ####
-            selectInput("id",
-              "ID column",
-              choices = NULL
+            h4("Options for transforming count data"),
+            fluidRow(
+              column(4,
+                selectInput("id",
+                  "Unique ID column",
+                   choices = NULL
+                )),
+              column(4,
+                selectInput("beadColumn",
+                  "Column with total # beads/sample",
+                  choices = NULL
+                )),
+              column(4,
+                selectInput("dilutionColumn",
+                  "Column with dilution factor: 1/x",
+                  choices = NULL
+                ))
             ),
-
-            checkboxInput("count",
-              "# Beads/dilution factor included in data",
-              value = FALSE
-            ),
+            #   column(4,
+            #     checkboxInput("count",
+            #       "Data are ready to count",
+            #       value = FALSE
+            #     ))
+            # ),
 
             fluidRow(
               column(6, numericInput("bead",
-                "# Beads/sample",
+                "Total # Beads/Sample",
                 value = NULL
               )),
               column(6, numericInput("dilution",
-                "Dilution factor",
+                "Dilution factor: 1/",
                 value = NULL
               ))
             )
@@ -699,6 +714,19 @@ server <- function(input, output, session) {
       )
     }
 
+    current_group <- input$group
+    if (is.null(input$group)) {
+      current_group <- "empty"
+    }
+    if (!current_group %in% vars) {
+      print("updating group")
+      updateSelectInput(session,
+                        "group",
+                        choices = c("variable", vars),
+                        selected = "variable"
+      )
+    }
+
     current_id <- input$id
     if (is.null(input$id)) {
       current_id <- "empty"
@@ -712,18 +740,34 @@ server <- function(input, output, session) {
       )
     }
 
-    current_group <- input$group
-    if (is.null(input$group)) {
-      current_group <- "empty"
+    current_beadColumn <- input$beadColumn
+    if (is.null(input$beadColumn)) {
+      current_beadColumn <- "empty"
     }
-    if (!current_group %in% vars) {
-      print("updating group")
+    if (!current_beadColumn %in% vars) {
+      print("updating beadColumn")
       updateSelectInput(session,
-        "group",
-        choices = c("variable", vars),
-        selected = "variable"
+                        "beadColumn",
+                        choices = vars,
+                        selected = "Total Bead"
       )
     }
+
+
+
+    current_dilutionColumn <- input$dilutionColumn
+    if (is.null(input$dilutionColumn)) {
+      current_dilutionColumn <- "empty"
+    }
+    if (!current_dilutionColumn %in% vars) {
+      print("updating dilutionColumn")
+      updateSelectInput(session,
+                        "dilutionColumn",
+                        choices = vars,
+                        selected = "Dilution"
+      )
+    }
+
   }, priority = 3)
 
 
@@ -760,7 +804,10 @@ server <- function(input, output, session) {
     input$comp
     input$group
     input$comps
-    input$count
+    input$id
+    # input$count
+    input$beadColumn
+    input$dilutionColumn
   }, {
     req(
       input$sheet,
@@ -768,9 +815,13 @@ server <- function(input, output, session) {
       input$variables,
       input$comp,
       input$group,
-      length(input$comps) > 1
+      length(input$comps) > 1,
+      input$id
     )
     print("organizing dataframe")
+    print(input$beadColumn)
+    print(input$dilutionColumn)
+
     d <- organizeData(
       data = rawData(),
       exclude = input$columns,
@@ -780,8 +831,8 @@ server <- function(input, output, session) {
       id = input$id,
       bead = input$bead,
       dilution = input$dilution,
-      count = input$count
-    )
+      beadColumn = input$beadColumn,
+      dilutionColumn = input$dilutionColumn)
     dataFrame(d)
   }, priority = 1)
 
@@ -1469,10 +1520,16 @@ server <- function(input, output, session) {
       "split",
       value = inputs[[input$loadPlot]]$split
     )
-    updateCheckboxInput(session,
-      "count",
-      value = inputs[[input$loadPlot]]$count
-    )
+    updateSelectInput(session,
+      "beadColumn",
+      value = inputs[[input$loadPlot]]$beadColumn)
+    updateSelectInput(session,
+                      "dilutionColumn",
+                      value = inputs[[input$loadPlot]]$dilutionColumn)
+    # updateCheckboxInput(session,
+    #   "count",
+    #   value = inputs[[input$loadPlot]]$count
+    # )
     updateCheckboxInput(session,
       "angle.x",
       value = inputs[[input$loadPlot]]$angle.x
@@ -1538,8 +1595,7 @@ server <- function(input, output, session) {
         variables = inputs[[i]]$variables,
         id = inputs[[i]]$id,
         bead = inputs[[i]]$bead,
-        dilution = inputs[[i]]$dilution,
-        count = inputs[[i]]$count
+        dilution = inputs[[i]]$dilution
       )
 
       errortype <- ifelse(inputs[[i]]$errortype == "SE", "mean_se", "mean_sdl")
