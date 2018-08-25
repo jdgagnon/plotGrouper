@@ -171,7 +171,7 @@ ui <- function(request) {
             #### Select error type to plot ####
             selectInput("errortype",
               "Select errorbar type",
-              choices = c("mean_se", "mean_sdl"),
+              choices = c("SE", "SD"),
               selected = "mean_sdl"
             ),
 
@@ -793,6 +793,8 @@ server <- function(input, output, session) {
     comparisons <- unique(dataFrame()[[input$comp]])
     comps <- c(input$comps)
 
+    errortype <- ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
+
     y.min <- ifelse(is.null(input$y.min), NA, input$y.min)
     y.max <- ifelse(is.null(input$y.max), NA, input$y.max)
 
@@ -843,7 +845,7 @@ server <- function(input, output, session) {
       comparison = input$comp,
       group.by = input$group,
       geom = input$geom,
-      errortype = input$errortype,
+      errortype = errortype,
       method = input$method,
       paired = input$paired,
       size = input$size,
@@ -917,6 +919,8 @@ server <- function(input, output, session) {
     groups <- unique(dataFrame()[[input$group]])
     comps <- c(input$comps)
 
+    errortype <- ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
+
     if (input$group == "variable") {
       levs <- order(factor(unique(dataFrame()[[input$group]]),
         levels = variables
@@ -933,7 +937,7 @@ server <- function(input, output, session) {
       dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
-      errortype = input$errortype,
+      errortype = errortype,
       method = input$method,
       paired = input$paired,
       levs = levs,
@@ -1538,6 +1542,8 @@ server <- function(input, output, session) {
         count = inputs[[i]]$count
       )
 
+      errortype <- ifelse(inputs[[i]]$errortype == "SE", "mean_se", "mean_sdl")
+
       if (inputs[[i]]$split.on == "") {
         split_str <- NULL
       } else {
@@ -1577,7 +1583,7 @@ server <- function(input, output, session) {
         comparison = inputs[[i]]$comp,
         group.by = inputs[[i]]$group,
         geom = inputs[[i]]$geom,
-        errortype = inputs[[i]]$errortype,
+        errortype = errortype,
         method = inputs[[i]]$method,
         paired = inputs[[i]]$paired,
         size = inputs[[i]]$size,
