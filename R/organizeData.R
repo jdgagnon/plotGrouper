@@ -11,8 +11,6 @@
 #' @param comps Takes a vector of names of the comparisons
 #' @param variables Takes vector of the variables to be plotted
 #' @param id Takes name of unique identifier column
-#' @param bead Takes number of beads per sample
-#' @param dilution Takes dilution factor
 #' @param beadColumn Takes column name that has total number of beads/sample
 #' @param dilutionColumn Takes column name that has dilution factor for each sample 1/x
 #' @keywords organizeData
@@ -26,13 +24,11 @@ organizeData <- function(data,
                          comps,
                          variables,
                          id,
-                         bead,
-                         dilution,
                          beadColumn,
                          dilutionColumn) {
 
-  if (beadColumn != "" &
-      dilutionColumn != "" &
+  if (!beadColumn %in% c("", "none") &
+      !dilutionColumn %in% c("", "none") &
       stringr::str_detect(variables, "#")) {
     shiny::showNotification(
       ui = paste0("Count data is being transformed
@@ -51,20 +47,8 @@ organizeData <- function(data,
   ) %>%
     filter(get(comp) %in% comps)
 
-  if (!is.na(bead) &
-    !is.na(dilution) &
-    str_detect(variables[1], "#")) {
-    d <- d %>%
-      group_by_(id) %>%
-      mutate(value = ifelse(str_detect(variable, "#") &
-        !is.na(bead),
-      value / value[variable == "Bead #"] * bead * dilution,
-      value
-      )) %>%
-      ungroup() %>%
-      filter(variable %in% variables) %>%
-      filter(!grepl("Bead|Ungated", variable))
-  } else if (beadColumn != "" & dilutionColumn != "") {
+  if (!beadColumn %in% c("", "none") &
+             !dilutionColumn %in% c("", "none")) {
     d <- d %>%
       group_by_(id) %>%
       mutate(value = ifelse(str_detect(variable, "#"),
