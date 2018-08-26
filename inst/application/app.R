@@ -37,7 +37,7 @@ ui <- function(request) {
             ),
 
             #### Sheet selection ####
-            h4("Select appropriate columns"),
+            h4("Build plot"),
             fluidRow(
               column(8, selectInput("sheet",
                 "Sheet(s)",
@@ -61,7 +61,7 @@ ui <- function(request) {
             #### Select comparison and grouping columns ####
             fluidRow(
               column(6, selectInput("comp",
-                "Comparison",
+                "Comparisons",
                 choices = NULL
               )),
               column(6, selectInput("group",
@@ -163,7 +163,7 @@ ui <- function(request) {
             hr(),
             #### Select error type to plot ####
             selectInput("errortype",
-              "Select errorbar type",
+              "Errorbar format",
               choices = c("SE", "SD"),
               selected = "SD"
             ),
@@ -213,7 +213,7 @@ ui <- function(request) {
             ),
             hr(),
             #### Options for transforming counts ####
-            h4("Select columns to transform count data"),
+            h4("Transform count data"),
             fluidRow(
               column(4,
                 selectInput("id",
@@ -250,8 +250,8 @@ ui <- function(request) {
                 max = 150,
                 value = 20
               )),
-              column(2, selectInput("geom",
-                "Select geoms to plot",
+              column(4, selectInput("geom",
+                "Geoms to plot",
                 choices = c(
                   "bar",
                   "crossbar",
@@ -278,7 +278,7 @@ ui <- function(request) {
                 multiple = TRUE
               )),
               column(2, selectInput("legend",
-                "Select legend position",
+                "Legend position",
                 choices = c(
                   "top",
                   "right",
@@ -287,21 +287,20 @@ ui <- function(request) {
                   "none"
                 ),
                 selected = "right"
-              )),
-
-              column(2,
-                style = "margin-top: 30px;",
-                actionButton("refreshData",
-                  label = "Refresh current plot",
-                  class = "btn btn-primary btn-sm",
-                  style = "color: #fff;
-                  background-color: #337ab7;
-                  border-color: #2e6da4"
-                )
-              )
+              ))
             ),
 
             fluidRow(
+              column(2,
+                     style = "margin-top: 30px;",
+                     actionButton("refreshData",
+                                  label = "Refresh current plot",
+                                  class = "btn btn-primary btn-sm",
+                                  style = "color: #fff;
+                                  background-color: #337ab7;
+                                  border-color: #2e6da4"
+                     )),
+
               column(2,
                 style = "margin-top: 30px;",
                 actionButton("plt2rprt",
@@ -552,7 +551,6 @@ server <- function(input, output, session) {
     updateSelectInput(
       session = session,
       inputId = "sheet",
-      label = "Select Sheet",
       choices = "iris",
       selected = "iris"
     )
@@ -569,7 +567,7 @@ server <- function(input, output, session) {
     updateSelectInput(
       session = session,
       inputId = "sheet",
-      label = "Select Sheet",
+      label = "Sheet(s)",
       choices = sheets(),
       selected = sheets()[1]
     )
@@ -592,7 +590,7 @@ server <- function(input, output, session) {
           Sample = paste0(Species, "_", row_number()),
           Sheet = input$sheet
         ) %>%
-        select(Sheet, everything())
+        select(Sample, Sheet, Species, everything())
     }
 
     # Read excel file in
