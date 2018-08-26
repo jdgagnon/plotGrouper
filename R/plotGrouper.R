@@ -10,7 +10,10 @@
 #' @import tidyverse
 #' @import gridExtra
 #' @import shinythemes
+#' @param ... Any argument that you can pass to shiny::runApp
 #' @export
+#' @examples
+#' plotGrouper()
 plotGrouper <- function(...)
 {
   # devtools::load_all()

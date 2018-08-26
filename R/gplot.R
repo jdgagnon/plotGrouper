@@ -23,7 +23,7 @@
 #' @param p.adjust.method Method used for adjusting the pvalue
 #' @param comparisons Specify which of the available comparisons within your data you would like to plot
 #' @param method Specify the statistical test to be used
-#' @param paird Specify whether or not the statistical comparisons should be paired
+#' @param paired Specify whether or not the statistical comparisons should be paired
 #' @param errortype Specify the method of statistical error to plot
 #' @param y.lim Specify the min and max values to be used for the y-axis
 #' @param y.lab Specify a custom y-axis label to use
@@ -52,6 +52,20 @@
 #' @param color.groups Specify the default colors to use for the comparisons
 #' @param fill.groups Specify the default fills to use for the comparisons
 #' @export
+#' @examples
+#' iris %>% mutate(Species = as.character(Species)) %>%
+#' group_by(Species) %>%
+#' mutate(Sample = paste0(Species, "_", row_number()),Sheet = "iris") %>%
+#' select(Sample, Sheet, Species, everything()) %>%
+#' gather(variable, value, -c(Sample, Sheet, Species)) %>%
+#' filter(variable == "Sepal.Length") %>%
+#' gplot(dataset = .,
+#' comparison = "Species",
+#' group.by = "variable",
+#' shape.groups = c(19,21,17),
+#' color.groups = c(rep("black",3)),
+#' fill.groups = c("black","#E016BE", "#1243C9")) %>%
+#' gridExtra::grid.arrange()
 
 
 gplot <- function(dataset = NULL, # Define your data set which should be a gathered tibble

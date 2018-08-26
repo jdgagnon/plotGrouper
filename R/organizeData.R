@@ -18,14 +18,14 @@
 #' @examples
 #' organizeData()
 
-organizeData <- function(data,
-                         exclude,
-                         comp,
-                         comps,
-                         variables,
-                         id,
-                         beadColumn,
-                         dilutionColumn) {
+organizeData <- function(data = NULL,
+                         exclude = NULL,
+                         comp = NULL,
+                         comps = NULL,
+                         variables = NULL,
+                         id = NULL,
+                         beadColumn = NULL,
+                         dilutionColumn = NULL) {
 
   if (!beadColumn %in% c("", "none") &
       !dilutionColumn %in% c("", "none") &

@@ -4,7 +4,7 @@
 \alias{readData}
 \title{A function to read the data to be plotted into the app}
 \usage{
-readData(sheet, file)
+readData(sheet = NULL, file = NULL)
 }
 \arguments{
 \item{sheet}{Takes a vector of sheets to be read}

@@ -12,7 +12,8 @@
 #' @examples
 #' readData()
 
-readData <- function(sheet, file) {
+readData <- function(sheet = NULL,
+                     file = NULL) {
   for (i in 1:length(sheet)) {
     a <- readxl::read_excel(file,
       sheet = sheet[i],

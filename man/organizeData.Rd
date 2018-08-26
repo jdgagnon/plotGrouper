@@ -4,8 +4,9 @@
 \alias{organizeData}
 \title{A function to organize the raw data to be plotted}
 \usage{
-organizeData(data, exclude, comp, comps, variables, id, bead, dilution,
-  count)
+organizeData(data = NULL, exclude = NULL, comp = NULL,
+  comps = NULL, variables = NULL, id = NULL, beadColumn = NULL,
+  dilutionColumn = NULL)
 }
 \arguments{
 \item{data}{Takes a tibble}
@@ -20,11 +21,9 @@ organizeData(data, exclude, comp, comps, variables, id, bead, dilution,
 
 \item{id}{Takes name of unique identifier column}
 
-\item{bead}{Takes number of beads per sample}
+\item{beadColumn}{Takes column name that has total number of beads/sample}
 
-\item{dilution}{Takes dilution factor}
-
-\item{count}{True or False indicating presence of columns specifying Total Bead and Dilution}
+\item{dilutionColumn}{Takes column name that has dilution factor for each sample 1/x}
 }
 \description{
 This function will organize the data and perform count calculations if appropriate
