@@ -42,6 +42,8 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 
 \item{method}{Specify the statistical test to be used}
 
+\item{paired}{Specify whether or not the statistical comparisons should be paired}
+
 \item{errortype}{Specify the method of statistical error to plot}
 
 \item{y.lim}{Specify the min and max values to be used for the y-axis}
@@ -95,9 +97,22 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 \item{color.groups}{Specify the default colors to use for the comparisons}
 
 \item{fill.groups}{Specify the default fills to use for the comparisons}
-
-\item{paird}{Specify whether or not the statistical comparisons should be paired}
 }
 \description{
 This function allows you to organize a dataframe and create a plot.
+}
+\examples{
+iris \%>\% mutate(Species = as.character(Species)) \%>\%
+group_by(Species) \%>\%
+mutate(Sample = paste0(Species, "_", row_number()),Sheet = "iris") \%>\%
+select(Sample, Sheet, Species, everything()) \%>\%
+gather(variable, value, -c(Sample, Sheet, Species)) \%>\%
+filter(variable == "Sepal.Length") \%>\%
+gplot(dataset = .,
+comparison = "Species",
+group.by = "variable",
+shape.groups = c(19,21,17),
+color.groups = c(rep("black",3)),
+fill.groups = c("black","#E016BE", "#1243C9")) \%>\%
+gridExtra::grid.arrange()
 }

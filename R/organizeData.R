@@ -16,20 +16,30 @@
 #' @keywords organizeData
 #' @export
 #' @examples
-#' organizeData()
+#' iris %>% mutate(Species = as.character(Species)) %>%
+#' group_by(Species) %>%
+#' mutate(Sample = paste0(Species, "_", row_number()), Sheet = "iris") %>%
+#' select(Sample, Sheet, Species, everything()) %>%
+#' organizeData(data = .,
+#' exclude = c("Sample", "Sheet", "Species"),
+#' comp = "Species",
+#' comps = c("setosa", "versicolor", "virginica"),
+#' variables = "Sepal.Length",
+#' id = "Sample",
+#' beadColumn = "none",
+#' dilutionColumn = "none")
 
-organizeData <- function(data,
-                         exclude,
-                         comp,
-                         comps,
-                         variables,
-                         id,
-                         beadColumn,
-                         dilutionColumn) {
-
+organizeData <- function(data = NULL,
+                         exclude = NULL,
+                         comp = NULL,
+                         comps = NULL,
+                         variables = NULL,
+                         id = NULL,
+                         beadColumn = NULL,
+                         dilutionColumn = NULL) {
   if (!beadColumn %in% c("", "none") &
-      !dilutionColumn %in% c("", "none") &
-      stringr::str_detect(variables, "#")) {
+    !dilutionColumn %in% c("", "none") &
+    stringr::str_detect(variables, "#")) {
     shiny::showNotification(
       ui = paste0("Count data is being transformed
                   by the equation:
@@ -48,13 +58,13 @@ organizeData <- function(data,
     filter(get(comp) %in% comps)
 
   if (!beadColumn %in% c("", "none") &
-             !dilutionColumn %in% c("", "none")) {
+    !dilutionColumn %in% c("", "none")) {
     d <- d %>%
       group_by_(id) %>%
       mutate(value = ifelse(str_detect(variable, "#"),
         (value / value[variable == "Bead #"] *
-           get(beadColumn) *
-           get(dilutionColumn)),
+          get(beadColumn) *
+          get(dilutionColumn)),
         value
       )) %>%
       ungroup() %>%
