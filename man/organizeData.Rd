@@ -29,6 +29,17 @@ organizeData(data = NULL, exclude = NULL, comp = NULL,
 This function will organize the data and perform count calculations if appropriate
 }
 \examples{
-organizeData()
+iris \%>\% mutate(Species = as.character(Species)) \%>\%
+group_by(Species) \%>\%
+mutate(Sample = paste0(Species, "_", row_number()), Sheet = "iris") \%>\%
+select(Sample, Sheet, Species, everything()) \%>\%
+organizeData(data = .,
+exclude = c("Sample", "Sheet", "Species"),
+comp = "Species",
+comps = c("setosa", "versicolor", "virginica"),
+variables = "Sepal.Length",
+id = "Sample",
+beadColumn = "none",
+dilutionColumn = "none")
 }
 \keyword{organizeData}
