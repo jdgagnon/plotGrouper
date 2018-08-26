@@ -15,16 +15,15 @@ ui <- function(request) {
       tabPanel(
         h2("Plot", style = "margin-top: 30px; margin-bottom: 30px"),
         fluidPage(
-
           ##### Plot sidebarPanel ####
           sidebarPanel(
             shiny::tags$style(type = "text/css", "body {padding-top: 140px;}"),
             bookmarkButton(),
             actionButton("sampleFile", "Iris"),
-
+            hr(),
             #### File input ####
             fileInput("file",
-              "Choose info-file to upload",
+              "Data file",
               accept = c(
                 "text/csv",
                 "text/comma-separated-values",
@@ -38,16 +37,17 @@ ui <- function(request) {
             ),
 
             #### Sheet selection ####
+            h4("Select appropriate columns"),
             fluidRow(
               column(8, selectInput("sheet",
-                "Select sheet",
+                "Sheet(s)",
                 multiple = TRUE,
                 choices = NULL
               ))
             ),
 
             selectInput("columns",
-              "Select columns to exclude from gather",
+              "Organizational variables",
               multiple = TRUE,
               choices = NULL
             ),
@@ -61,7 +61,7 @@ ui <- function(request) {
             #### Select comparison and grouping columns ####
             fluidRow(
               column(6, selectInput("comp",
-                "Compare by",
+                "Comparison",
                 choices = NULL
               )),
               column(6, selectInput("group",
@@ -69,9 +69,7 @@ ui <- function(request) {
                 choices = NULL
               ))
             ),
-
             hr(),
-
             #### Save plot ####
             fluidRow(
               column(8, textInput(
@@ -90,9 +88,7 @@ ui <- function(request) {
                 )
               )
             ),
-
             hr(),
-
             #### Modify Y label ####
             fluidRow(
               column(8, textInput("y.lab",
@@ -107,7 +103,7 @@ ui <- function(request) {
                 )
               )
             ),
-
+            hr(),
             #### Modify group lables ####
             fluidRow(
               column(
@@ -134,14 +130,11 @@ ui <- function(request) {
                 )
               )
             ),
-
             textInput("trim",
               "Trim text from right side of group labels",
               value = "none"
             ),
-
             hr(),
-
             #### Transform Y axis ####
             fluidRow(
               column(
@@ -167,14 +160,13 @@ ui <- function(request) {
                 )
               )
             ),
-
+            hr(),
             #### Select error type to plot ####
             selectInput("errortype",
               "Select errorbar type",
-              choices = c("mean_se", "mean_sdl"),
-              selected = "mean_sdl"
+              choices = c("SE", "SD"),
+              selected = "SD"
             ),
-
             #### Select statistical method ####
             fluidRow(
               column(4, selectInput("method",
@@ -186,7 +178,6 @@ ui <- function(request) {
                   "kruskal.test"
                 )
               )),
-
               column(4,
                 style = "margin-top: 25px;",
                 checkboxInput("refGroup",
@@ -202,47 +193,43 @@ ui <- function(request) {
                 )
               )
             ),
-
+            hr(),
             #### Format width and dodge ####
             fluidRow(
               column(6, sliderInput("width",
-                "Width",
+                "Group width",
                 min = 0,
                 max = 1,
                 step = 0.05,
                 value = 0.80
               )),
               column(6, sliderInput("dodge",
-                "Dodge",
+                "Comparison Dodge",
                 min = 0,
                 max = 2,
                 step = 0.05,
                 value = 0.80
               ))
             ),
-
             hr(),
-
             #### Options for transforming counts ####
-            selectInput("id",
-              "ID column",
-              choices = NULL
-            ),
-
-            checkboxInput("count",
-              "# Beads/dilution factor included in data",
-              value = FALSE
-            ),
-
+            h4("Select columns to transform count data"),
             fluidRow(
-              column(6, numericInput("bead",
-                "# Beads/sample",
-                value = NULL
-              )),
-              column(6, numericInput("dilution",
-                "Dilution factor",
-                value = NULL
-              ))
+              column(4,
+                selectInput("id",
+                  "Unique ID",
+                   choices = NULL
+                )),
+              column(4,
+                selectInput("beadColumn",
+                  "# Beads/Sample",
+                  choices = NULL
+                )),
+              column(4,
+                selectInput("dilutionColumn",
+                  "Dilution (1/x)",
+                  choices = NULL
+                ))
             )
           ),
 
@@ -651,8 +638,7 @@ server <- function(input, output, session) {
         choices = vars,
         selected = vars[which(vars %in% columns_select)]
       )
-    }
-    if (all(current_columns %in% vars)) {
+    } else if (all(current_columns %in% vars)) {
       print("updating column choices; keeping selected")
       updateSelectInput(session,
         "columns",
@@ -672,8 +658,7 @@ server <- function(input, output, session) {
         choices = variables,
         selected = variables[1]
       )
-    }
-    if (all(current_variables %in% variables)) {
+    } else if (all(current_variables %in% variables)) {
       print("updating variable choices; keeping selected")
       updateSelectInput(session,
         "variables",
@@ -697,18 +682,12 @@ server <- function(input, output, session) {
           "Species"
         ))]
       )
-    }
-
-    current_id <- input$id
-    if (is.null(input$id)) {
-      current_id <- "empty"
-    }
-    if (!current_id %in% vars) {
-      print("updating id")
+    } else if (all(current_comp %in% vars)) {
+      print("updating comp choices; keeping selected")
       updateSelectInput(session,
-        "id",
-        choices = vars,
-        selected = "Sample"
+                        "comp",
+                        choices = vars,
+                        selected = input$comp
       )
     }
 
@@ -723,7 +702,46 @@ server <- function(input, output, session) {
         choices = c("variable", vars),
         selected = "variable"
       )
+    } else if (current_group %in% vars) {
+      print("updating group choices; keeping selected")
+      updateSelectInput(session,
+        "group",
+        choices = c("variable", vars),
+        selected = input$group
+      )
     }
+
+    current_id <- input$id
+    if (is.null(input$id)) {
+      current_id <- "empty"
+    }
+    if (!current_id %in% vars) {
+      print("updating id")
+      updateSelectInput(session,
+        "id",
+        choices = vars,
+        selected = "Sample"
+      )
+    } else if (current_id %in% vars) {
+      print("updating id choices; keeping selected")
+      updateSelectInput(session,
+                        "id",
+                        choices = vars,
+                        selected = input$id
+      )
+    }
+
+    updateSelectInput(session,
+        "beadColumn",
+        choices = c("none", vars),
+        selected = "Total Bead"
+      )
+
+    updateSelectInput(session,
+                        "dilutionColumn",
+                        choices = c("none", vars),
+                        selected = "Dilution")
+
   }, priority = 3)
 
 
@@ -755,12 +773,12 @@ server <- function(input, output, session) {
     input$refreshData
     input$columns
     input$variables
-    input$bead
-    input$dilution
     input$comp
     input$group
     input$comps
-    input$count
+    input$id
+    input$beadColumn
+    input$dilutionColumn
   }, {
     req(
       input$sheet,
@@ -768,9 +786,11 @@ server <- function(input, output, session) {
       input$variables,
       input$comp,
       input$group,
-      length(input$comps) > 1
+      length(input$comps) > 1,
+      input$id
     )
     print("organizing dataframe")
+
     d <- organizeData(
       data = rawData(),
       exclude = input$columns,
@@ -778,10 +798,8 @@ server <- function(input, output, session) {
       comps = input$comps,
       variables = input$variables,
       id = input$id,
-      bead = input$bead,
-      dilution = input$dilution,
-      count = input$count
-    )
+      beadColumn = input$beadColumn,
+      dilutionColumn = input$dilutionColumn)
     dataFrame(d)
   }, priority = 1)
 
@@ -792,6 +810,8 @@ server <- function(input, output, session) {
     groups <- unique(dataFrame()[[input$group]])
     comparisons <- unique(dataFrame()[[input$comp]])
     comps <- c(input$comps)
+
+    errortype <- ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
 
     y.min <- ifelse(is.null(input$y.min), NA, input$y.min)
     y.max <- ifelse(is.null(input$y.max), NA, input$y.max)
@@ -843,7 +863,7 @@ server <- function(input, output, session) {
       comparison = input$comp,
       group.by = input$group,
       geom = input$geom,
-      errortype = input$errortype,
+      errortype = errortype,
       method = input$method,
       paired = input$paired,
       size = input$size,
@@ -917,6 +937,8 @@ server <- function(input, output, session) {
     groups <- unique(dataFrame()[[input$group]])
     comps <- c(input$comps)
 
+    errortype <- ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
+
     if (input$group == "variable") {
       levs <- order(factor(unique(dataFrame()[[input$group]]),
         levels = variables
@@ -933,7 +955,7 @@ server <- function(input, output, session) {
       dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
-      errortype = input$errortype,
+      errortype = errortype,
       method = input$method,
       paired = input$paired,
       levs = levs,
@@ -1393,6 +1415,14 @@ server <- function(input, output, session) {
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading independent inputs")
+    updateSelectInput(session,
+      "beadColumn",
+      selected = inputs[[input$loadPlot]]$beadColumn
+    )
+    updateSelectInput(session,
+      "dilutionColumn",
+      selected = inputs[[input$loadPlot]]$dilutionColumn
+    )
     updateTextInput(session,
       "y.lab",
       value = inputs[[input$loadPlot]]$y.lab
@@ -1445,14 +1475,6 @@ server <- function(input, output, session) {
       "dodge",
       value = inputs[[input$loadPlot]]$dodge
     )
-    updateNumericInput(session,
-      "dilution",
-      value = inputs[[input$loadPlot]]$dilution
-    )
-    updateNumericInput(session,
-      "bead",
-      value = inputs[[input$loadPlot]]$bead
-    )
     updateTextInput(session,
       "trim",
       value = inputs[[input$loadPlot]]$trim
@@ -1464,10 +1486,6 @@ server <- function(input, output, session) {
     updateCheckboxInput(session,
       "split",
       value = inputs[[input$loadPlot]]$split
-    )
-    updateCheckboxInput(session,
-      "count",
-      value = inputs[[input$loadPlot]]$count
     )
     updateCheckboxInput(session,
       "angle.x",
@@ -1482,16 +1500,8 @@ server <- function(input, output, session) {
       value = inputs[[input$loadPlot]]$paired
     )
     updateCheckboxInput(session,
-      "dilution",
-      value = inputs[[input$loadPlot]]$dilution
-    )
-    updateCheckboxInput(session,
       "scientific",
       value = inputs[[input$loadPlot]]$scientific
-    )
-    updateCheckboxInput(session,
-      "bead",
-      value = inputs[[input$loadPlot]]$bead
     )
   }, priority = -7)
 
@@ -1533,10 +1543,11 @@ server <- function(input, output, session) {
         comps = inputs[[i]]$comps,
         variables = inputs[[i]]$variables,
         id = inputs[[i]]$id,
-        bead = inputs[[i]]$bead,
-        dilution = inputs[[i]]$dilution,
-        count = inputs[[i]]$count
+        beadColumn = inputs[[i]]$beadColumn,
+        dilutionColumn = inputs[[i]]$dilutionColumn
       )
+
+      errortype <- ifelse(inputs[[i]]$errortype == "SE", "mean_se", "mean_sdl")
 
       if (inputs[[i]]$split.on == "") {
         split_str <- NULL
@@ -1577,7 +1588,7 @@ server <- function(input, output, session) {
         comparison = inputs[[i]]$comp,
         group.by = inputs[[i]]$group,
         geom = inputs[[i]]$geom,
-        errortype = inputs[[i]]$errortype,
+        errortype = errortype,
         method = inputs[[i]]$method,
         paired = inputs[[i]]$paired,
         size = inputs[[i]]$size,
@@ -1628,8 +1639,8 @@ server <- function(input, output, session) {
     state$values$plotList <- reactiveValuesToList(plotList)
     state$values$inputs <- reactiveValuesToList(inputs)
     state$values$plotListLength <- isolate(plotListLength())
-    state$values$hlist <- hlist
-    state$values$wlist <- wlist
+    state$values$hlist <- reactiveValuesToList(hlist)
+    state$values$wlist <- reactiveValuesToList(wlist)
   })
 
   #### Restoring values ####
@@ -1639,6 +1650,8 @@ server <- function(input, output, session) {
     for (i in 1:isolate(plotListLength())) {
       inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
       plotList[[as.character(i)]] <- state$values$plotList[[as.character(i)]]
+      hlist[[as.character(i)]] <- state$values$hlist[[as.character(i)]]
+      wlist[[as.character(i)]] <- state$values$wlist[[as.character(i)]]
     }
     plotListPlots <- as.character(1:isolate(plotListLength()))
     updateSelectInput(session,
@@ -1646,10 +1659,19 @@ server <- function(input, output, session) {
       choices = plotListPlots,
       selected = tail(plotListPlots, 1)
     )
-    hlist <<- state$values$hlist
-    wlist <<- state$values$wlist
-    reportHeight(sum(hlist))
-    reportWidth(sum(wlist))
+    current_plotListLength <- plotListLength()
+    current_numcol <- floor(sqrt(current_plotListLength))
+    widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
+    heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    widths[is.na(widths)] <- 0
+    heights[is.na(heights)] <- 0
+    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+      mutate(rowSums = rowSums(., na.rm = TRUE))
+    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
+    reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })
 
   #### Stop app on close ####
