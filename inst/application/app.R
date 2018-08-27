@@ -595,7 +595,7 @@ server <- function(input, output, session) {
 
     # Read excel file in
     if (!is.null(inFile())) {
-      f <- readData(
+      f <- plotGrouper::readData(
         sheet = input$sheet,
         file = input$file$datapath
       )
@@ -789,7 +789,7 @@ server <- function(input, output, session) {
     )
     print("organizing dataframe")
 
-    d <- organizeData(
+    d <- plotGrouper::organizeData(
       data = rawData(),
       exclude = input$columns,
       comp = input$comp,
@@ -856,7 +856,7 @@ server <- function(input, output, session) {
       updateTextInput(session, "trim", value = "none")
     }
 
-    gplot(
+    plotGrouper::gplot(
       dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
@@ -949,7 +949,7 @@ server <- function(input, output, session) {
       levels = comps
     ))
 
-    gplot(
+    plotGrouper::gplot(
       dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
@@ -1162,9 +1162,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[as.character(current_plotListLength)]] <- isolate(currentPlot())
@@ -1210,9 +1210,9 @@ server <- function(input, output, session) {
       length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
       widths[is.na(widths)] <- 0
       heights[is.na(heights)] <- 0
-      wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+      wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
         mutate(rowSums = rowSums(., na.rm = TRUE))
-      hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+      hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
       reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
       reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
       reportPlots <- as.character(1:current_plotListLength)
@@ -1273,9 +1273,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[input$loadPlot]] <- isolate(currentPlot())
@@ -1529,12 +1529,12 @@ server <- function(input, output, session) {
     for (i in as.character(1:plotListLength())) {
       print(paste0("refreshing plot: ", i))
 
-      rData <- readData(
+      rData <- plotGrouper::readData(
         sheet = inputs[[i]]$sheet,
         file = input$file$datapath
       )
 
-      oData <- organizeData(
+      oData <- plotGrouper::organizeData(
         data = rData,
         exclude = inputs[[i]]$columns,
         comp = inputs[[i]]$comp,
@@ -1581,7 +1581,7 @@ server <- function(input, output, session) {
         updateTextInput(session, "trim", value = "none")
       }
 
-      cPlot <- gplot(
+      cPlot <- plotGrouper::gplot(
         dataset = oData,
         comparison = inputs[[i]]$comp,
         group.by = inputs[[i]]$group,
@@ -1625,9 +1625,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })
@@ -1665,9 +1665,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })

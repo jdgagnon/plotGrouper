@@ -9,7 +9,7 @@
 #' @import shinythemes
 #' @import dplyr
 #' @import ggplot2
-#' @importFrom magrittr %>%
+#' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
 #' @importFrom readxl excel_sheets read_excel
