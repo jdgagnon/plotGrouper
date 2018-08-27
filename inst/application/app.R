@@ -1162,9 +1162,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- dplyr::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- dplyr::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[as.character(current_plotListLength)]] <- isolate(currentPlot())
@@ -1210,9 +1210,9 @@ server <- function(input, output, session) {
       length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
       widths[is.na(widths)] <- 0
       heights[is.na(heights)] <- 0
-      wdims <- dplyr::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+      wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
         mutate(rowSums = rowSums(., na.rm = TRUE))
-      hdims <- dplyr::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+      hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
       reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
       reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
       reportPlots <- as.character(1:current_plotListLength)
@@ -1273,9 +1273,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- dplyr::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- dplyr::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[input$loadPlot]] <- isolate(currentPlot())
@@ -1625,9 +1625,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- dplyr::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- dplyr::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })
@@ -1665,9 +1665,9 @@ server <- function(input, output, session) {
     length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- dplyr::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
       mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- dplyr::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })
