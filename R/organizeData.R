@@ -24,6 +24,7 @@
 #' @param dilutionColumn Takes column name that has dilution factor for each sample 1/x
 #' @keywords organizeData
 #' @export
+#' @return Tibble in tidy format based on columns chosen to be excluded. Count data will be transformed if appropriate columns are present.
 #' @examples
 #' iris %>% mutate(Species = as.character(Species)) %>%
 #' group_by(Species) %>%

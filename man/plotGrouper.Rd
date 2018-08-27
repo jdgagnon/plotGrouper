@@ -9,6 +9,9 @@ plotGrouper(...)
 \arguments{
 \item{...}{Any argument that you can pass to shiny::runApp}
 }
+\value{
+Runs the plotGrouper shiny app.
+}
 \description{
 This function allows you to run the app
 }

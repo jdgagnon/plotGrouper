@@ -11,6 +11,9 @@ readData(sheet = NULL, file = NULL)
 
 \item{file}{Takes an excel file to be read from}
 }
+\value{
+Tibble assembled from the sheets selected from the file
+}
 \description{
 This function will read each sheet listed and return a tibble
 }
