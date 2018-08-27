@@ -2,34 +2,36 @@
 % Please edit documentation in R/organizeData.R
 \name{organizeData}
 \alias{organizeData}
-\title{A function to organize the raw data to be plotted}
+\title{A function to organize a tibble into tidy format and perform count transformations}
 \usage{
 organizeData(data = NULL, exclude = NULL, comp = NULL,
   comps = NULL, variables = NULL, id = NULL, beadColumn = NULL,
   dilutionColumn = NULL)
 }
 \arguments{
-\item{data}{Takes a tibble}
+\item{data}{A tibble}
 
-\item{exclude}{Takes list of columns to exclude from gather}
+\item{exclude}{A list of columns to exclude from gather}
 
-\item{comp}{Takes name of comparison column}
+\item{comp}{the name of comparison column}
 
-\item{comps}{Takes a vector of names of the comparisons}
+\item{comps}{A vector of names of the comparisons}
 
-\item{variables}{Takes vector of the variables to be plotted}
+\item{variables}{A vector of the variables to be plotted}
 
-\item{id}{Takes name of unique identifier column}
+\item{id}{The name of unique identifier column}
 
-\item{beadColumn}{Takes column name that has total number of beads/sample}
+\item{beadColumn}{The column name that has total number of beads/sample}
 
-\item{dilutionColumn}{Takes column name that has dilution factor for each sample 1/x}
+\item{dilutionColumn}{The column name that has dilution factor for each sample 1/x}
 }
 \value{
-Tibble in tidy format based on columns chosen to be excluded. Count data will be transformed if appropriate columns are present.
+Tibble in tidy format based on columns chosen to be excluded.
+Count data will be transformed if appropriate columns are present.
 }
 \description{
-This function will organize the data and perform count calculations if appropriate
+This function will organize a tibble into tidy format and perform count
+transformations if appropriate columns are specified.
 }
 \examples{
 iris \%>\% mutate(Species = as.character(Species)) \%>\%

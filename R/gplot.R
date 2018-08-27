@@ -2,20 +2,32 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to organize a dataframe and create a plot.
+#' A function to create a grouped plot and return a table grob.
 #'
-#' This function allows you to organize a dataframe and create a plot.
-#' @import magrittr
+#' This function allows you to create a grouped plot and return a table grob.
+#' It takes a tidy dataset containing sample replicate values for at least one
+#' variable, a column organizing each replicate into the proper comparison
+#' group, and a column that gruops the variables to be plotted. Additional
+#' arguments allow for the re-ordering of the variables and the
+#' comparisons being ploted, selection of the type of graph to display (e.g.,
+#' bar graph, boxplot, violin plot, points, statistical summary, etc...), as
+#' well as other aesthetics of the plot.
 #' @import shiny
-#' @import tidyverse
-#' @import gridExtra
 #' @import shinythemes
-#' @import Hmisc
-#' @import digest
-#' @import egg
-#' @import readxl
-#' @importFrom colourpicker updateColourInput
-#' @importFrom colourpicker colourInput
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom magrittr %>%
+#' @importFrom  gridExtra grid.arrange arrangeGrob
+#' @importFrom egg set_panel_size
+#' @importFrom readxl excel_sheets read_excel
+#' @importFrom ggpubr compare_means get_legend
+#' @importFrom gtable gtable_add_padding
+#' @importFrom readr parse_number
+#' @importFrom scales trans_format math_format rescale_none
+#' @importFrom stringr str_remove str_split word
+#' @importFrom tidyr gather
+#' @importFrom stats na.omit
+#' @importFrom colourpicker colourInput updateColourInput
 #' @param dataset Define your data set which should be a gathered tibble
 #' @param comparison Specify the comparison you would like to make (e.g., Genotype)
 #' @param group.by Specify the variable to group by (e.g., Tissue)
@@ -73,13 +85,17 @@
 #' gridExtra::grid.arrange()
 
 
-gplot <- function(dataset = NULL, # Define your data set which should be a gathered tibble
-                  comparison = NULL, # Specify the comparison you would like to make (e.g., Genotype)
-                  group.by = NULL, # Specify the variable to group by (e.g., Tissue)
+gplot <- function(dataset = NULL,
+                  comparison = NULL,
+                  group.by = NULL,
                   levs =TRUE,
-                  val = "value", # If your tibble is not 'tidy', and there are multiple value columns, specify the one you want to plot
-                  geom = c("bar", "errorbar", "point", "stat", "seg"), # Define the list of geoms you want to plot
-                  p = "p.signif", # Specify representation of pvalue ('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)
+                  val = "value",
+                  geom = c("bar",
+                           "errorbar",
+                           "point",
+                           "stat",
+                           "seg"),
+                  p = "p.signif",
                   ref.group = NULL,
                   p.adjust.method = "holm",
                   comparisons = NULL,
@@ -109,9 +125,13 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
                   dodge = 0.8,
                   plotWidth = 30,
                   plotHeight = 40,
-                  shape.groups = c(19, 21),
-                  color.groups = c("black", "black"),
-                  fill.groups = c("#444444", NA, "#A33838")) {
+                  shape.groups = c(19,
+                                   21),
+                  color.groups = c("black",
+                                   "black"),
+                  fill.groups = c("#444444",
+                                  NA,
+                                  "#A33838")) {
   df <- droplevels(dataset)
 
   # Assign labels to the groups
@@ -468,7 +488,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     geom <- geom[which(!geom %in% c("stat", "seg"))]
   } else {
     stat <- ggplot2::geom_text(
-      data = statistics, ggplot2::aes(x.pos, na.omit(h.p)),
+      data = statistics, ggplot2::aes(x.pos, stats::na.omit(h.p)),
       label = statistics[[p]],
       size = font_size / (1 / 0.35),
       inherit.aes = FALSE,

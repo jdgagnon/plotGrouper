@@ -2,18 +2,25 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to run the shiny app
+#' A function to run the plotGrouper shiny app
 #'
-#' This function allows you to run the app
-#' @import magrittr
+#' This function runs the plotGrouper app
 #' @import shiny
-#' @import tidyverse
-#' @import gridExtra
 #' @import shinythemes
-#' @import Hmisc
-#' @import digest
-#' @import egg
-#' @import readxl
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom magrittr %>%
+#' @importFrom  gridExtra grid.arrange arrangeGrob
+#' @importFrom egg set_panel_size
+#' @importFrom readxl excel_sheets read_excel
+#' @importFrom ggpubr compare_means get_legend
+#' @importFrom gtable gtable_add_padding
+#' @importFrom readr parse_number
+#' @importFrom scales trans_format math_format rescale_none
+#' @importFrom stringr str_remove str_split word
+#' @importFrom tidyr gather
+#' @importFrom stats na.omit
+#' @importFrom colourpicker colourInput updateColourInput
 #' @param ... Any argument that you can pass to shiny::runApp
 #' @export
 #' @return Runs the plotGrouper shiny app.
