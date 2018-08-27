@@ -24,7 +24,7 @@
 #' @param ... Any argument that you can pass to shiny::runApp
 #' @return Runs the plotGrouper shiny app.
 #' @examples
-#' plotGrouper()
+#' plotGrouper::plotGrouper()
 #' @export
 plotGrouper <- function(...)
 {
