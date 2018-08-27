@@ -10,6 +10,10 @@
 #' @import tidyverse
 #' @import gridExtra
 #' @import shinythemes
+#' @import Hmisc
+#' @import digest
+#' @import egg
+#' @import readxl
 #' @param ... Any argument that you can pass to shiny::runApp
 #' @export
 #' @examples

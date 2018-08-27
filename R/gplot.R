@@ -10,6 +10,10 @@
 #' @import tidyverse
 #' @import gridExtra
 #' @import shinythemes
+#' @import Hmisc
+#' @import digest
+#' @import egg
+#' @import readxl
 #' @importFrom colourpicker updateColourInput
 #' @importFrom colourpicker colourInput
 #' @param dataset Define your data set which should be a gathered tibble
@@ -53,13 +57,13 @@
 #' @param fill.groups Specify the default fills to use for the comparisons
 #' @export
 #' @examples
-#' iris %>% mutate(Species = as.character(Species)) %>%
-#' group_by(Species) %>%
-#' mutate(Sample = paste0(Species, "_", row_number()),Sheet = "iris") %>%
-#' select(Sample, Sheet, Species, everything()) %>%
-#' gather(variable, value, -c(Sample, Sheet, Species)) %>%
-#' filter(variable == "Sepal.Length") %>%
-#' gplot(dataset = .,
+#' iris %>% dplyr::mutate(Species = as.character(Species)) %>%
+#' dplyr::group_by(Species) %>%
+#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),Sheet = "iris") %>%
+#' dplyr::select(Sample, Sheet, Species, everything()) %>%
+#' tidyr::gather(variable, value, -c(Sample, Sheet, Species)) %>%
+#' dplyr::filter(variable == "Sepal.Length") %>%
+#' ggplot2::gplot(dataset = .,
 #' comparison = "Species",
 #' group.by = "variable",
 #' shape.groups = c(19,21,17),
@@ -116,11 +120,13 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     }
   } else if (is.null(group.labs) & split == TRUE & is.null(split_str)) {
     group.labs <- function(x) {
-      sapply(str_remove(word(str_remove(x, trim), -1, sep = "/"), " %| #|% |# "), "[", 1)
+      sapply(stringr::str_remove(stringr::word(stringr::str_remove(x, trim),
+        -1, sep = "/"), " %| #|% |# "), "[", 1)
     }
   } else if (is.null(group.labs) & split == TRUE & !is.null(split_str)) {
     group.labs <- function(x) {
-      sapply(strsplit(str_remove(x, trim), split = split_str, fixed = TRUE), "[", 2)
+      sapply(strsplit(stringr::str_remove(x, trim), split = split_str,
+        fixed = TRUE), "[", 2)
     }
   } else {
     group.labs <- group.labs
@@ -139,12 +145,15 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
 
   # If grouping variable is not numeric, scale x discretely, and assign levels. If it is numeric, scale x continuously
   if (is.factor(df[[group.by]])) {
-    scale.x <- scale_x_discrete(labels = group.labs, breaks = unique(df[[group.by]]))
+    scale.x <- ggplot2::scale_x_discrete(labels = group.labs,
+      breaks = unique(df[[group.by]]))
   } else if (!is.numeric(df[[group.by]]) & !is.factor(df[[group.by]])) {
-    df[, group.by] <- factor(df[[group.by]], levels = unique(df[[group.by]])[levs])
-    scale.x <- scale_x_discrete(labels = group.labs, breaks = unique(df[[group.by]]))
+    df[, group.by] <- factor(df[[group.by]],
+      levels = unique(df[[group.by]])[levs])
+    scale.x <- ggplot2::scale_x_discrete(labels = group.labs,
+      breaks = unique(df[[group.by]]))
   } else {
-    scale.x <- scale_x_continuous(
+    scale.x <- ggplot2::scale_x_continuous(
       breaks = df[[group.by]],
       labels = formatC(df[[group.by]],
         drop0trailing = TRUE
@@ -154,24 +163,26 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     )
   }
 
-  df <- arrange_(df, comparison) # Arrange tibble according to levels of comparison
+  df <- dplyr::arrange_(df, comparison)
 
   # Create a tibble of max values by group for assigning height of p values
   dmax <- droplevels(df %>%
-    group_by_(group.by, comparison) %>%
-    mutate(error_max = max(get(errortype)(value, mult = 1), na.rm = TRUE)) %>%
-    ungroup() %>%
-    group_by_(group.by) %>%
-    slice(which.max(value)) %>%
-    select_(group.by, "value", "error_max") %>%
-    ungroup() %>%
-    arrange_(group.by))
+    dplyr::group_by_(group.by, comparison) %>%
+    dplyr::mutate(error_max = max(get(errortype)(value, mult = 1),
+      na.rm = TRUE)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by_(group.by) %>%
+    dplyr::slice(which.max(value)) %>%
+    dplyr::select_(group.by, "value", "error_max") %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange_(group.by))
 
   if (all(is.na(y.lim))) {
     y.lim <- c(0, max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[1]) & is.na(y.lim[2])) {
-    y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
+    y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")],
+      na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[2] & is.na(y.lim[1]))) {
     y.lim <- c(0, y.lim[2])
@@ -189,69 +200,70 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
 
   # Calculate p values for all comparisons being made
   statOut <- try(ggpubr::compare_means(
-    formula = formula(paste("value", "~", comparison)),
+    formula = stats::formula(paste("value", "~", comparison)),
     data = df, method = method, group.by = group.by, ref.group = ref.group,
-    paired = paired, symnum.args = symnum.args, p.adjust.method = p.adjust.method
+    paired = paired, symnum.args = symnum.args,
+    p.adjust.method = p.adjust.method
   ))
 
   if (method %in% c("t.test", "wilcox.test")) {
-    statistics <- try(left_join(statOut, dmax, by = group.by) %>%
-      filter(group1 %in% comparisons | group2 %in% comparisons) %>%
-      mutate(max = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
-      group_by_(group.by) %>%
-      mutate(
-        n = row_number(),
-        group1 = factor(group1, levels = levels(df[[comparison]])),
-        group2 = factor(group2, levels = levels(df[[comparison]])),
-        r = if_else(p == "p.signif", max * 0.1, max * 0.2),
-        e = max * n,
-        n_comps = max(n),
-        group.by_n = as.numeric(get(group.by)), # number of grouping variables
-        group1_n = as.integer(group1),
-        group2_n = as.integer(group2),
-        unit = (width / max(group2_n)) * dodge / width, # relative width of 1 bar
-        start = group.by_n - unit * max(group2_n) / 2, # center position of the first bar
-        w.start = start + (group1_n - 1) * unit + unit / 2, # center position of group1
-        w.stop = start + (group2_n - 1) * unit + unit / 2
+    statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
+      dplyr::filter(group1 %in% comparisons | group2 %in% comparisons) %>%
+      dplyr::mutate("max" = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
+      dplyr::group_by_(group.by) %>%
+      dplyr::mutate(
+        "n" = dplyr::row_number(),
+        "group1" = factor(group1, levels = levels(df[[comparison]])),
+        "group2" = factor(group2, levels = levels(df[[comparison]])),
+        "r" = dplyr::if_else(p == "p.signif", max * 0.1, max * 0.2),
+        "e" = max * n,
+        "n_comps" = max(n),
+        "group.by_n" = as.numeric(get(group.by)), # number of grouping variables
+        "group1_n" = as.integer(group1),
+        "group2_n" = as.integer(group2),
+        "unit" = (width / max(group2_n)) * dodge / width, # relative width of 1 bar
+        "start" = group.by_n - unit * max(group2_n) / 2, # center position of the first bar
+        "w.start" = start + (group1_n - 1) * unit + unit / 2, # center position of group1
+        "w.stop" = start + (group2_n - 1) * unit + unit / 2
       ) %>% # center position of group2
-      ungroup() %>%
-      mutate(
-        x.pos = rowMeans(.[, c("w.start", "w.stop")]), # center of line segment
-        w.start = ifelse(!is.na(p.signif), w.start, NA),
-        w.stop = ifelse(!is.na(p.signif), w.stop, NA),
-        h.p = value + e,
-        h.s = value + e - r
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        "x.pos" = rowMeans(.[, c("w.start", "w.stop")]), # center of line segment
+        "w.start" = ifelse(!is.na(p.signif), w.start, NA),
+        "w.stop" = ifelse(!is.na(p.signif), w.stop, NA),
+        "h.p" = value + e,
+        "h.s" = value + e - r
       ))
   } else {
-    statistics <- try(left_join(statOut, dmax, by = group.by) %>%
-      mutate(max = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
-      group_by_(group.by) %>%
-      mutate(
-        n = row_number(),
-        r = if_else(p == "p.signif", max * 0.1, max * 0.2),
-        e = max * n,
-        n_comps = max(n),
-        group.by_n = as.numeric(get(group.by)),
-        w.start = group.by_n - width / length(unique(df[[comparison]])),
-        w.stop = group.by_n + width / length(unique(df[[comparison]]))
+    statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
+      dplyr::mutate("max" = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
+      dplyr::group_by_(group.by) %>%
+      dplyr::mutate(
+        "n" = dplyr::row_number(),
+        "r" = dplyr::if_else(p == "p.signif", max * 0.1, max * 0.2),
+        "e" = max * n,
+        "n_comps" = max(n),
+        "group.by_n" = as.numeric(get(group.by)),
+        "w.start" = group.by_n - width / length(unique(df[[comparison]])),
+        "w.stop" = group.by_n + width / length(unique(df[[comparison]]))
       ) %>%
-      ungroup() %>%
-      mutate(
-        x.pos = rowMeans(.[, c("w.start", "w.stop")]), # center of line segment
-        w.start = ifelse(!is.na(p.signif), w.start, NA),
-        w.stop = ifelse(!is.na(p.signif), w.stop, NA),
-        h.p = value + e,
-        h.s = value + e - r
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        "x.pos" = rowMeans(.[, c("w.start", "w.stop")]), # center of line segment
+        "w.start" = ifelse(!is.na(p.signif), w.start, NA),
+        "w.stop" = ifelse(!is.na(p.signif), w.stop, NA),
+        "h.p" = value + e,
+        "h.s" = value + e - r
       ))
   }
 
 
   if (("try-error" %in% class(statOut))) {
-    statistics <- tibble("p.signif" = NA)
+    statistics <- dplyr::tibble("p.signif" = NA)
   }
 
   if (("try-error" %in% class(statistics))) {
-    statistics <- tibble("p.signif" = NA)
+    statistics <- dplyr::tibble("p.signif" = NA)
   }
 
   if (stats == TRUE) {
@@ -259,11 +271,11 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   }
 
   if (trans.y != "identity" & !all(is.na(statistics$p.signif))) {
-    logBase <- parse_number(trans.y)
+    logBase <- readr::parse_number(trans.y)
     statistics <- statistics %>%
-      mutate(
-        h.p = h.p * logBase,
-        h.s = h.s * logBase
+      dplyr::mutate(
+        "h.p" = h.p * logBase,
+        "h.s" = h.s * logBase
       )
   }
 
@@ -274,7 +286,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       y.lab <- y.lab[1]
       shiny::showNotification(
         ui = "Plotting of multiple variables may
-                              result in incorrect y-axis label.",
+              result in incorrect y-axis label.",
         type = "message",
         duration = 2
       )
@@ -282,7 +294,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   } # If not specified by user, set y axis label to the variable being plotted.
 
   # Make pretty scientific notation
-  max_e <- as.numeric(str_split(
+  max_e <- as.numeric(stringr::str_split(
     string = format(max(c(
       dmax$value,
       dmax$error_max
@@ -294,13 +306,13 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   fancy_scientific <- function(l) {
     l <- format(l, scientific = TRUE)
     e <- as.numeric(sapply(l, function(a) {
-      str_split(a, pattern = "e\\+")[[1]][2]
+      stringr::str_split(a, pattern = "e\\+")[[1]][2]
     }))
     e_dif <- as.numeric(sapply(e, function(x) {
       (max_e - x)
     }))
     l <- as.numeric(sapply(l, function(x) {
-      str_split(string = x, pattern = "e\\+")[[1]][1]
+      stringr::str_split(string = x, pattern = "e\\+")[[1]][1]
     }))
     l2 <- c()
     for (i in 1:length(e)) {
@@ -326,14 +338,9 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     labs.y <- fancy_scientific
     y.lab <- bquote(.(paste0(gsub("\\s*#\\s*", "", y.lab), " "))(10^.(max_e)))
   } else {
-    labs.y <- waiver()
+    labs.y <- ggplot2::waiver()
   }
   if (trans.y != "identity") {
-    # logBase <- parse_number(trans.y)
-    # log_trans <- function(x) {
-    #   x <- sapply(x, function(a) log(a,logBase))
-    #   format(x)
-    # }
     if (trans.y == "log2") {
       labs.y <- scales::trans_format(trans.y, scales::math_format(2^.x))
       y.lim <- c(NA, NA)
@@ -347,11 +354,11 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   # Assign names to the shape, fill, color, and alpha arguments
 
   for (x in c("shape.groups", "fill.groups", "color.groups")) {
-    assign(x, setNames(object = get(x), levels(df[[comparison]])))
+    assign(x, stats::setNames(object = get(x), levels(df[[comparison]])))
   }
 
   # Create geoms
-  crossbar <- stat_summary(aes(
+  crossbar <- ggplot2::stat_summary(ggplot2::aes(
     group = get(comparison),
     color = get(comparison)
   ),
@@ -361,58 +368,58 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   size = stroke / 3,
   geom = "crossbar",
   width = width,
-  position = position_dodge(dodge)
+  position = ggplot2::position_dodge(dodge)
   )
 
-  point <- geom_point(aes(
+  point <- ggplot2::geom_point(ggplot2::aes(
     shape = get(comparison),
     color = get(comparison)
   ),
   stroke = stroke,
   size = size,
-  position = position_jitterdodge(
+  position = ggplot2::position_jitterdodge(
     jitter.width = 0.25,
     dodge.width = dodge
   )
   )
 
-  errorbar <- stat_summary(aes(group = get(comparison)),
+  errorbar <- ggplot2::stat_summary(ggplot2::aes(group = get(comparison)),
     fun.data = errortype,
     fun.args = list(mult = 1),
     geom = "errorbar",
     color = "black",
     width = 0.25 * width,
-    position = position_dodge(dodge),
+    position = ggplot2::position_dodge(dodge),
     size = stroke
   )
 
-  bar <- stat_summary(aes(fill = get(comparison)),
+  bar <- ggplot2::stat_summary(ggplot2::aes(fill = get(comparison)),
     color = "black",
     fun.y = mean,
     size = stroke,
     geom = "bar",
     width = width,
-    position = position_dodge(dodge),
+    position = ggplot2::position_dodge(dodge),
     show.legend = TRUE
   )
 
-  violin <- geom_violin(aes(
+  violin <- ggplot2::geom_violin(ggplot2::aes(
     fill = get(comparison),
     color = get(comparison)
   ),
   show.legend = TRUE,
-  position = position_dodge(dodge)
+  position = ggplot2::position_dodge(dodge)
   )
 
-  box <- geom_boxplot(aes(
+  box <- ggplot2::geom_boxplot(ggplot2::aes(
     color = get(comparison),
     fill = get(comparison)
   ),
   show.legend = TRUE,
-  position = position_dodge(dodge)
+  position = ggplot2::position_dodge(dodge)
   )
 
-  line <- stat_summary(aes(
+  line <- ggplot2::stat_summary(ggplot2::aes(
     group = get(comparison),
     color = get(comparison)
   ),
@@ -421,7 +428,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   size = stroke
   )
 
-  line_error <- stat_summary(aes(group = get(comparison)),
+  line_error <- ggplot2::stat_summary(ggplot2::aes(group = get(comparison)),
     fun.data = errortype,
     fun.args = list(mult = 1),
     geom = "errorbar",
@@ -430,7 +437,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     size = stroke
   )
 
-  line_point <- stat_summary(aes(
+  line_point <- ggplot2::stat_summary(ggplot2::aes(
     fill = get(comparison),
     shape = get(comparison),
     color = get(comparison)
@@ -441,14 +448,14 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   geom = "point"
   )
 
-  dot <- geom_dotplot(aes(color = get(comparison)),
+  dot <- ggplot2::geom_dotplot(ggplot2::aes(color = get(comparison)),
     binaxis = "y",
     stackdir = "center",
     method = "histodot",
-    position = position_dodge(dodge)
+    position = ggplot2::position_dodge(dodge)
   )
 
-  density <- geom_density(aes(
+  density <- ggplot2::geom_density(ggplot2::aes(
     color = get(comparison),
     fill = get(comparison),
     x = value
@@ -459,17 +466,17 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   if (all(is.na(statOut$p.signif))) {
     geom <- geom[which(!geom %in% c("stat", "seg"))]
   } else {
-    stat <- geom_text(
-      data = statistics, aes(x.pos, na.omit(h.p)),
+    stat <- ggplot2::geom_text(
+      data = statistics, ggplot2::aes(x.pos, na.omit(h.p)),
       label = statistics[[p]],
       size = font_size / (1 / 0.35),
       inherit.aes = FALSE,
       na.rm = TRUE
     )
 
-    seg <- geom_segment(
+    seg <- ggplot2::geom_segment(
       data = statistics,
-      aes(
+      ggplot2::aes(
         x = w.start,
         xend = w.stop,
         y = h.s,
@@ -486,13 +493,13 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
   })
 
   suppressWarnings(if (geom %in% "density") {
-    scale.x <- scale_x_continuous(expand = c(0, 0), limits = x.lim)
+    scale.x <- ggplot2::scale_x_continuous(expand = c(0, 0), limits = x.lim)
     y.lim <- c(0, NA)
   })
 
   # Create ggplot object and plot
-  g <- ggplot(data = df, aes(x = get(group.by), y = value)) +
-    labs(
+  g <- ggplot2::ggplot(data = df, ggplot2::aes(x = get(group.by), y = value)) +
+    ggplot2::labs(
       x = x.lab,
       y = y.lab,
       color = comparison,
@@ -501,7 +508,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       alpha = comparison,
       hjust = 0.5
     ) +
-    scale_y_continuous(
+    ggplot2::scale_y_continuous(
       limits = y.lim,
       expand = expand.y,
       labels = labs.y,
@@ -509,47 +516,47 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       oob = scales::rescale_none
     ) +
     scale.x +
-    scale_shape_manual(values = shape.groups) +
-    scale_fill_manual(values = fill.groups) +
-    scale_alpha_manual(values = alpha.groups) +
-    scale_color_manual(values = color.groups) +
+    ggplot2::scale_shape_manual(values = shape.groups) +
+    ggplot2::scale_fill_manual(values = fill.groups) +
+    ggplot2::scale_alpha_manual(values = alpha.groups) +
+    ggplot2::scale_color_manual(values = color.groups) +
     lapply(geom, function(x) get(x)) +
-    theme(
-      line = element_line(
+    ggplot2::theme(
+      line = ggplot2::element_line(
         colour = "black",
         size = stroke
       ),
-      text = element_text(
+      text = ggplot2::element_text(
         size = font_size,
         colour = "black"
       ),
-      rect = element_blank(),
-      panel.grid = element_blank(),
+      rect = ggplot2::element_blank(),
+      panel.grid = ggplot2::element_blank(),
       legend.position = leg.pos,
-      legend.title = element_text(
+      legend.title = ggplot2::element_text(
         size = font_size,
         colour = "black"
       ),
-      legend.text = element_text(
+      legend.text = ggplot2::element_text(
         size = font_size,
         colour = "black"
       ),
-      axis.line.x = element_line(colour = "black", size = stroke),
-      axis.line.y = element_line(colour = "black", size = stroke),
-      axis.ticks.x = element_blank(),
-      axis.text.x = element_text(
+      axis.line.x = ggplot2::element_line(colour = "black", size = stroke),
+      axis.line.y = ggplot2::element_line(colour = "black", size = stroke),
+      axis.ticks.x = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_text(
         size = font_size,
         colour = "black",
         angle = angle,
         vjust = vjust,
         hjust = hjust
       ),
-      axis.text = element_text(
+      axis.text = ggplot2::element_text(
         size = font_size,
         colour = "black"
       ),
-      plot.margin = margin(5, 0, 5, 0, "mm"),
-      legend.margin = margin(0, 0, 0, 0, "mm")
+      plot.margin = ggplot2::margin(5, 0, 5, 0, "mm"),
+      legend.margin = ggplot2::margin(0, 0, 0, 0, "mm")
     )
   if (stats == FALSE) {
     if (leg.pos %in% c("top", "bottom")) {
@@ -559,8 +566,8 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       lwidth <- 0
     }
     gt <- egg::set_panel_size(g,
-      width = unit(plotWidth, "mm"),
-      height = unit(plotHeight, "mm")
+      width = ggplot2::unit(plotWidth, "mm"),
+      height = ggplot2::unit(plotHeight, "mm")
     )
     gt$layout$clip[gt$layout$name == "panel"] <- "off"
     # rect grobs such as those created by geom_bar() have "height" / "width" measurements,
@@ -595,27 +602,33 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
 
     # calculate height of all the grobs above the panel
     height.above.panel <- gt$heights[1:(panel.row - 1)]
-    height.above.panel <- sum(as.numeric(grid::convertUnit(height.above.panel, "mm")), na.rm = TRUE)
+    height.above.panel <- sum(as.numeric(grid::convertUnit(height.above.panel,
+      "mm")), na.rm = TRUE)
 
-    # check whether the out-of-bound object (if any) exceeds this height, & replace if necessary
+    # check whether the out-of-bound object (if any) exceeds this height,
+    # & replace if necessary
     if (max.grob.heights > 1) {
       oob.height.above.panel <- (max.grob.heights - 1) * panel.height
-      height.above.panel <- max(height.above.panel, oob.height.above.panel, na.rm = TRUE)
+      height.above.panel <- max(height.above.panel, oob.height.above.panel,
+      na.rm = TRUE)
     }
 
     # as above, calculate the height of all the grobs below the panel
     height.below.panel <- gt$heights[(panel.row + 1):length(gt$heights)]
-    height.below.panel <- sum(as.numeric(grid::convertUnit(height.below.panel, "mm")), na.rm = TRUE)
+    height.below.panel <- sum(as.numeric(grid::convertUnit(height.below.panel,
+      "mm")), na.rm = TRUE)
 
     # as above
     if (min.grob.heights < 0) {
       oob.height.below.panel <- abs(min.grob.heights) * panel.height
-      height.below.panel <- max(height.below.panel, oob.height.below.panel, na.rm = TRUE)
+      height.below.panel <- max(height.below.panel, oob.height.below.panel,
+        na.rm = TRUE)
     }
 
     # sum the result
     pheight <- height.above.panel + panel.height + height.below.panel
-    gt <- gtable::gtable_add_padding(gt, padding = unit(c(height.above.panel, lwidth / 2, 5, lwidth / 2), "mm"))
+    gt <- gtable::gtable_add_padding(gt,
+      padding = ggplot2::unit(c(height.above.panel, lwidth / 2, 5, lwidth / 2), "mm"))
     return(gt)
   }
 }
