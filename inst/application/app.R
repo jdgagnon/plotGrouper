@@ -856,7 +856,7 @@ server <- function(input, output, session) {
       updateTextInput(session, "trim", value = "none")
     }
 
-    gplot(
+    plotGrouper::gplot(
       dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
@@ -949,7 +949,7 @@ server <- function(input, output, session) {
       levels = comps
     ))
 
-    gplot(
+    plotGrouper::gplot(
       dataset = dataFrame(),
       comparison = input$comp,
       group.by = input$group,
@@ -1581,7 +1581,7 @@ server <- function(input, output, session) {
         updateTextInput(session, "trim", value = "none")
       }
 
-      cPlot <- gplot(
+      cPlot <- plotGrouper::gplot(
         dataset = oData,
         comparison = inputs[[i]]$comp,
         group.by = inputs[[i]]$group,
