@@ -25,11 +25,10 @@
 #' @param sheet Takes a vector of sheets to be read
 #' @param file Takes an excel file to be read from
 #' @keywords readData
-#' @export
 #' @return Tibble assembled from the sheets selected from the file
 #' @examples
 #' readData()
-
+#' @export
 readData <- function(file = NULL,
                      sheet = NULL) {
   for (i in seq_len(length(sheet))) {

@@ -67,7 +67,6 @@
 #' @param shape.groups Specify the default shapes to use for the comparisons
 #' @param color.groups Specify the default colors to use for the comparisons
 #' @param fill.groups Specify the default fills to use for the comparisons
-#' @export
 #' @return Table grob of the plot
 #' @examples
 #' iris %>% dplyr::mutate(Species = as.character(Species)) %>%
@@ -83,8 +82,7 @@
 #' color.groups = c(rep("black",3)),
 #' fill.groups = c("black","#E016BE", "#1243C9")) %>%
 #' gridExtra::grid.arrange()
-
-
+#' @export
 gplot <- function(dataset = NULL,
                   comparison = NULL,
                   group.by = NULL,
