@@ -22,10 +22,10 @@
 #' @importFrom stats na.omit
 #' @importFrom colourpicker colourInput updateColourInput
 #' @param ... Any argument that you can pass to shiny::runApp
-#' @export
 #' @return Runs the plotGrouper shiny app.
 #' @examples
 #' plotGrouper()
+#' @export
 plotGrouper <- function(...)
 {
   # devtools::load_all()

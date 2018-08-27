@@ -31,7 +31,6 @@
 #' @param beadColumn The column name that has total number of beads/sample
 #' @param dilutionColumn The column name that has dilution factor for each sample 1/x
 #' @keywords organizeData
-#' @export
 #' @return Tibble in tidy format based on columns chosen to be excluded.
 #' Count data will be transformed if appropriate columns are present.
 #' @examples
@@ -47,7 +46,7 @@
 #' id = "Sample",
 #' beadColumn = "none",
 #' dilutionColumn = "none")
-
+#' @export
 organizeData <- function(data = NULL,
                          exclude = NULL,
                          comp = NULL,
