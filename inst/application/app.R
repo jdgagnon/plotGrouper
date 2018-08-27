@@ -4,8 +4,6 @@
 
 # UI ----------------------------------------------------------------------
 
-library(dplyr)
-
 ui <- function(request) {
   fluidPage(
     title = "plotGrouper",
