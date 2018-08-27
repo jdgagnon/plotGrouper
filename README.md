@@ -1,4 +1,4 @@
-<img src="www/logo_small.png" width ="150"/>
+<img src="img/logo_small.png" width ="150"/>
 <br>
 This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the ggplot2 and dplyr from the tidyverse and batch statistical calculations from ggpubr.
 <br><br><br>
@@ -6,11 +6,11 @@ Plots can be made using combinations of geoms including bar, violin, box, crossb
 
 <br><br>
 
-<img src="www/Bar_example.png" width ="350"/>  <img src="www/Violin_example.png" width ="350"/>
+<img src="img/Bar_example.png" width ="350"/>  <img src="img/Violin_example.png" width ="350"/>
 
 <br><br><br><br>
 
-<img src="www/Box_example.png" width ="350"/>  <img src="www/Crossbar_example.png" width ="350"/>
+<img src="img/Box_example.png" width ="350"/>  <img src="img/Crossbar_example.png" width ="350"/>
 
 
 

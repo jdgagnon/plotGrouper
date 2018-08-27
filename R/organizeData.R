@@ -2,29 +2,38 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to organize the raw data to be plotted
+#' A function to organize a tibble into tidy format and perform count transformations
 #'
-#' This function will organize the data and perform count calculations if appropriate
-#' @import magrittr
+#' This function will organize a tibble into tidy format and perform count
+#' transformations if appropriate columns are specified.
 #' @import shiny
-#' @import tidyverse
-#' @import gridExtra
 #' @import shinythemes
-#' @import Hmisc
-#' @import digest
-#' @import egg
-#' @import readxl
-#' @param data Takes a tibble
-#' @param exclude Takes list of columns to exclude from gather
-#' @param comp Takes name of comparison column
-#' @param comps Takes a vector of names of the comparisons
-#' @param variables Takes vector of the variables to be plotted
-#' @param id Takes name of unique identifier column
-#' @param beadColumn Takes column name that has total number of beads/sample
-#' @param dilutionColumn Takes column name that has dilution factor for each sample 1/x
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom magrittr %>%
+#' @importFrom  gridExtra grid.arrange arrangeGrob
+#' @importFrom egg set_panel_size
+#' @importFrom readxl excel_sheets read_excel
+#' @importFrom ggpubr compare_means get_legend
+#' @importFrom gtable gtable_add_padding
+#' @importFrom readr parse_number
+#' @importFrom scales trans_format math_format rescale_none
+#' @importFrom stringr str_remove str_split word
+#' @importFrom tidyr gather
+#' @importFrom stats na.omit
+#' @importFrom colourpicker colourInput updateColourInput
+#' @param data A tibble
+#' @param exclude A list of columns to exclude from gather
+#' @param comp the name of comparison column
+#' @param comps A vector of names of the comparisons
+#' @param variables A vector of the variables to be plotted
+#' @param id The name of unique identifier column
+#' @param beadColumn The column name that has total number of beads/sample
+#' @param dilutionColumn The column name that has dilution factor for each sample 1/x
 #' @keywords organizeData
 #' @export
-#' @return Tibble in tidy format based on columns chosen to be excluded. Count data will be transformed if appropriate columns are present.
+#' @return Tibble in tidy format based on columns chosen to be excluded.
+#' Count data will be transformed if appropriate columns are present.
 #' @examples
 #' iris %>% mutate(Species = as.character(Species)) %>%
 #' group_by(Species) %>%

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotGrouper.R
 \name{plotGrouper}
 \alias{plotGrouper}
-\title{A function to run the shiny app}
+\title{A function to run the plotGrouper shiny app}
 \usage{
 plotGrouper(...)
 }
@@ -13,7 +13,7 @@ plotGrouper(...)
 Runs the plotGrouper shiny app.
 }
 \description{
-This function allows you to run the app
+This function runs the plotGrouper app
 }
 \examples{
 plotGrouper()

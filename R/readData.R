@@ -2,18 +2,26 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to read the data to be plotted into the app
+#' A function to read an excel file and combine its sheets into a single dataframe.
 #'
-#' This function will read each sheet listed and return a tibble
-#' @import magrittr
+#' This function will read an excel file and combine its sheets into a single
+#' dataframe.
 #' @import shiny
-#' @import tidyverse
-#' @import gridExtra
 #' @import shinythemes
-#' @import Hmisc
-#' @import digest
-#' @import egg
-#' @import readxl
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom magrittr %>%
+#' @importFrom  gridExtra grid.arrange arrangeGrob
+#' @importFrom egg set_panel_size
+#' @importFrom readxl excel_sheets read_excel
+#' @importFrom ggpubr compare_means get_legend
+#' @importFrom gtable gtable_add_padding
+#' @importFrom readr parse_number
+#' @importFrom scales trans_format math_format rescale_none
+#' @importFrom stringr str_remove str_split word
+#' @importFrom tidyr gather
+#' @importFrom stats na.omit
+#' @importFrom colourpicker colourInput updateColourInput
 #' @param sheet Takes a vector of sheets to be read
 #' @param file Takes an excel file to be read from
 #' @keywords readData
@@ -22,8 +30,8 @@
 #' @examples
 #' readData()
 
-readData <- function(sheet = NULL,
-                     file = NULL) {
+readData <- function(file = NULL,
+                     sheet = NULL) {
   for (i in seq_len(length(sheet))) {
     a <- readxl::read_excel(file,
       sheet = sheet[i],

@@ -2,7 +2,7 @@
 % Please edit documentation in R/gplot.R
 \name{gplot}
 \alias{gplot}
-\title{A function to organize a dataframe and create a plot.}
+\title{A function to create a grouped plot and return a table grob.}
 \usage{
 gplot(dataset = NULL, comparison = NULL, group.by = NULL,
   levs = TRUE, val = "value", geom = c("bar", "errorbar", "point",
@@ -102,7 +102,14 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 Table grob of the plot
 }
 \description{
-This function allows you to organize a dataframe and create a plot.
+This function allows you to create a grouped plot and return a table grob.
+It takes a tidy dataset containing sample replicate values for at least one
+variable, a column organizing each replicate into the proper comparison
+group, and a column that gruops the variables to be plotted. Additional
+arguments allow for the re-ordering of the variables and the
+comparisons being ploted, selection of the type of graph to display (e.g.,
+bar graph, boxplot, violin plot, points, statistical summary, etc...), as
+well as other aesthetics of the plot.
 }
 \examples{
 iris \%>\% dplyr::mutate(Species = as.character(Species)) \%>\%

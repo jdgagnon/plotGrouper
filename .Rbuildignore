@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-www/
+img/
 plotGrouper.Rproj
 README.md
 _config.yml
