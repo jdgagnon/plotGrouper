@@ -16,6 +16,7 @@
 #' @import readxl
 #' @param ... Any argument that you can pass to shiny::runApp
 #' @export
+#' @return Runs the plotGrouper shiny app.
 #' @examples
 #' plotGrouper()
 plotGrouper <- function(...)

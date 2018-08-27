@@ -56,6 +56,7 @@
 #' @param color.groups Specify the default colors to use for the comparisons
 #' @param fill.groups Specify the default fills to use for the comparisons
 #' @export
+#' @return Table grob of the plot
 #' @examples
 #' iris %>% dplyr::mutate(Species = as.character(Species)) %>%
 #' dplyr::group_by(Species) %>%
@@ -63,7 +64,7 @@
 #' dplyr::select(Sample, Sheet, Species, everything()) %>%
 #' tidyr::gather(variable, value, -c(Sample, Sheet, Species)) %>%
 #' dplyr::filter(variable == "Sepal.Length") %>%
-#' ggplot2::gplot(dataset = .,
+#' gplot(dataset = .,
 #' comparison = "Species",
 #' group.by = "variable",
 #' shape.groups = c(19,21,17),
@@ -315,7 +316,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
       stringr::str_split(string = x, pattern = "e\\+")[[1]][1]
     }))
     l2 <- c()
-    for (i in 1:length(e)) {
+    for (i in seq_len(length(e))) {
       l2[i] <- ifelse(e[i] == 0, l[i],
         ifelse(e[i] < max_e, (10^-e_dif[i]) * l[i], l[i])
       )
@@ -601,7 +602,7 @@ gplot <- function(dataset = NULL, # Define your data set which should be a gathe
     panel.height <- as.numeric(grid::convertUnit(gt$heights[panel.row], "mm"))
 
     # calculate height of all the grobs above the panel
-    height.above.panel <- gt$heights[1:(panel.row - 1)]
+    height.above.panel <- gt$heights[seq_len(panel.row - 1)]
     height.above.panel <- sum(as.numeric(grid::convertUnit(height.above.panel,
       "mm")), na.rm = TRUE)
 

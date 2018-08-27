@@ -25,6 +25,9 @@ organizeData(data = NULL, exclude = NULL, comp = NULL,
 
 \item{dilutionColumn}{Takes column name that has dilution factor for each sample 1/x}
 }
+\value{
+Tibble in tidy format based on columns chosen to be excluded. Count data will be transformed if appropriate columns are present.
+}
 \description{
 This function will organize the data and perform count calculations if appropriate
 }

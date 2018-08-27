@@ -18,12 +18,13 @@
 #' @param file Takes an excel file to be read from
 #' @keywords readData
 #' @export
+#' @return Tibble assembled from the sheets selected from the file
 #' @examples
 #' readData()
 
 readData <- function(sheet = NULL,
                      file = NULL) {
-  for (i in 1:length(sheet)) {
+  for (i in seq_len(length(sheet))) {
     a <- readxl::read_excel(file,
       sheet = sheet[i],
       col_names = TRUE
