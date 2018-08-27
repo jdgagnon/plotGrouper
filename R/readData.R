@@ -5,6 +5,15 @@
 #' A function to read the data to be plotted into the app
 #'
 #' This function will read each sheet listed and return a tibble
+#' @import magrittr
+#' @import shiny
+#' @import tidyverse
+#' @import gridExtra
+#' @import shinythemes
+#' @import Hmisc
+#' @import digest
+#' @import egg
+#' @import readxl
 #' @param sheet Takes a vector of sheets to be read
 #' @param file Takes an excel file to be read from
 #' @keywords readData
@@ -19,11 +28,11 @@ readData <- function(sheet = NULL,
       sheet = sheet[i],
       col_names = TRUE
     ) %>%
-      mutate(Sheet = sheet[i]) %>%
-      select(Sheet, everything())
+      dplyr::mutate(Sheet = sheet[i]) %>%
+      dplyr::select(Sheet, everything())
 
     column_names <- names(a)
-    column_names <- str_replace_all(column_names, c(
+    column_names <- stringr::str_replace_all(column_names, c(
       ",Freq. of Parent" = " %",
       ",Count" = " #",
       "—" = "-",
@@ -36,7 +45,7 @@ readData <- function(sheet = NULL,
     if (i == 1) {
       f <- a
     } else {
-      f <- bind_rows(f, a)
+      f <- dplyr::bind_rows(f, a)
     }
   }
   return(f)

@@ -5,6 +5,15 @@
 #' A function to organize the raw data to be plotted
 #'
 #' This function will organize the data and perform count calculations if appropriate
+#' @import magrittr
+#' @import shiny
+#' @import tidyverse
+#' @import gridExtra
+#' @import shinythemes
+#' @import Hmisc
+#' @import digest
+#' @import egg
+#' @import readxl
 #' @param data Takes a tibble
 #' @param exclude Takes list of columns to exclude from gather
 #' @param comp Takes name of comparison column
@@ -49,32 +58,32 @@ organizeData <- function(data = NULL,
     )
   }
 
-  d <- gather(
+  d <- tidyr::gather(
     data,
     variable,
     value,
     -c(exclude)
   ) %>%
-    filter(get(comp) %in% comps)
+    dplyr::filter(get(comp) %in% comps)
 
   if (!beadColumn %in% c("", "none") &
     !dilutionColumn %in% c("", "none")) {
     d <- d %>%
-      group_by_(id) %>%
-      mutate(value = ifelse(str_detect(variable, "#"),
+      dplyr::group_by_(id) %>%
+      dplyr::mutate(value = ifelse(stringr::str_detect(variable, "#"),
         (value / value[variable == "Bead #"] *
           get(beadColumn) *
           get(dilutionColumn)),
         value
       )) %>%
-      ungroup() %>%
-      filter(variable %in% variables) %>%
-      filter(!grepl("Bead|Ungated", variable))
+      dplyr::ungroup() %>%
+      dplyr::filter(variable %in% variables) %>%
+      dplyr::filter(!grepl("Bead|Ungated", variable))
   } else {
     d <- d %>%
-      ungroup() %>%
-      filter(variable %in% variables) %>%
-      filter(!grepl("Bead|Ungated", variable))
+      dplyr::ungroup() %>%
+      dplyr::filter(variable %in% variables) %>%
+      dplyr::filter(!grepl("Bead|Ungated", variable))
   }
   return(d)
 }

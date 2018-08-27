@@ -102,13 +102,13 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 This function allows you to organize a dataframe and create a plot.
 }
 \examples{
-iris \%>\% mutate(Species = as.character(Species)) \%>\%
-group_by(Species) \%>\%
-mutate(Sample = paste0(Species, "_", row_number()),Sheet = "iris") \%>\%
-select(Sample, Sheet, Species, everything()) \%>\%
-gather(variable, value, -c(Sample, Sheet, Species)) \%>\%
-filter(variable == "Sepal.Length") \%>\%
-gplot(dataset = .,
+iris \%>\% dplyr::mutate(Species = as.character(Species)) \%>\%
+dplyr::group_by(Species) \%>\%
+dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),Sheet = "iris") \%>\%
+dplyr::select(Sample, Sheet, Species, everything()) \%>\%
+tidyr::gather(variable, value, -c(Sample, Sheet, Species)) \%>\%
+dplyr::filter(variable == "Sepal.Length") \%>\%
+ggplot2::gplot(dataset = .,
 comparison = "Species",
 group.by = "variable",
 shape.groups = c(19,21,17),
