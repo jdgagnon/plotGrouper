@@ -595,7 +595,7 @@ server <- function(input, output, session) {
 
     # Read excel file in
     if (!is.null(inFile())) {
-      f <- readData(
+      f <- plotGrouper::readData(
         sheet = input$sheet,
         file = input$file$datapath
       )
@@ -789,7 +789,7 @@ server <- function(input, output, session) {
     )
     print("organizing dataframe")
 
-    d <- organizeData(
+    d <- plotGrouper::organizeData(
       data = rawData(),
       exclude = input$columns,
       comp = input$comp,
@@ -1529,12 +1529,12 @@ server <- function(input, output, session) {
     for (i in as.character(1:plotListLength())) {
       print(paste0("refreshing plot: ", i))
 
-      rData <- readData(
+      rData <- plotGrouper::readData(
         sheet = inputs[[i]]$sheet,
         file = input$file$datapath
       )
 
-      oData <- organizeData(
+      oData <- plotGrouper::organizeData(
         data = rData,
         exclude = inputs[[i]]$columns,
         comp = inputs[[i]]$comp,
