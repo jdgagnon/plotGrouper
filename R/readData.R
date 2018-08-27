@@ -27,7 +27,7 @@
 #' @keywords readData
 #' @return Tibble assembled from the sheets selected from the file
 #' @examples
-#' readData()
+#' plotGrouper::readData()
 #' @export
 readData <- function(file = NULL,
                      sheet = NULL) {
@@ -37,7 +37,7 @@ readData <- function(file = NULL,
       col_names = TRUE
     ) %>%
       dplyr::mutate(Sheet = sheet[i]) %>%
-      dplyr::select(Sheet, everything())
+      dplyr::select(Sheet, dplyr::everything())
 
     column_names <- names(a)
     column_names <- stringr::str_replace_all(column_names, c(

@@ -37,8 +37,8 @@
 #' iris %>% mutate(Species = as.character(Species)) %>%
 #' group_by(Species) %>%
 #' mutate(Sample = paste0(Species, "_", row_number()), Sheet = "iris") %>%
-#' select(Sample, Sheet, Species, everything()) %>%
-#' organizeData(data = .,
+#' select(Sample, Sheet, Species, dplyr::everything()) %>%
+#' plotGrouper::organizeData(data = .,
 #' exclude = c("Sample", "Sheet", "Species"),
 #' comp = "Species",
 #' comps = c("setosa", "versicolor", "virginica"),
