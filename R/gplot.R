@@ -512,7 +512,7 @@ gplot <- function(dataset = NULL,
     geom <- c("line", "line_error", "line_point", "stat")
   })
 
-  suppressWarnings(if (geom %in% "density") {
+  suppressWarnings(if ("density" %in% geom) {
     scale.x <- ggplot2::scale_x_continuous(expand = c(0, 0), limits = x.lim)
     y.lim <- c(0, NA)
   })
