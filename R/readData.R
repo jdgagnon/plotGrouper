@@ -10,6 +10,7 @@
 #' @import shinythemes
 #' @import dplyr
 #' @import ggplot2
+#' @rawNamespace import(Hmisc, except = c(summarize, src))
 #' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
@@ -26,8 +27,6 @@
 #' @param file Takes an excel file to be read from
 #' @keywords readData
 #' @return Tibble assembled from the sheets selected from the file
-#' @examples
-#' plotGrouper::readData()
 #' @export
 readData <- function(file = NULL,
                      sheet = NULL) {
@@ -36,14 +35,14 @@ readData <- function(file = NULL,
       sheet = sheet[i],
       col_names = TRUE
     ) %>%
-      dplyr::mutate(Sheet = sheet[i]) %>%
-      dplyr::select(Sheet, dplyr::everything())
+      dplyr::mutate("Sheet" = sheet[i]) %>%
+      dplyr::select(.data$Sheet, dplyr::everything())
 
     column_names <- names(a)
     column_names <- stringr::str_replace_all(column_names, c(
       ",Freq. of Parent" = " %",
       ",Count" = " #",
-      "—" = "-",
+      "\u2014" = "-",
       ",," = "",
       ",Median,<.*>," = " MFI "
     ))

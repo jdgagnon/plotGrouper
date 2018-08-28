@@ -15,6 +15,3 @@ Runs the plotGrouper shiny app.
 \description{
 This function runs the plotGrouper app
 }
-\examples{
-plotGrouper()
-}

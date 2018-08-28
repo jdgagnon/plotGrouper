@@ -10,7 +10,9 @@
 #' @param lhs,rhs A visualisation and a function to apply to it
 #' @examples
 #' # Instead of
-#' layer_points(ggvis(mtcars, ~mpg, ~wt))
-#' # you can write
-#' mtcars %>% ggvis(~mpg, ~wt) %>% layer_points()
+#' dplyr::mutate(dplyr::filter(iris, Species == "versicolor"),
+#' "Sample" = paste0(Species, dplyr::row_number()))
+#' # You can write
+#' dplyr::filter(iris, Species == "versicolor") %>%
+#' dplyr::mutate("Sample" = paste0(Species, "_", dplyr::row_number()))
 NULL

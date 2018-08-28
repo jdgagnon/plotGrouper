@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-img/
-plotGrouper.Rproj
-README.md
-_config.yml
+^img$
+^plotGrouper\.Rproj$
+^README\.Rmd$       # An Rmarkdown file used to generate README.md
+^.*\.yml$
+^.*github$

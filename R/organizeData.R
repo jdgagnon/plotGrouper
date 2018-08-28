@@ -10,6 +10,7 @@
 #' @import shinythemes
 #' @import dplyr
 #' @import ggplot2
+#' @rawNamespace import(Hmisc, except = c(summarize, src))
 #' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
@@ -34,10 +35,10 @@
 #' @return Tibble in tidy format based on columns chosen to be excluded.
 #' Count data will be transformed if appropriate columns are present.
 #' @examples
-#' iris %>% mutate(Species = as.character(Species)) %>%
-#' group_by(Species) %>%
-#' mutate(Sample = paste0(Species, "_", row_number()), Sheet = "iris") %>%
-#' select(Sample, Sheet, Species, dplyr::everything()) %>%
+#' iris %>% dplyr::mutate(Species = as.character(Species)) %>%
+#' dplyr::group_by(Species) %>%
+#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()), Sheet = "iris") %>%
+#' dplyr::select(Sample, Sheet, Species, dplyr::everything()) %>%
 #' plotGrouper::organizeData(data = .,
 #' exclude = c("Sample", "Sheet", "Species"),
 #' comp = "Species",
@@ -69,8 +70,8 @@ organizeData <- function(data = NULL,
 
   d <- tidyr::gather(
     data,
-    variable,
-    value,
+    "variable",
+    "value",
     -c(exclude)
   ) %>%
     dplyr::filter(get(comp) %in% comps)
@@ -79,7 +80,7 @@ organizeData <- function(data = NULL,
     !dilutionColumn %in% c("", "none")) {
     d <- d %>%
       dplyr::group_by_(id) %>%
-      dplyr::mutate(value = ifelse(stringr::str_detect(variable, "#"),
+      dplyr::mutate("value" = ifelse(stringr::str_detect(variable, "#"),
         (value / value[variable == "Bead #"] *
           get(beadColumn) *
           get(dilutionColumn)),
