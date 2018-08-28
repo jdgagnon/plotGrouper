@@ -27,7 +27,7 @@
 #' @importFrom scales trans_format math_format rescale_none
 #' @importFrom stringr str_remove str_split word
 #' @importFrom tidyr gather
-#' @importFrom stats na.omit
+#' @importFrom stats na.omit start
 #' @importFrom colourpicker colourInput updateColourInput
 #' @param dataset Define your data set which should be a gathered tibble
 #' @param comparison Specify the comparison you would like to make (e.g., Genotype)
@@ -512,7 +512,7 @@ gplot <- function(dataset = NULL,
     geom <- c("line", "line_error", "line_point", "stat")
   })
 
-  suppressWarnings(if (geom %in% "density") {
+  suppressWarnings(if ("density" %in% geom) {
     scale.x <- ggplot2::scale_x_continuous(expand = c(0, 0), limits = x.lim)
     y.lim <- c(0, NA)
   })

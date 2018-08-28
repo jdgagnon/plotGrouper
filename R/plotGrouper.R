@@ -20,9 +20,11 @@
 #' @importFrom scales trans_format math_format rescale_none
 #' @importFrom stringr str_remove str_split word
 #' @importFrom tidyr gather
-#' @importFrom stats na.omit
+#' @importFrom stats na.omit start
 #' @importFrom colourpicker colourInput updateColourInput
 #' @param ... Any argument that you can pass to shiny::runApp
+#' @examples
+#' plotGrouper()
 #' @return Runs the plotGrouper shiny app.
 #' @export
 plotGrouper <- function(...)
