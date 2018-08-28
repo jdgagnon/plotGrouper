@@ -27,7 +27,7 @@
 #' @importFrom scales trans_format math_format rescale_none
 #' @importFrom stringr str_remove str_split word
 #' @importFrom tidyr gather
-#' @importFrom stats na.omit
+#' @importFrom stats na.omit start
 #' @importFrom colourpicker colourInput updateColourInput
 #' @param dataset Define your data set which should be a gathered tibble
 #' @param comparison Specify the comparison you would like to make (e.g., Genotype)

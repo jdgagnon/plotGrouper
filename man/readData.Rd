@@ -18,4 +18,8 @@ Tibble assembled from the sheets selected from the file
 This function will read an excel file and combine its sheets into a single
 dataframe.
 }
+\examples{
+datasets <- readData_example("iris.xlsx")
+readData(datasets, "iris")
+}
 \keyword{readData}
