@@ -5,6 +5,7 @@
 #' directory. This function make them easy to access.
 #'
 #' @param path Name of file. If `NULL`, the example files will be listed.
+#' @return Located example excel file in package
 #' @examples
 #' readData_example(path = "iris.xlsx")
 #' @export
