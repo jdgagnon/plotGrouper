@@ -9,6 +9,9 @@ readData_example(path = NULL)
 \arguments{
 \item{path}{Name of file. If `NULL`, the example files will be listed.}
 }
+\value{
+Located example excel file in package
+}
 \description{
 readData comes bundled with an example file in its `inst/applications/www`
 directory. This function make them easy to access.
