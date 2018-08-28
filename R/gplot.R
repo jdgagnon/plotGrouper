@@ -403,6 +403,20 @@ gplot <- function(dataset = NULL,
   )
   )
 
+  point_noJitter <- ggplot2::geom_point(ggplot2::aes(
+    shape = get(comparison),
+    color = get(comparison)
+  ),
+  stroke = stroke,
+  size = size,
+  position = ggplot2::position_dodge(dodge)
+  )
+
+  # paired_lines <- ggplot2::geom_line(ggplot2::aes(
+  #   group = Pairs),
+  #   position = position_dodge(width = dodge)
+  # )
+
   errorbar <- ggplot2::stat_summary(ggplot2::aes(group = get(comparison)),
     fun.data = errortype,
     fun.args = list(mult = 1),
@@ -507,6 +521,7 @@ gplot <- function(dataset = NULL,
       na.rm = TRUE
     )
   }
+
 
   suppressWarnings(if ("line_point_stat" %in% geom) {
     geom <- c("line", "line_error", "line_point", "stat")

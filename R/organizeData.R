@@ -56,8 +56,9 @@ organizeData <- function(data = NULL,
                          id = NULL,
                          beadColumn = NULL,
                          dilutionColumn = NULL) {
-  if (!beadColumn %in% c("", "none") &
-    !dilutionColumn %in% c("", "none") &
+  
+  if (!any(beadColumn %in% c("", "none")) &
+    !any(dilutionColumn %in% c("", "none")) &
     stringr::str_detect(variables, "#")) {
     shiny::showNotification(
       ui = paste0("Count data is being transformed
@@ -76,8 +77,8 @@ organizeData <- function(data = NULL,
   ) %>%
     dplyr::filter(get(comp) %in% comps)
 
-  if (!beadColumn %in% c("", "none") &
-    !dilutionColumn %in% c("", "none")) {
+  if (!any(beadColumn %in% c("", "none")) &
+    !any(dilutionColumn %in% c("", "none"))) {
     d <- d %>%
       dplyr::group_by_(id) %>%
       dplyr::mutate("value" = ifelse(stringr::str_detect(variable, "#"),

@@ -257,6 +257,8 @@ ui <- function(request) {
                   "crossbar",
                   "errorbar",
                   "point",
+                  "point_noJitter",
+                  # "paired_lines",
                   "dot",
                   "stat",
                   "seg",
@@ -584,13 +586,13 @@ server <- function(input, output, session) {
     if (is.null(inFile())) {
       print("using iris data")
       f <- iris %>%
-        mutate(Species = as.character(Species)) %>%
-        group_by(Species) %>%
-        mutate(
-          Sample = paste0(Species, "_", row_number()),
+        dplyr::mutate(Species = as.character(Species)) %>%
+        dplyr::group_by(Species) %>%
+        dplyr::mutate(
+          Sample = paste0(Species, "_", dplyr::row_number()),
           Sheet = input$sheet
         ) %>%
-        select(Sample, Sheet, Species, everything())
+        dplyr::select(Sample, Sheet, Species, dplyr::everything())
     }
 
     # Read excel file in
@@ -614,7 +616,8 @@ server <- function(input, output, session) {
       "Target",
       "Species",
       "Dilution",
-      "Total Bead"
+      "Total Bead",
+      "Pairs"
     )
 
     variables <- vars[which(!vars %in% c(
@@ -845,7 +848,7 @@ server <- function(input, output, session) {
     cols <- c()
     fills <- c()
     shapes <- c()
-    lapply(1:length(comparisons), function(i) {
+    lapply(seq_len(length(comparisons)), function(i) {
       cols[i] <<- input[[paste0("col", i)]]
       fills[i] <<- input[[paste0("fill", i)]]
       shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
@@ -893,7 +896,7 @@ server <- function(input, output, session) {
   currentPlot <- reactive({
     print("currentPlot triggered")
     req(!is.null(dataFrame()))
-    lapply(1:length(unique(dataFrame()[[input$comp]])), function(i) {
+    lapply(seq_len(length(unique(dataFrame()[[input$comp]]))), function(i) {
       req(
         input[[paste0("shape", i)]],
         input[[paste0("col", i)]],
@@ -979,12 +982,12 @@ server <- function(input, output, session) {
 
     if (input$lock.shapes) {
       choices <- c()
-      lapply(1:length(comparisons), function(i) {
+      lapply(seq_len(length(comparisons)), function(i) {
         choices[i] <<- as.numeric(input[[paste0("shape", i)]])
       })
     }
 
-    selection <- rep(choices[1:length(comparisons)], length(comparisons))
+    selection <- rep(choices[seq_len(length(comparisons))], length(comparisons))
 
     lapply(1:length(comparisons), function(i) {
       shiny::tags$div(
@@ -1015,14 +1018,14 @@ server <- function(input, output, session) {
 
     if (input$lock.cols) {
       choices <- c()
-      lapply(1:length(comparisons), function(i) {
+      lapply(seq_len(length(comparisons)), function(i) {
         choices[i] <<- input[[paste0("col", i)]]
       })
     }
 
     selection <- rep(choices, length(comparisons))
 
-    lapply(1:length(comparisons), function(i) {
+    lapply(seq_len(length(comparisons)), function(i) {
       colourpicker::colourInput(
         inputId = paste0("col", i),
         label = comparisons[i],
@@ -1047,7 +1050,7 @@ server <- function(input, output, session) {
 
     if (input$lock.fills) {
       choices <- c()
-      lapply(1:length(comparisons), function(i) {
+      lapply(seq_len(length(comparisons)), function(i) {
         choices[i] <<- input[[paste0("fill", i)]]
       })
     }
@@ -1100,7 +1103,7 @@ server <- function(input, output, session) {
       paste0(input$filename, ".pdf")
     },
     content = function(file) {
-      ggsave(file,
+      ggplot2::ggsave(file,
         plot = isolate(currentPlot()),
         useDingbats = FALSE,
         height = isolate(cpHeight()) / 3.7795275591,
@@ -1124,7 +1127,7 @@ server <- function(input, output, session) {
       paste0(input$file, "_stats", ".csv")
     },
     content = function(file) {
-      write_csv(stats(), file, col_names = TRUE)
+      readr::write_csv(stats(), file, col_names = TRUE)
     }
   )
 
@@ -1173,7 +1176,7 @@ server <- function(input, output, session) {
     cols <- c()
     fills <- c()
     shapes <- c()
-    lapply(1:length(comparisons), function(i) {
+    lapply(seq_len(length(comparisons)), function(i) {
       cols[i] <<- input[[paste0("col", i)]]
       fills[i] <<- input[[paste0("fill", i)]]
       shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
@@ -1242,7 +1245,7 @@ server <- function(input, output, session) {
   observeEvent(input$clearAll, {
     print("clear all plots from report was clicked")
     previous_plotListLength <- plotListLength()
-    for (i in previous_plotListLength:1) {
+    for (i in seq_len(previous_plotListLength)) {
       plotList[[as.character(i)]] <- grid::nullGrob(vp = NULL)
       inputs[[as.character(i)]] <- NULL
       wlist[[as.character(i)]] <- NULL
@@ -1283,7 +1286,7 @@ server <- function(input, output, session) {
     cols <- c()
     fills <- c()
     shapes <- c()
-    lapply(1:length(comparisons), function(i) {
+    lapply(seq_len(length(comparisons)), function(i) {
       cols[i] <<- input[[paste0("col", i)]]
       fills[i] <<- input[[paste0("fill", i)]]
       shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
@@ -1332,7 +1335,7 @@ server <- function(input, output, session) {
       paste(input$report, "pdf", sep = ".")
     },
     content = function(file) {
-      ggsave(file,
+      ggplot2::ggsave(file,
         plot =
           if (plotListLength() > 0) {
             numcol <- floor(sqrt(plotListLength()))
@@ -1526,7 +1529,7 @@ server <- function(input, output, session) {
   observeEvent(input$refresh, {
     req(input$file,
         plotListLength() >= 1)
-    for (i in as.character(1:plotListLength())) {
+    for (i in as.character(seq_len(plotListLength()))) {
       print(paste0("refreshing plot: ", i))
 
       rData <- plotGrouper::readData(
@@ -1645,13 +1648,13 @@ server <- function(input, output, session) {
   onRestored(function(state) {
     print("Restoring report")
     plotListLength(state$values$plotListLength)
-    for (i in 1:isolate(plotListLength())) {
+    for (i in seq_len(isolate(plotListLength()))) {
       inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
       plotList[[as.character(i)]] <- state$values$plotList[[as.character(i)]]
       hlist[[as.character(i)]] <- state$values$hlist[[as.character(i)]]
       wlist[[as.character(i)]] <- state$values$wlist[[as.character(i)]]
     }
-    plotListPlots <- as.character(1:isolate(plotListLength()))
+    plotListPlots <- as.character(seq_len(isolate(plotListLength())))
     updateSelectInput(session,
       "loadPlot",
       choices = plotListPlots,
