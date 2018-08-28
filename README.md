@@ -1,5 +1,3 @@
-<img src="img/logo_small.png" width ="150"/>
-<br>
 This package was designed as a tool for generating figure-ready graphs from data in an excel file. It borrows heavily from packages developed by others, including the ggplot2 and dplyr from the tidyverse and batch statistical calculations from ggpubr.
 <br><br><br>
 Plots can be made using combinations of geoms including bar, violin, box, crossbar, density, point, line, and errorbar.
