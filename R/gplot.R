@@ -16,6 +16,7 @@
 #' @import shinythemes
 #' @import dplyr
 #' @import ggplot2
+#' @rawNamespace import(Hmisc, except = c(summarize, src))
 #' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
@@ -75,7 +76,7 @@
 #' dplyr::select(Sample, Sheet, Species, dplyr::everything()) %>%
 #' tidyr::gather(variable, value, -c(Sample, Sheet, Species)) %>%
 #' dplyr::filter(variable == "Sepal.Length") %>%
-#' plotGrouper::gplot(dataset = .,
+#' plotGrouper::gplot(
 #' comparison = "Species",
 #' group.by = "variable",
 #' shape.groups = c(19,21,17),
@@ -187,7 +188,7 @@ gplot <- function(dataset = NULL,
   # Create a tibble of max values by group for assigning height of p values
   dmax <- droplevels(df %>%
     dplyr::group_by_(group.by, comparison) %>%
-    dplyr::mutate(error_max = max(get(errortype)(value, mult = 1),
+    dplyr::mutate("error_max" = max(get(errortype)(value, mult = 1),
       na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by_(group.by) %>%
@@ -320,8 +321,7 @@ gplot <- function(dataset = NULL,
     )),
     scientific = TRUE
     ),
-    pattern = "e\\+"
-  )[[1]][2])
+    pattern = "e\\+")[[1]][2])
   fancy_scientific <- function(l) {
     l <- format(l, scientific = TRUE)
     e <- as.numeric(sapply(l, function(a) {
@@ -360,6 +360,7 @@ gplot <- function(dataset = NULL,
     labs.y <- ggplot2::waiver()
   }
   if (trans.y != "identity") {
+    .x <- NULL
     if (trans.y == "log2") {
       labs.y <- scales::trans_format(trans.y, scales::math_format(2^.x))
       y.lim <- c(NA, NA)
@@ -537,7 +538,6 @@ gplot <- function(dataset = NULL,
     scale.x +
     ggplot2::scale_shape_manual(values = shape.groups) +
     ggplot2::scale_fill_manual(values = fill.groups) +
-    ggplot2::scale_alpha_manual(values = alpha.groups) +
     ggplot2::scale_color_manual(values = color.groups) +
     lapply(geom, function(x) get(x)) +
     ggplot2::theme(

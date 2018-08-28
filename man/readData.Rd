@@ -18,7 +18,4 @@ Tibble assembled from the sheets selected from the file
 This function will read an excel file and combine its sheets into a single
 dataframe.
 }
-\examples{
-readData()
-}
 \keyword{readData}

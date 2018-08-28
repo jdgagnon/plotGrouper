@@ -9,6 +9,7 @@
 #' @import shinythemes
 #' @import dplyr
 #' @import ggplot2
+#' @rawNamespace import(Hmisc, except = c(summarize, src))
 #' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
@@ -23,15 +24,13 @@
 #' @importFrom colourpicker colourInput updateColourInput
 #' @param ... Any argument that you can pass to shiny::runApp
 #' @return Runs the plotGrouper shiny app.
-#' @examples
-#' plotGrouper::plotGrouper()
 #' @export
 plotGrouper <- function(...)
 {
   # devtools::load_all()
   appDir <- system.file("application", package = "plotGrouper")
   if (appDir == "") {
-    stop("Could not find directory. Try re-installing `plotGrouper`.", call. = FALSE)
+    stop("Could not find directory. Try re-installing plotGrouper.", call. = FALSE)
   }
   shiny::runApp(appDir, launch.browser = TRUE, ...)
 }

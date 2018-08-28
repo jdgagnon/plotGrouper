@@ -34,11 +34,11 @@ This function will organize a tibble into tidy format and perform count
 transformations if appropriate columns are specified.
 }
 \examples{
-iris \%>\% mutate(Species = as.character(Species)) \%>\%
-group_by(Species) \%>\%
-mutate(Sample = paste0(Species, "_", row_number()), Sheet = "iris") \%>\%
-select(Sample, Sheet, Species, everything()) \%>\%
-organizeData(data = .,
+iris \%>\% dplyr::mutate(Species = as.character(Species)) \%>\%
+dplyr::group_by(Species) \%>\%
+dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()), Sheet = "iris") \%>\%
+dplyr::select(Sample, Sheet, Species, dplyr::everything()) \%>\%
+plotGrouper::organizeData(data = .,
 exclude = c("Sample", "Sheet", "Species"),
 comp = "Species",
 comps = c("setosa", "versicolor", "virginica"),

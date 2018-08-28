@@ -115,10 +115,10 @@ well as other aesthetics of the plot.
 iris \%>\% dplyr::mutate(Species = as.character(Species)) \%>\%
 dplyr::group_by(Species) \%>\%
 dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),Sheet = "iris") \%>\%
-dplyr::select(Sample, Sheet, Species, everything()) \%>\%
+dplyr::select(Sample, Sheet, Species, dplyr::everything()) \%>\%
 tidyr::gather(variable, value, -c(Sample, Sheet, Species)) \%>\%
 dplyr::filter(variable == "Sepal.Length") \%>\%
-gplot(dataset = .,
+plotGrouper::gplot(
 comparison = "Species",
 group.by = "variable",
 shape.groups = c(19,21,17),
