@@ -527,6 +527,7 @@ server <- function(input, output, session) {
     "load",
     "update"
   ))
+  `%>%` <- magrittr::`%>%`
   dataFrame <- reactiveVal(NULL)
   rawData <- reactiveVal(NULL)
   inFile <- reactiveVal(NULL)
