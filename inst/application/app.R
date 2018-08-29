@@ -25,10 +25,6 @@ ui <- function(request) {
             fileInput("file",
               "Data file",
               accept = c(
-                "text/csv",
-                "text/comma-separated-values",
-                "text/tab-separated-values",
-                "text/plain",
                 ".csv",
                 ".tsv",
                 ".xlsx",
@@ -215,21 +211,27 @@ ui <- function(request) {
             #### Options for transforming counts ####
             h4("Transform count data"),
             fluidRow(
-              column(4,
+              column(
+                4,
                 selectInput("id",
                   "Unique ID",
-                   choices = NULL
-                )),
-              column(4,
+                  choices = NULL
+                )
+              ),
+              column(
+                4,
                 selectInput("beadColumn",
                   "# Beads/Sample",
                   choices = NULL
-                )),
-              column(4,
+                )
+              ),
+              column(
+                4,
                 selectInput("dilutionColumn",
                   "Dilution (1/x)",
                   choices = NULL
-                ))
+                )
+              )
             )
           ),
 
@@ -294,14 +296,15 @@ ui <- function(request) {
 
             fluidRow(
               column(2,
-                     style = "margin-top: 30px;",
-                     actionButton("refreshData",
-                                  label = "Refresh current plot",
-                                  class = "btn btn-primary btn-sm",
-                                  style = "color: #fff;
+                style = "margin-top: 30px;",
+                actionButton("refreshData",
+                  label = "Refresh current plot",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff;
                                   background-color: #337ab7;
                                   border-color: #2e6da4"
-                     )),
+                )
+              ),
 
               column(2,
                 style = "margin-top: 30px;",
@@ -528,6 +531,7 @@ server <- function(input, output, session) {
     "update"
   ))
   `%>%` <- magrittr::`%>%`
+  fileExtension <- reactiveVal(NULL)
   dataFrame <- reactiveVal(NULL)
   rawData <- reactiveVal(NULL)
   inFile <- reactiveVal(NULL)
@@ -565,8 +569,19 @@ server <- function(input, output, session) {
   }, {
     print("File input changed")
     inFile(input$file)
+    # Identify file type
+    fileExtension(stringr::word(input$file$name,
+      -1,
+      sep = stringr::fixed(".")
+    ))
     # Identify sheets and use them as choices to load file
-    sheets(readxl::excel_sheets(input$file$datapath))
+    if (fileExtension() %in% c("xlsx","xls")) {
+      sheets(readxl::excel_sheets(input$file$datapath))
+    }
+    if (fileExtension() %in% c("tsv", "csv")) {
+      sheets(input$file$name)
+    }
+    
     updateSelectInput(
       session = session,
       inputId = "sheet",
@@ -593,15 +608,28 @@ server <- function(input, output, session) {
           Sample = paste0(Species, "_", dplyr::row_number()),
           Sheet = input$sheet
         ) %>%
-        dplyr::select(Sample, Sheet, Species, dplyr::everything())
+        dplyr::select(Sheet, Sample, Species, dplyr::everything())
     }
 
     # Read excel file in
     if (!is.null(inFile())) {
-      f <- plotGrouper::readData(
-        sheet = input$sheet,
-        file = input$file$datapath
-      )
+      if (fileExtension() %in% c("xlsx", "xls")) {
+        f <- plotGrouper::readData(
+          sheet = input$sheet,
+          file = input$file$datapath
+        )
+      }
+      if (fileExtension() == "csv") {
+        f <- readr::read_csv(input$file$datapath) %>%
+          dplyr::mutate("Sheet" = input$sheet) %>%
+          dplyr::select(Sheet, dplyr::everything())
+      }
+      if (fileExtension() == "tsv") {
+        f <- readr::read_tsv(input$file$datapath) %>%
+          dplyr::mutate("Sheet" = input$sheet) %>%
+          dplyr::select(Sheet, dplyr::everything())
+      }
+      
     }
     print("dataframe created")
     rawData(f)
@@ -687,9 +715,9 @@ server <- function(input, output, session) {
     } else if (all(current_comp %in% vars)) {
       print("updating comp choices; keeping selected")
       updateSelectInput(session,
-                        "comp",
-                        choices = vars,
-                        selected = input$comp
+        "comp",
+        choices = vars,
+        selected = input$comp
       )
     }
 
@@ -727,23 +755,23 @@ server <- function(input, output, session) {
     } else if (current_id %in% vars) {
       print("updating id choices; keeping selected")
       updateSelectInput(session,
-                        "id",
-                        choices = vars,
-                        selected = input$id
+        "id",
+        choices = vars,
+        selected = input$id
       )
     }
 
     updateSelectInput(session,
-        "beadColumn",
-        choices = c("none", vars),
-        selected = "Total Bead"
-      )
+      "beadColumn",
+      choices = c("none", vars),
+      selected = "Total Bead"
+    )
 
     updateSelectInput(session,
-                        "dilutionColumn",
-                        choices = c("none", vars),
-                        selected = "Dilution")
-
+      "dilutionColumn",
+      choices = c("none", vars),
+      selected = "Dilution"
+    )
   }, priority = 3)
 
 
@@ -801,7 +829,8 @@ server <- function(input, output, session) {
       variables = input$variables,
       id = input$id,
       beadColumn = input$beadColumn,
-      dilutionColumn = input$dilutionColumn)
+      dilutionColumn = input$dilutionColumn
+    )
     dataFrame(d)
   }, priority = 1)
 
@@ -1528,15 +1557,29 @@ server <- function(input, output, session) {
 
   #### Refresh plots in report ####
   observeEvent(input$refresh, {
-    req(input$file,
-        plotListLength() >= 1)
+    req(
+      input$file,
+      plotListLength() >= 1
+    )
     for (i in as.character(seq_len(plotListLength()))) {
       print(paste0("refreshing plot: ", i))
-
-      rData <- plotGrouper::readData(
-        sheet = inputs[[i]]$sheet,
-        file = input$file$datapath
-      )
+      
+      if (fileExtension() %in% c("xlsx", "xls")) {
+        rData <- plotGrouper::readData(
+          sheet = input$sheet,
+          file = input$file$datapath
+        )
+      }
+      if (fileExtension() == "csv") {
+        rData <- readr::read_csv(input$file$datapath) %>%
+          dplyr::mutate("Sheet" = input$sheet) %>%
+          dplyr::select(Sheet, dplyr::everything())
+      }
+      if (fileExtension() == "tsv") {
+        rData <- readr::read_tsv(input$file$datapath) %>%
+          dplyr::mutate("Sheet" = input$sheet) %>%
+          dplyr::select(Sheet, dplyr::everything())
+      }
 
       oData <- plotGrouper::organizeData(
         data = rData,

@@ -1,6 +1,6 @@
 Package: plotGrouper
 Title: Shiny app GUI wrapper for ggplot with built-in statistical analysis
-Version: 0.99.17
+Version: 0.99.18
 Authors@R: person("John", "Gagnon", email = "john.gagnon.42@gmail.com", role = c("aut", "cre"))
 Description: A shinyapp-based GUI wrapper for ggplot with built-in statistical 
   analysis. Import data from file and use dropdown menus and checkboxes to 
