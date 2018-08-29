@@ -1,7 +1,8 @@
-^.*\.Rproj$           # Automatically added by RStudio,
-^\.Rproj\.user$       # Used for temporary files.
-^img$                 # Exclude images for GitHub README
-^plotGrouper\.Rproj$  # Exclude project file
-^README\.Rmd$         # An Rmarkdown file used to generate README.md
-^.*\.yml$             # Exclude .yml files
-^.*github$            # Exclude .github file
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.travis\.yml$
+^img$
+^\.github$
+^README\.md$
+^_config\.yml$
+^plotGrouper\.Rproj$
