@@ -140,13 +140,13 @@ gplot <- function(dataset = NULL,
     }
   } else if (is.null(group.labs) & split == TRUE & is.null(split_str)) {
     group.labs <- function(x) {
-      sapply(stringr::str_remove(stringr::word(stringr::str_remove(x, trim),
-        -1, sep = "/"), " %| #|% |# "), "[", 1)
+      vapply(stringr::str_remove(stringr::word(stringr::str_remove(x, trim),
+        -1, sep = "/"), " %| #|% |# "), "[", FUN.VALUE = "", 1)
     }
   } else if (is.null(group.labs) & split == TRUE & !is.null(split_str)) {
     group.labs <- function(x) {
-      sapply(strsplit(stringr::str_remove(x, trim), split = split_str,
-        fixed = TRUE), "[", 2)
+      vapply(strsplit(stringr::str_remove(x, trim), split = split_str,
+        fixed = TRUE), "[", FUN.VALUE = "", 2)
     }
   } else {
     group.labs <- group.labs
@@ -324,15 +324,15 @@ gplot <- function(dataset = NULL,
     pattern = "e\\+")[[1]][2])
   fancy_scientific <- function(l) {
     l <- format(l, scientific = TRUE)
-    e <- as.numeric(sapply(l, function(a) {
+    e <- as.numeric(vapply(l, function(a) {
       stringr::str_split(a, pattern = "e\\+")[[1]][2]
-    }))
-    e_dif <- as.numeric(sapply(e, function(x) {
+    }, ""))
+    e_dif <- as.numeric(vapply(e, function(x) {
       (max_e - x)
-    }))
-    l <- as.numeric(sapply(l, function(x) {
+    }, numeric(1)))
+    l <- as.numeric(vapply(l, function(x) {
       stringr::str_split(string = x, pattern = "e\\+")[[1]][1]
-    }))
+    }, ""))
     l2 <- c()
     for (i in seq_len(length(e))) {
       l2[i] <- ifelse(e[i] == 0, l[i],
@@ -606,7 +606,7 @@ gplot <- function(dataset = NULL,
     gt$layout$clip[gt$layout$name == "panel"] <- "off"
     # rect grobs such as those created by geom_bar() have "height" / "width" measurements,
     # while point & text grobs have "y" / "x" measurements, & we look for both
-    max.grob.heights <- sapply(
+    max.grob.heights <- vapply(
       gt$grob[[which(gt$layout$name == "panel")]]$children,
       function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
           max(as.numeric(x$height), na.rm = TRUE),
@@ -614,11 +614,11 @@ gplot <- function(dataset = NULL,
             max(as.numeric(x$y)),
             0
           )
-        )
+        ), numeric(1)
     )
     max.grob.heights <- max(max.grob.heights, na.rm = TRUE)
 
-    min.grob.heights <- sapply(
+    min.grob.heights <- vapply(
       gt$grob[[which(gt$layout$name == "panel")]]$children,
       function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
           min(as.numeric(x$height), na.rm = TRUE),
@@ -626,7 +626,7 @@ gplot <- function(dataset = NULL,
             min(as.numeric(x$y)),
             0
           )
-        )
+        ), numeric(1)
     )
     min.grob.heights <- min(min.grob.heights, na.rm = TRUE)
 
