@@ -1167,7 +1167,7 @@ server <- function(input, output, session) {
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
     wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
-      mutate(rowSums = rowSums(., na.rm = TRUE))
+      dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
     hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
@@ -1215,7 +1215,7 @@ server <- function(input, output, session) {
       widths[is.na(widths)] <- 0
       heights[is.na(heights)] <- 0
       wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
-        mutate(rowSums = rowSums(., na.rm = TRUE))
+        dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
       hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
       reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
       reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
@@ -1278,7 +1278,7 @@ server <- function(input, output, session) {
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
     wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
-      mutate(rowSums = rowSums(., na.rm = TRUE))
+      dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
     hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
@@ -1630,7 +1630,7 @@ server <- function(input, output, session) {
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
     wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
-      mutate(rowSums = rowSums(., na.rm = TRUE))
+      dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
     hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
@@ -1670,7 +1670,7 @@ server <- function(input, output, session) {
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
     wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
-      mutate(rowSums = rowSums(., na.rm = TRUE))
+      dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
     hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
