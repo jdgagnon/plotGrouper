@@ -16,7 +16,7 @@
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom ggpubr compare_means get_legend
 #' @importFrom gtable gtable_add_padding
-#' @importFrom readr parse_number
+#' @importFrom readr parse_number read_csv read_tsv
 #' @importFrom scales trans_format math_format rescale_none
 #' @importFrom stringr str_remove str_split word
 #' @importFrom tidyr gather
