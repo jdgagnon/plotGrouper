@@ -33,8 +33,9 @@
 #' datasets <- readData_example("iris.xlsx")
 #' readData(datasets, "iris")
 #' @export
-readData <- function(file = NULL,
-                     sheet = NULL) {
+readData <- function(
+    file = NULL,
+    sheet = NULL) {
   for (i in seq_len(length(sheet))) {
     a <- readxl::read_excel(file,
       sheet = sheet[i],
