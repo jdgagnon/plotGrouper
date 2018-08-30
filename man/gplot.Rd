@@ -22,27 +22,32 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 \arguments{
 \item{dataset}{Define your data set which should be a gathered tibble}
 
-\item{comparison}{Specify the comparison you would like to make (e.g., Genotype)}
+\item{comparison}{Specify the comparison you would like to make 
+(e.g., Genotype)}
 
 \item{group.by}{Specify the variable to group by (e.g., Tissue)}
 
 \item{levs}{Specify the order of the grouping variables}
 
-\item{val}{If your tibble is not 'tidy', and there are multiple value columns, specify the one you want to plot}
+\item{val}{Specify column name that contains values (optional)}
 
 \item{geom}{Define the list of geoms you want to plot}
 
-\item{p}{Specify representation of pvalue ('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)}
+\item{p}{Specify representation of pvalue 
+('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)}
 
-\item{ref.group}{Specify a reference group to compare all other comparisons to}
+\item{ref.group}{Specify a reference group to compare all other 
+comparisons to}
 
 \item{p.adjust.method}{Method used for adjusting the pvalue}
 
-\item{comparisons}{Specify which of the available comparisons within your data you would like to plot}
+\item{comparisons}{Specify which of the available comparisons within your 
+data you would like to plot}
 
 \item{method}{Specify the statistical test to be used}
 
-\item{paired}{Specify whether or not the statistical comparisons should be paired}
+\item{paired}{Specify whether or not the statistical comparisons should be 
+paired}
 
 \item{errortype}{Specify the method of statistical error to plot}
 
@@ -50,7 +55,8 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 
 \item{y.lab}{Specify a custom y-axis label to use}
 
-\item{trans.y}{Specify the transformation to perform on the dependent variable}
+\item{trans.y}{Specify the transformation to perform on the dependent 
+variable}
 
 \item{x.lim}{Specify the min and max values to be used for the x-axis}
 
@@ -58,9 +64,11 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 
 \item{x.lab}{Specify a custom x-axis label to use}
 
-\item{trans.x}{Specify the transformation to perform on the independent variable}
+\item{trans.x}{Specify the transformation to perform on the independent 
+variable}
 
-\item{sci}{Specify whether or not to display the dependent variable using scientific notation}
+\item{sci}{Specify whether or not to display the dependent variable using 
+scientific notation}
 
 \item{angle.x}{Specify whether or not to angle the x-axis text 45deg}
 
@@ -72,9 +80,11 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 
 \item{split}{Specify whether or not to split the x-axis label text}
 
-\item{split_str}{Specify the string to split the x-axis label text by; uses regex}
+\item{split_str}{Specify the string to split the x-axis label text by; uses 
+regex}
 
-\item{trim}{Specify the string to trim text from the right side of the x-axis label text; uses regex}
+\item{trim}{Specify the string to trim text from the right side of the 
+x-axis label text; uses regex}
 
 \item{leg.pos}{Specify where to place the legend}
 
@@ -114,7 +124,8 @@ well as other aesthetics of the plot.
 \examples{
 iris \%>\% dplyr::mutate(Species = as.character(Species)) \%>\%
 dplyr::group_by(Species) \%>\%
-dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),Sheet = "iris") \%>\%
+dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),
+Sheet = "iris") \%>\%
 dplyr::select(Sample, Sheet, Species, dplyr::everything()) \%>\%
 tidyr::gather(variable, value, -c(Sample, Sheet, Species)) \%>\%
 dplyr::filter(variable == "Sepal.Length") \%>\%

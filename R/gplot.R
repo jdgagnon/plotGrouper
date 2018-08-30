@@ -17,6 +17,7 @@
 #' @import dplyr
 #' @import ggplot2
 #' @rawNamespace import(Hmisc, except = c(summarize, src))
+#' @importFrom rlang .data
 #' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
@@ -30,33 +31,43 @@
 #' @importFrom stats na.omit start
 #' @importFrom colourpicker colourInput updateColourInput
 #' @param dataset Define your data set which should be a gathered tibble
-#' @param comparison Specify the comparison you would like to make (e.g., Genotype)
+#' @param comparison Specify the comparison you would like to make 
+#' (e.g., Genotype)
 #' @param group.by Specify the variable to group by (e.g., Tissue)
 #' @param levs Specify the order of the grouping variables
-#' @param val If your tibble is not 'tidy', and there are multiple value columns, specify the one you want to plot
+#' @param val Specify column name that contains values (optional)
 #' @param geom Define the list of geoms you want to plot
-#' @param p Specify representation of pvalue ('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)
-#' @param ref.group Specify a reference group to compare all other comparisons to
+#' @param p Specify representation of pvalue 
+#' ('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)
+#' @param ref.group Specify a reference group to compare all other 
+#' comparisons to
 #' @param p.adjust.method Method used for adjusting the pvalue
-#' @param comparisons Specify which of the available comparisons within your data you would like to plot
+#' @param comparisons Specify which of the available comparisons within your 
+#' data you would like to plot
 #' @param method Specify the statistical test to be used
-#' @param paired Specify whether or not the statistical comparisons should be paired
+#' @param paired Specify whether or not the statistical comparisons should be 
+#' paired
 #' @param errortype Specify the method of statistical error to plot
 #' @param y.lim Specify the min and max values to be used for the y-axis
 #' @param y.lab Specify a custom y-axis label to use
 #' @param expand.y Specify values to expand the y-axis
-#' @param trans.y Specify the transformation to perform on the dependent variable
+#' @param trans.y Specify the transformation to perform on the dependent 
+#' variable
 #' @param x.lim Specify the min and max values to be used for the x-axis
 #' @param x.lab Specify a custom x-axis label to use
-#' @param trans.x Specify the transformation to perform on the independent variable
-#' @param sci Specify whether or not to display the dependent variable using scientific notation
+#' @param trans.x Specify the transformation to perform on the independent 
+#' variable
+#' @param sci Specify whether or not to display the dependent variable using 
+#' scientific notation
 #' @param angle.x Specify whether or not to angle the x-axis text 45deg
 #' @param levs.comps Specify the order in which to plot the comparisons
 #' @param group.labs Specify custom labels for the independent variables
 #' @param stats Specify whether or not to output the statistics table
 #' @param split Specify whether or not to split the x-axis label text
-#' @param split_str Specify the string to split the x-axis label text by; uses regex
-#' @param trim Specify the string to trim text from the right side of the x-axis label text; uses regex
+#' @param split_str Specify the string to split the x-axis label text by; uses 
+#' regex
+#' @param trim Specify the string to trim text from the right side of the 
+#' x-axis label text; uses regex
 #' @param leg.pos Specify where to place the legend
 #' @param stroke Specify the line thickness to use
 #' @param font_size Specify the font size to use
@@ -72,7 +83,8 @@
 #' @examples
 #' iris %>% dplyr::mutate(Species = as.character(Species)) %>%
 #' dplyr::group_by(Species) %>%
-#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),Sheet = "iris") %>%
+#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),
+#' Sheet = "iris") %>%
 #' dplyr::select(Sample, Sheet, Species, dplyr::everything()) %>%
 #' tidyr::gather(variable, value, -c(Sample, Sheet, Species)) %>%
 #' dplyr::filter(variable == "Sepal.Length") %>%
@@ -131,6 +143,8 @@ gplot <- function(dataset = NULL,
                   fill.groups = c("#444444",
                                   NA,
                                   "#A33838")) {
+  . <- "Stop NOTE"
+  
   df <- droplevels(dataset)
 
   # Assign labels to the groups
@@ -152,7 +166,8 @@ gplot <- function(dataset = NULL,
     group.labs <- group.labs
   })
 
-  # If the column of values has a different column name than 'value', assign it 'value'
+  # If the column of values has a different column name than 'value', 
+  # assign it 'value'
   colnames(df)[colnames(df) == val] <- "value"
   df$value <- as.numeric(df$value)
 
@@ -163,7 +178,8 @@ gplot <- function(dataset = NULL,
     )
   }
 
-  # If grouping variable is not numeric, scale x discretely, and assign levels. If it is numeric, scale x continuously
+  # If grouping variable is not numeric, scale x discretely, and assign levels. 
+  # If it is numeric, scale x continuously
   if (is.factor(df[[group.by]])) {
     scale.x <- ggplot2::scale_x_discrete(labels = group.labs,
       breaks = unique(df[[group.by]]))
@@ -188,11 +204,11 @@ gplot <- function(dataset = NULL,
   # Create a tibble of max values by group for assigning height of p values
   dmax <- droplevels(df %>%
     dplyr::group_by_(group.by, comparison) %>%
-    dplyr::mutate("error_max" = max(get(errortype)(value, mult = 1),
+    dplyr::mutate("error_max" = max(get(errortype)(.data$value, mult = 1),
       na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by_(group.by) %>%
-    dplyr::slice(which.max(value)) %>%
+    dplyr::slice(which.max(.data$value)) %>%
     dplyr::select_(group.by, "value", "error_max") %>%
     dplyr::ungroup() %>%
     dplyr::arrange_(group.by))
@@ -228,52 +244,67 @@ gplot <- function(dataset = NULL,
 
   if (method %in% c("t.test", "wilcox.test")) {
     statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
-      dplyr::filter(group1 %in% comparisons | group2 %in% comparisons) %>%
-      dplyr::mutate("max" = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
+      dplyr::filter(.data$group1 %in% comparisons |
+                      .data$group2 %in% comparisons) %>%
+      dplyr::mutate("max" = max(c(.data$value, .data$error_max), 
+                                na.rm = TRUE) * 0.05) %>%
       dplyr::group_by_(group.by) %>%
       dplyr::mutate(
         "n" = dplyr::row_number(),
-        "group1" = factor(group1, levels = levels(df[[comparison]])),
-        "group2" = factor(group2, levels = levels(df[[comparison]])),
-        "r" = dplyr::if_else(p == "p.signif", max * 0.1, max * 0.2),
-        "e" = max * n,
-        "n_comps" = max(n),
+        "group1" = factor(.data$group1, levels = levels(df[[comparison]])),
+        "group2" = factor(.data$group2, levels = levels(df[[comparison]])),
+        "r" = dplyr::if_else(p == "p.signif", .data$max * 0.1, .data$max * 0.2),
+        "e" = .data$max * .data$n,
+        "n_comps" = max(.data$n),
         "group.by_n" = as.numeric(get(group.by)), # number of grouping variables
-        "group1_n" = as.integer(group1),
-        "group2_n" = as.integer(group2),
-        "unit" = (width / max(group2_n)) * dodge / width, # relative width of 1 bar
-        "start" = group.by_n - unit * max(group2_n) / 2, # center position of the first bar
-        "w.start" = start + (group1_n - 1) * unit + unit / 2, # center position of group1
-        "w.stop" = start + (group2_n - 1) * unit + unit / 2
+        "group1_n" = as.integer(.data$group1),
+        "group2_n" = as.integer(.data$group2),
+        "unit" = (width / max(.data$group2_n)) * dodge / width, # relative 
+        # width of 1 bar
+        "start" = .data$group.by_n - 
+          .data$unit * 
+          max(.data$group2_n) / 2, # center position of the first bar
+        "w.start" = .data$start + 
+          (.data$group1_n - 1) * 
+          .data$unit + 
+          .data$unit / 
+          2, # center position of group1
+        "w.stop" = .data$start + 
+          (.data$group2_n - 1) * 
+          .data$unit + 
+          .data$unit / 2
       ) %>% # center position of group2
       dplyr::ungroup() %>%
       dplyr::mutate(
-        "x.pos" = rowMeans(.[, c("w.start", "w.stop")]), # center of line segment
-        "w.start" = ifelse(!is.na(p.signif), w.start, NA),
-        "w.stop" = ifelse(!is.na(p.signif), w.stop, NA),
-        "h.p" = value + e,
-        "h.s" = value + e - r
+        "x.pos" = rowMeans(.[, c("w.start", 
+                                 "w.stop")]), # center of line segment
+        "w.start" = ifelse(!is.na(.data$p.signif), .data$w.start, NA),
+        "w.stop" = ifelse(!is.na(.data$p.signif), .data$w.stop, NA),
+        "h.p" = .data$value + .data$e,
+        "h.s" = .data$value + .data$e - .data$r
       ))
   } else {
     statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
-      dplyr::mutate("max" = max(c(value, error_max), na.rm = TRUE) * 0.05) %>%
+      dplyr::mutate("max" = max(c(.data$value, 
+                                  .data$error_max), 
+                                na.rm = TRUE) * 0.05) %>%
       dplyr::group_by_(group.by) %>%
       dplyr::mutate(
         "n" = dplyr::row_number(),
         "r" = dplyr::if_else(p == "p.signif", max * 0.1, max * 0.2),
-        "e" = max * n,
-        "n_comps" = max(n),
+        "e" = .data$max * .data$n,
+        "n_comps" = max(.data$n),
         "group.by_n" = as.numeric(get(group.by)),
-        "w.start" = group.by_n - width / length(unique(df[[comparison]])),
-        "w.stop" = group.by_n + width / length(unique(df[[comparison]]))
+        "w.start" = .data$group.by_n - width / length(unique(df[[comparison]])),
+        "w.stop" = .data$group.by_n + width / length(unique(df[[comparison]]))
       ) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
-        "x.pos" = rowMeans(.[, c("w.start", "w.stop")]), # center of line segment
-        "w.start" = ifelse(!is.na(p.signif), w.start, NA),
-        "w.stop" = ifelse(!is.na(p.signif), w.stop, NA),
-        "h.p" = value + e,
-        "h.s" = value + e - r
+        "x.pos" = rowMeans(.[, c("w.start", "w.stop")]), # center of segment
+        "w.start" = ifelse(!is.na(.data$p.signif), .data$w.start, NA),
+        "w.stop" = ifelse(!is.na(.data$p.signif), .data$w.stop, NA),
+        "h.p" = .data$value + .data$e,
+        "h.s" = .data$value + .data$e - .data$r
       ))
   }
 
@@ -294,8 +325,8 @@ gplot <- function(dataset = NULL,
     logBase <- readr::parse_number(trans.y)
     statistics <- statistics %>%
       dplyr::mutate(
-        "h.p" = h.p * logBase,
-        "h.s" = h.s * logBase
+        "h.p" = .data$h.p * logBase,
+        "h.s" = .data$h.s * logBase
       )
   }
 
@@ -492,7 +523,7 @@ gplot <- function(dataset = NULL,
   density <- ggplot2::geom_density(ggplot2::aes(
     color = get(comparison),
     fill = get(comparison),
-    x = value
+    x = .data$value
   ),
   inherit.aes = FALSE
   )
@@ -501,7 +532,7 @@ gplot <- function(dataset = NULL,
     geom <- geom[which(!geom %in% c("stat", "seg"))]
   } else {
     stat <- ggplot2::geom_text(
-      data = statistics, ggplot2::aes(x.pos, stats::na.omit(h.p)),
+      data = statistics, ggplot2::aes(.data$x.pos, stats::na.omit(.data$h.p)),
       label = statistics[[p]],
       size = font_size / (1 / 0.35),
       inherit.aes = FALSE,
@@ -511,10 +542,10 @@ gplot <- function(dataset = NULL,
     seg <- ggplot2::geom_segment(
       data = statistics,
       ggplot2::aes(
-        x = w.start,
-        xend = w.stop,
-        y = h.s,
-        yend = h.s
+        x = .data$w.start,
+        xend = .data$w.stop,
+        y = .data$h.s,
+        yend = .data$h.s
       ),
       size = stroke,
       inherit.aes = FALSE,
@@ -533,7 +564,9 @@ gplot <- function(dataset = NULL,
   })
 
   # Create ggplot object and plot
-  g <- ggplot2::ggplot(data = df, ggplot2::aes(x = get(group.by), y = value)) +
+  g <- ggplot2::ggplot(data = df, 
+                       ggplot2::aes(x = get(group.by), 
+                                    y = .data$value)) +
     ggplot2::labs(
       x = x.lab,
       y = y.lab,
@@ -604,8 +637,10 @@ gplot <- function(dataset = NULL,
       height = ggplot2::unit(plotHeight, "mm")
     )
     gt$layout$clip[gt$layout$name == "panel"] <- "off"
-    # rect grobs such as those created by geom_bar() have "height" / "width" measurements,
-    # while point & text grobs have "y" / "x" measurements, & we look for both
+    
+    # rect grobs such as those created by geom_bar() have "height" / "width" 
+    # measurements, while point & text grobs have "y" / "x" measurements, 
+    # & we look for both
     max.grob.heights <- vapply(
       gt$grob[[which(gt$layout$name == "panel")]]$children,
       function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
@@ -662,7 +697,10 @@ gplot <- function(dataset = NULL,
     # sum the result
     pheight <- height.above.panel + panel.height + height.below.panel
     gt <- gtable::gtable_add_padding(gt,
-      padding = ggplot2::unit(c(height.above.panel, lwidth / 2, 5, lwidth / 2), "mm"))
+      padding = ggplot2::unit(c(height.above.panel, 
+                                lwidth / 2, 
+                                5, 
+                                lwidth / 2), "mm"))
     return(gt)
   }
 }

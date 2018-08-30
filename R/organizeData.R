@@ -2,7 +2,8 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to organize a tibble into tidy format and perform count transformations
+#' A function to organize a tibble into tidy format 
+#' and perform count transformations
 #'
 #' This function will organize a tibble into tidy format and perform count
 #' transformations if appropriate columns are specified.
@@ -11,6 +12,7 @@
 #' @import dplyr
 #' @import ggplot2
 #' @rawNamespace import(Hmisc, except = c(summarize, src))
+#' @importFrom rlang .data
 #' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
@@ -30,14 +32,16 @@
 #' @param variables A vector of the variables to be plotted
 #' @param id The name of unique identifier column
 #' @param beadColumn The column name that has total number of beads/sample
-#' @param dilutionColumn The column name that has dilution factor for each sample 1/x
+#' @param dilutionColumn The column name that has dilution factor for 
+#' each sample 1/x
 #' @keywords organizeData
 #' @return Tibble in tidy format based on columns chosen to be excluded.
 #' Count data will be transformed if appropriate columns are present.
 #' @examples
 #' iris %>% dplyr::mutate(Species = as.character(Species)) %>%
 #' dplyr::group_by(Species) %>%
-#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()), Sheet = "iris") %>%
+#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()), 
+#' Sheet = "iris") %>%
 #' dplyr::select(Sample, Sheet, Species, dplyr::everything()) %>%
 #' plotGrouper::organizeData(data = .,
 #' exclude = c("Sample", "Sheet", "Species"),
@@ -81,20 +85,20 @@ organizeData <- function(data = NULL,
       !dilutionColumn %in% c("", "none")) {
     d <- d %>%
       dplyr::group_by_(id) %>%
-      dplyr::mutate("value" = ifelse(stringr::str_detect(variable, "#"),
-        (value / value[variable == "Bead #"] *
+      dplyr::mutate("value" = ifelse(stringr::str_detect(.data$variable, "#"),
+        (.data$value / .data$value[.data$variable == "Bead #"] *
           get(beadColumn) *
           get(dilutionColumn)),
-        value
+        .data$value
       )) %>%
       dplyr::ungroup() %>%
-      dplyr::filter(variable %in% variables) %>%
-      dplyr::filter(!grepl("Bead|Ungated", variable))
+      dplyr::filter(.data$variable %in% variables) %>%
+      dplyr::filter(!grepl("Bead|Ungated", .data$variable))
   } else {
     d <- d %>%
       dplyr::ungroup() %>%
-      dplyr::filter(variable %in% variables) %>%
-      dplyr::filter(!grepl("Bead|Ungated", variable))
+      dplyr::filter(.data$variable %in% variables) %>%
+      dplyr::filter(!grepl("Bead|Ungated", .data$variable))
   }
   return(d)
 }
