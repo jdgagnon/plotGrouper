@@ -1,0 +1,173 @@
+{
+  "input": {
+    "._bookmark_": 0,
+    "angle.x": false,
+    "beadColumn": "",
+    "clear": 0,
+    "clearAll": 0,
+    "col1": "#000000",
+    "col2": "#000000",
+    "col3": "#000000",
+    "columns": [
+      "Sheet",
+      "Sample",
+      "Species"
+    ],
+    "comp": "Species",
+    "comps": [
+      "setosa",
+      "versicolor",
+      "virginica"
+    ],
+    "dilutionColumn": "",
+    "dodge": 0.8,
+    "errortype": "SD",
+    "file": null,
+    "filename": "Plot1",
+    "fill1": "#444444",
+    "fill2": "#BB3F98",
+    "fill3": "#2E4DA1",
+    "font": 12,
+    "geom": [
+      "bar",
+      "errorbar",
+      "point_noJitter",
+      "stat",
+      "seg"
+    ],
+    "group": "variable",
+    "id": "Sample",
+    "legend": "right",
+    "load": 0,
+    "loadPlot": "",
+    "lock.cols": false,
+    "lock.fills": false,
+    "lock.shapes": false,
+    "method": "t.test",
+    "paired": false,
+    "plotHeight": 80,
+    "plotWidth": 100,
+    "plt2rprt": 0,
+    "refGroup": false,
+    "refresh": 0,
+    "refreshData": 0,
+    "report": "Report1",
+    "sampleFile": 1,
+    "scientific": false,
+    "shape1": "19",
+    "shape2": "21",
+    "shape3": "17",
+    "sheet": "iris",
+    "size": 3,
+    "split": true,
+    "split.on": "",
+    "stroke": 0.25,
+    "trans.y": "identity",
+    "trim": "none",
+    "update": 0,
+    "variables": [
+      "Sepal.Length",
+      "Petal.Length"
+    ],
+    "width": 0.8,
+    "y.lab": "",
+    "y.max": null,
+    "y.min": null
+  },
+  "output": {
+    "colors": {
+      "html": "<div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n  <label for=\"col1\">setosa<\/label>\n  <input id=\"col1\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#000000\" data-show-colour=\"both\" data-palette=\"square\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n  <label for=\"col2\">versicolor<\/label>\n  <input id=\"col2\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#000000\" data-show-colour=\"both\" data-palette=\"square\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n  <label for=\"col3\">virginica<\/label>\n  <input id=\"col3\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#000000\" data-show-colour=\"both\" data-palette=\"square\"/>\n<\/div>",
+      "deps": [
+        {
+          "name": "colourpicker-binding",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-binding"
+          },
+          "meta": null,
+          "script": "input_binding_colour.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "colourpicker-lib",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-lib"
+          },
+          "meta": null,
+          "script": "js/colourpicker.min.js",
+          "stylesheet": "css/colourpicker.min.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "fills": {
+      "html": "<div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n  <label for=\"fill1\">setosa<\/label>\n  <input id=\"fill1\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#444444\" data-show-colour=\"both\" data-palette=\"square\" data-allow-alpha=\"true\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n  <label for=\"fill2\">versicolor<\/label>\n  <input id=\"fill2\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#00000000\" data-show-colour=\"both\" data-palette=\"square\" data-allow-alpha=\"true\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n  <label for=\"fill3\">virginica<\/label>\n  <input id=\"fill3\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#444444\" data-show-colour=\"both\" data-palette=\"square\" data-allow-alpha=\"true\"/>\n<\/div>",
+      "deps": [
+        {
+          "name": "colourpicker-binding",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-binding"
+          },
+          "meta": null,
+          "script": "input_binding_colour.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "colourpicker-lib",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-lib"
+          },
+          "meta": null,
+          "script": "js/colourpicker.min.js",
+          "stylesheet": "css/colourpicker.min.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "myPlot": {
+      "src": "[image data sha1: a10ab292351cf7bb978cb8b4cc49876504d8bba5]",
+      "width": 525.982738139861,
+      "height": 400.048323386952,
+      "alt": "This is alternate text"
+    },
+    "shapes": {
+      "html": "<div style=\"margin-bottom:25px;\">\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"shape1\">setosa<\/label>\n    <div>\n      <select id=\"shape1\"><option value=\"19\" selected>19<\/option>\n<option value=\"21\">21<\/option>\n<option value=\"17\">17<\/option>\n<option value=\"24\">24<\/option>\n<option value=\"15\">15<\/option>\n<option value=\"22\">22<\/option><\/select>\n      <script type=\"application/json\" data-for=\"shape1\" data-nonempty=\"\">{}<\/script>\n    <\/div>\n  <\/div>\n<\/div>\n<div style=\"margin-bottom:25px;\">\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"shape2\">versicolor<\/label>\n    <div>\n      <select id=\"shape2\"><option value=\"19\">19<\/option>\n<option value=\"21\" selected>21<\/option>\n<option value=\"17\">17<\/option>\n<option value=\"24\">24<\/option>\n<option value=\"15\">15<\/option>\n<option value=\"22\">22<\/option><\/select>\n      <script type=\"application/json\" data-for=\"shape2\" data-nonempty=\"\">{}<\/script>\n    <\/div>\n  <\/div>\n<\/div>\n<div style=\"margin-bottom:25px;\">\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"shape3\">virginica<\/label>\n    <div>\n      <select id=\"shape3\"><option value=\"19\">19<\/option>\n<option value=\"21\">21<\/option>\n<option value=\"17\" selected>17<\/option>\n<option value=\"24\">24<\/option>\n<option value=\"15\">15<\/option>\n<option value=\"22\">22<\/option><\/select>\n      <script type=\"application/json\" data-for=\"shape3\" data-nonempty=\"\">{}<\/script>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.11.2",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": "<!--[if lt IE 9]>\n<script src=\"shared/selectize/js/es5-shim.min.js\"><\/script>\n<![endif]-->\n<script src=\"shared/selectize/js/selectize.min.js\"><\/script>",
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    }
+  },
+  "export": {
+
+  }
+}

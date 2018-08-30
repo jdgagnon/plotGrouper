@@ -1,0 +1,19 @@
+CHANGES IN VERSION 0.99.24  (pre-release)
+-------------------------
+
+## New features
+* Added unit testing for the shiny app.
+
+
+CHANGES IN VERSION 0.99.15  (pre-release)
+-------------------------
+
+## New features
+* Can now load .csv and .tsv files.
+
+
+CHANGES IN VERSION 0.99.14  (pre-release)
+
+## Minor improvements and bug fixes
+
+* Using `vapply()` instead of `sapply()` for safer code.

@@ -1,0 +1,13 @@
+app <- ShinyDriver$new("../")
+app$snapshotInit("mytest2")
+
+app$uploadFile(file = "iris_test.csv")
+app$setInputs(plotHeight = 70)
+app$setInputs(plotWidth = 80)
+app$setInputs(variables = c("Sepal.Length", "Petal.Length"))
+app$setInputs(font = 12)
+app$setInputs(size = 3)
+app$setInputs(geom = c("bar", "errorbar", "point_noJitter", "stat", "seg"))
+app$snapshot()
+app$setInputs(sampleFile = "click")
+app$snapshot()

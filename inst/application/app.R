@@ -1023,7 +1023,8 @@ server <- function(input, output, session) {
       })
     }
 
-    selection <- rep(choices[seq_len(length(comparisons))], length(comparisons))
+    selection <- rep(choices[seq_len(length(comparisons))], 
+                     length(comparisons))
 
     lapply(1:length(comparisons), function(i) {
       shiny::tags$div(
@@ -1416,7 +1417,8 @@ server <- function(input, output, session) {
           if (plotListLength() > 0) {
             numcol <- floor(sqrt(plotListLength()))
             gridExtra::arrangeGrob(
-              grobs = reactiveValuesToList(plotList)[1:isolate(plotListLength())],
+              grobs = reactiveValuesToList(plotList)
+              [1:isolate(plotListLength())],
               ncol = numcol
             )
           },
