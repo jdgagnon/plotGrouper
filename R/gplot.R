@@ -335,12 +335,6 @@ gplot <- function(dataset = NULL,
 
     if (length(y.lab) > 1) {
       y.lab <- y.lab[1]
-      shiny::showNotification(
-        ui = "Plotting of multiple variables may
-              result in incorrect y-axis label.",
-        type = "message",
-        duration = 2
-      )
     }
   } # If not specified by user, set y axis label to the variable being plotted.
 

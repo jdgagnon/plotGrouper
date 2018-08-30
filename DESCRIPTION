@@ -1,6 +1,6 @@
 Package: plotGrouper
 Title: Shiny app GUI wrapper for ggplot with built-in statistical analysis
-Version: 0.99.23
+Version: 0.99.24
 Authors@R: person("John", "Gagnon", email = "john.gagnon.42@gmail.com", role = c("aut", "cre"))
 Description: A shinyapp-based GUI wrapper for ggplot with built-in statistical 
   analysis. Import data from file and use dropdown menus and checkboxes to 
@@ -13,15 +13,17 @@ Depends: R (>= 3.5)
 Imports: ggplot2, dplyr, tidyr, tibble, stringr, readr, readxl, scales, stats,
   gridExtra, egg, gtable, ggpubr, shiny, shinythemes, colourpicker, 
   magrittr, Hmisc, rlang
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat,
+    shinytest
+VignetteBuilder: knitr
 biocViews: FlowCytometry, GraphAndNetwork, StatisticalMethod, 
   DataImport, GUI, MultipleComparison
+URL: https://github.com/jdgagnon/plotGrouper
 BugReports: https://github.com/jdgagnon/plotGrouper/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.0
-Suggests: 
-    knitr,
-    rmarkdown,
-    testthat
-VignetteBuilder: knitr
