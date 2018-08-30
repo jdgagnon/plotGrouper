@@ -2,7 +2,8 @@
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to read an excel file and combine its sheets into a single dataframe.
+#' A function to read an excel file and combine its sheets into a 
+#' single dataframe.
 #'
 #' This function will read an excel file and combine its sheets into a single
 #' dataframe.
@@ -11,6 +12,7 @@
 #' @import dplyr
 #' @import ggplot2
 #' @rawNamespace import(Hmisc, except = c(summarize, src))
+#' @importFrom rlang .data
 #' @importFrom tibble as.tibble
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size

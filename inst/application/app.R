@@ -4,12 +4,16 @@
 
 # UI ----------------------------------------------------------------------
 
+. <- "Stop NOTE"
+
 ui <- function(request) {
   fluidPage(
     title = "plotGrouper",
     theme = shinythemes::shinytheme("cosmo"),
     navbarPage(
-      (shiny::tags$img(src = "logo_white_small.png", width = "100px", height = "100px")),
+      (shiny::tags$img(src = "logo_white_small.png", 
+                       width = "100px", 
+                       height = "100px")),
       fluid = TRUE,
       position = "fixed-top",
       tabPanel(
@@ -620,12 +624,12 @@ server <- function(input, output, session) {
         )
       }
       if (fileExtension() == "csv") {
-        f <- readr::read_csv(input$file$datapath) %>%
+        f <- readr::read_csv(input$file$datapath, col_names = TRUE) %>%
           dplyr::mutate("Sheet" = input$sheet) %>%
           dplyr::select(Sheet, dplyr::everything())
       }
       if (fileExtension() == "tsv") {
-        f <- readr::read_tsv(input$file$datapath) %>%
+        f <- readr::read_tsv(input$file$datapath, col_names = TRUE) %>%
           dplyr::mutate("Sheet" = input$sheet) %>%
           dplyr::select(Sheet, dplyr::everything())
       }
@@ -1183,25 +1187,40 @@ server <- function(input, output, session) {
     previous_plotListLength <- plotListLength()
     plotListLength(previous_plotListLength + 1)
     current_plotListLength <- previous_plotListLength + 1
-    prev_numcol <- ifelse(previous_plotListLength == 0, 1, floor(sqrt(previous_plotListLength)))
+    prev_numcol <- ifelse(previous_plotListLength == 0, 1, 
+                          floor(sqrt(previous_plotListLength)))
     current_numcol <- floor(sqrt(current_plotListLength))
-    prev_numrow <- ifelse(previous_plotListLength == 0, 1, ceiling(previous_plotListLength / prev_numcol))
+    prev_numrow <- ifelse(previous_plotListLength == 0, 1, 
+                          ceiling(previous_plotListLength / prev_numcol))
     current_numrow <- ceiling(current_plotListLength / current_numcol)
     wlist[[as.character(current_plotListLength)]] <- cpWidth()
     hlist[[as.character(current_plotListLength)]] <- cpHeight()
     widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
     heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
-    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
-    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, 
+                                                       ncol = current_numcol)
+                                                )
+                                            )
+                                       )
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, 
+                                                        ncol = current_numcol)
+                                                 )
+                                             )
+                                        )
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE)) %>%
       dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[as.character(current_plotListLength)]] <- isolate(currentPlot())
-    inputs[[as.character(current_plotListLength)]] <- isolate(reactiveValuesToList(input))
+    inputs[[as.character(current_plotListLength)]] <- 
+      isolate(reactiveValuesToList(input))
     reportPlots <- as.character(1:current_plotListLength)
     cols <- c()
     fills <- c()
@@ -1235,17 +1254,30 @@ server <- function(input, output, session) {
       current_numrow <- ceiling(current_plotListLength / current_numcol)
       wlist[[as.character(previous_plotListLength)]] <- NULL
       hlist[[as.character(previous_plotListLength)]] <- NULL
-      plotList[[as.character(previous_plotListLength)]] <- grid::nullGrob(vp = NULL)
+      plotList[[as.character(previous_plotListLength)]] <- 
+        grid::nullGrob(vp = NULL)
       inputs[[as.character(previous_plotListLength)]] <- NULL
       widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
       heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
-      length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
-      length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+      length(widths) <- suppressWarnings(prod(dim(matrix(widths, 
+                                                         ncol = current_numcol)
+                                                  )
+                                              )
+                                         )
+      length(heights) <- suppressWarnings(prod(dim(matrix(heights, 
+                                                          ncol = current_numcol)
+                                                   )
+                                               )
+                                          )
       widths[is.na(widths)] <- 0
       heights[is.na(heights)] <- 0
-      wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+      wdims <- tibble::as.tibble(matrix(widths, 
+                                        ncol = current_numcol, 
+                                        byrow = TRUE)) %>%
         dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
-      hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+      hdims <- tibble::as.tibble(matrix(heights, 
+                                        ncol = current_numcol, 
+                                        byrow = TRUE))
       reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
       reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
       reportPlots <- as.character(1:current_plotListLength)
@@ -1302,13 +1334,25 @@ server <- function(input, output, session) {
     hlist[[as.character(input$loadPlot)]] <- cpHeight()
     widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
     heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
-    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
-    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, 
+                                                       ncol = current_numcol)
+                                                )
+                                            )
+                                       )
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, 
+                                                        ncol = current_numcol)
+                                                 )
+                                             )
+                                        )
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE)) %>%
       dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
     plotList[[input$loadPlot]] <- isolate(currentPlot())
@@ -1571,12 +1615,12 @@ server <- function(input, output, session) {
         )
       }
       if (fileExtension() == "csv") {
-        rData <- readr::read_csv(input$file$datapath) %>%
+        rData <- readr::read_csv(input$file$datapath, col_names = TRUE) %>%
           dplyr::mutate("Sheet" = input$sheet) %>%
           dplyr::select(Sheet, dplyr::everything())
       }
       if (fileExtension() == "tsv") {
-        rData <- readr::read_tsv(input$file$datapath) %>%
+        rData <- readr::read_tsv(input$file$datapath, col_names = TRUE) %>%
           dplyr::mutate("Sheet" = input$sheet) %>%
           dplyr::select(Sheet, dplyr::everything())
       }
@@ -1658,8 +1702,10 @@ server <- function(input, output, session) {
         shape.groups = shapes,
         sci = inputs[[i]]$scientific
       )
-      pheight <- sum(as.numeric(grid::convertUnit(cPlot$heights, "mm"))) * 3.7795275591
-      pwidth <- sum(as.numeric(grid::convertUnit(cPlot$widths, "mm"))) * 3.7795275591
+      pheight <- sum(as.numeric(grid::convertUnit(cPlot$heights, "mm"))) * 
+        3.7795275591
+      pwidth <- sum(as.numeric(grid::convertUnit(cPlot$widths, "mm"))) * 
+        3.7795275591
       wlist[[i]] <- pwidth
       hlist[[i]] <- pheight
       plotList[[i]] <- cPlot
@@ -1668,13 +1714,25 @@ server <- function(input, output, session) {
     current_numcol <- floor(sqrt(current_plotListLength))
     widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
     heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
-    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
-    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, 
+                                                       ncol = current_numcol)
+                                                )
+                                            )
+                                       )
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, 
+                                                        ncol = current_numcol)
+                                                 )
+                                             )
+                                        )
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE)) %>%
       dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })
@@ -1708,13 +1766,25 @@ server <- function(input, output, session) {
     current_numcol <- floor(sqrt(current_plotListLength))
     widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
     heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
-    length(widths) <- suppressWarnings(prod(dim(matrix(widths, ncol = current_numcol))))
-    length(heights) <- suppressWarnings(prod(dim(matrix(heights, ncol = current_numcol))))
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths, 
+                                                       ncol = current_numcol)
+                                                )
+                                            )
+                                       )
+    length(heights) <- suppressWarnings(prod(dim(matrix(heights, 
+                                                        ncol = current_numcol)
+                                                 )
+                                             )
+                                        )
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- tibble::as.tibble(matrix(widths, ncol = current_numcol, byrow = TRUE)) %>%
+    wdims <- tibble::as.tibble(matrix(widths, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE)) %>%
       dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- tibble::as.tibble(matrix(heights, ncol = current_numcol, byrow = TRUE))
+    hdims <- tibble::as.tibble(matrix(heights, 
+                                      ncol = current_numcol, 
+                                      byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   })
