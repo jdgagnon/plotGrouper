@@ -557,7 +557,7 @@ server <- function(input, output, session) {
   )
 
   observeEvent(input$sampleFile, {
-    print("updating sheet with iris")
+    print("Updating sheet with iris")
     inFile(NULL)
     updateSelectInput(
       session = session,
@@ -803,7 +803,6 @@ server <- function(input, output, session) {
 
   #### Filter tibble ####
   observeEvent({
-    # rawData()
     input$refreshData
     input$columns
     input$variables
@@ -823,6 +822,7 @@ server <- function(input, output, session) {
       length(input$comps) > 1,
       input$id
     )
+    
     print("organizing dataframe")
 
     d <- plotGrouper::organizeData(
@@ -929,7 +929,9 @@ server <- function(input, output, session) {
   #### Create current plot ####
   currentPlot <- reactive({
     print("currentPlot triggered")
-    req(!is.null(dataFrame()))
+    req(!is.null(dataFrame()),
+        all(dataFrame()$variable %in% colnames(rawData())))
+    
     lapply(seq_len(length(unique(dataFrame()[[input$comp]]))), function(i) {
       req(
         input[[paste0("shape", i)]],
