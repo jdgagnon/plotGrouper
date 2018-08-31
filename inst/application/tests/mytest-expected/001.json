@@ -22,7 +22,20 @@
     "dilutionColumn": "",
     "dodge": 0.8,
     "errortype": "SD",
-    "file": null,
+    "file": {
+      "name": [
+        "iris_test.csv"
+      ],
+      "size": [
+        6454
+      ],
+      "type": [
+        "text/csv"
+      ],
+      "datapath": [
+        "0.csv"
+      ]
+    },
     "filename": "Plot1",
     "fill1": "#444444",
     "fill2": "#BB3F98",
@@ -39,25 +52,26 @@
     "id": "Sample",
     "legend": "right",
     "load": 0,
-    "loadPlot": "",
+    "loadPlot": "2",
     "lock.cols": false,
     "lock.fills": false,
     "lock.shapes": false,
     "method": "t.test",
+    "navbar": "<h2 style=\"margin-top: 30px; margin-bottom: 30px\">Plot<\/h2>",
     "paired": false,
-    "plotHeight": 80,
-    "plotWidth": 100,
-    "plt2rprt": 0,
+    "plotHeight": 72.5,
+    "plotWidth": 80,
+    "plt2rprt": 2,
     "refGroup": false,
     "refresh": 0,
     "refreshData": 0,
     "report": "Report1",
-    "sampleFile": 1,
+    "sampleFile": 0,
     "scientific": false,
-    "shape1": "19",
-    "shape2": "21",
-    "shape3": "17",
-    "sheet": "iris",
+    "shape1": "21",
+    "shape2": "24",
+    "shape3": "22",
+    "sheet": "iris_test.csv",
     "size": 3,
     "split": true,
     "split.on": "",
@@ -66,8 +80,8 @@
     "trim": "none",
     "update": 0,
     "variables": [
-      "Sepal.Length",
-      "Petal.Length"
+      "Sepal.Width",
+      "Petal.Width"
     ],
     "width": 0.8,
     "y.lab": "",
@@ -142,9 +156,9 @@
       ]
     },
     "myPlot": {
-      "src": "[image data sha1: a10ab292351cf7bb978cb8b4cc49876504d8bba5]",
-      "width": 525.982738139861,
-      "height": 400.048323386952,
+      "src": "[image data sha1: 926222aad39c306c722cbcb89bc4783ce1dd6cc5]",
+      "width": 450.392186957861,
+      "height": 371.001954182757,
       "alt": "This is alternate text"
     },
     "shapes": {

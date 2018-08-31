@@ -22,40 +22,56 @@
     "dilutionColumn": "",
     "dodge": 0.8,
     "errortype": "SD",
-    "file": null,
+    "file": {
+      "name": [
+        "iris_test.csv"
+      ],
+      "size": [
+        6454
+      ],
+      "type": [
+        "text/csv"
+      ],
+      "datapath": [
+        "0.csv"
+      ]
+    },
     "filename": "Plot1",
     "fill1": "#444444",
     "fill2": "#BB3F98",
     "fill3": "#2E4DA1",
     "font": 12,
     "geom": [
-      "violin",
+      "bar",
+      "errorbar",
+      "point_noJitter",
       "stat",
       "seg"
     ],
     "group": "variable",
     "id": "Sample",
     "legend": "right",
-    "load": 0,
-    "loadPlot": "",
+    "load": 1,
+    "loadPlot": "1",
     "lock.cols": false,
     "lock.fills": false,
     "lock.shapes": false,
     "method": "t.test",
+    "navbar": "<h2 style=\"margin-top: 30px; margin-bottom: 30px\">Plot<\/h2>",
     "paired": false,
-    "plotHeight": 80,
-    "plotWidth": 100,
-    "plt2rprt": 0,
+    "plotHeight": 72.5,
+    "plotWidth": 80,
+    "plt2rprt": 2,
     "refGroup": false,
     "refresh": 0,
     "refreshData": 0,
     "report": "Report1",
-    "sampleFile": 1,
+    "sampleFile": 0,
     "scientific": false,
-    "shape1": "19",
-    "shape2": "21",
-    "shape3": "17",
-    "sheet": "iris",
+    "shape1": "21",
+    "shape2": "24",
+    "shape3": "22",
+    "sheet": "iris_test.csv",
     "size": 3,
     "split": true,
     "split.on": "",
@@ -140,9 +156,9 @@
       ]
     },
     "myPlot": {
-      "src": "[image data sha1: b3a4d8e0df797fa87a3f99dde8112b104c72bc7b]",
-      "width": 525.982738139861,
-      "height": 400.048323386952,
+      "src": "[image data sha1: 907b054e52e0e226a4d753711cb05aa83022543d]",
+      "width": 450.392186957861,
+      "height": 371.001954182757,
       "alt": "This is alternate text"
     },
     "shapes": {
