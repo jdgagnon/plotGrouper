@@ -1,5 +1,6 @@
 library(testthat)
 library(shinytest)
+library(plotGrouper)
 
 test_that("Application works", {
   # Use compareImages=FALSE because the expected image screenshots were created
