@@ -6,3 +6,4 @@
 ^README\.md$
 ^_config\.yml$
 ^plotGrouper\.Rproj$
+^run_tests\.R$
