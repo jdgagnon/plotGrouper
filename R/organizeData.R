@@ -80,6 +80,7 @@ organizeData <- function(
     "value",
     -c(exclude)
   ) %>%
+    mutate("value" = as.numeric(.data$value)) %>%
     dplyr::filter(get(comp) %in% comps)
 
   if (!beadColumn %in% c("", "none") &

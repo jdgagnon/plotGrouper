@@ -4,7 +4,7 @@
     "angle.x": false,
     "beadColumn": "",
     "clear": 0,
-    "clearAll": 0,
+    "clearAll": 1,
     "col1": "#000000",
     "col2": "#000000",
     "col3": "#000000",
@@ -24,22 +24,22 @@
     "errortype": "SD",
     "file": {
       "name": [
-        "iris_test.csv"
+        "iris_test.xlsx"
       ],
       "size": [
-        6302
+        14977
       ],
       "type": [
-        "text/csv"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       ],
       "datapath": [
-        "0.csv"
+        "0.xlsx"
       ]
     },
     "filename": "Plot1",
     "fill1": "#444444",
-    "fill2": "#00000000",
-    "fill3": "#444444",
+    "fill2": "#BB3F98",
+    "fill3": "#2E4DA1",
     "font": 12,
     "geom": [
       "bar",
@@ -51,33 +51,37 @@
     "group": "variable",
     "id": "Sample",
     "legend": "right",
-    "load": 0,
+    "load": 1,
     "loadPlot": "",
     "lock.cols": false,
     "lock.fills": false,
     "lock.shapes": false,
     "method": "t.test",
+    "navbar": "<h2 style=\"margin-top: 30px; margin-bottom: 30px\">Report<\/h2>",
     "paired": false,
-    "plotHeight": 70,
+    "plotHeight": 72.5,
     "plotWidth": 80,
-    "plt2rprt": 0,
+    "plt2rprt": 2,
     "refGroup": false,
-    "refresh": 0,
+    "refresh": 1,
     "refreshData": 0,
     "report": "Report1",
     "sampleFile": 0,
     "scientific": false,
-    "shape1": "19",
-    "shape2": "21",
-    "shape3": "17",
-    "sheet": "iris_test.csv",
+    "shape1": "21",
+    "shape2": "24",
+    "shape3": "22",
+    "sheet": [
+      "iris_1",
+      "iris_2"
+    ],
     "size": 3,
     "split": true,
     "split.on": "",
     "stroke": 0.25,
     "trans.y": "identity",
     "trim": "none",
-    "update": 0,
+    "update": 1,
     "variables": [
       "Sepal.Length",
       "Petal.Length"
@@ -155,10 +159,15 @@
       ]
     },
     "myPlot": {
-      "src": "[image data sha1: 74af2c451a4aaf09231e7f9be71b92f4d93b7ebb]",
+      "src": "[image data sha1: 907b054e52e0e226a4d753711cb05aa83022543d]",
       "width": 450.392186957861,
-      "height": 361.553135285007,
+      "height": 371.001954182757,
       "alt": "This is alternate text"
+    },
+    "myReport": {
+      "width": 10,
+      "height": 10,
+      "alt": "Nothing added to report yet."
     },
     "shapes": {
       "html": "<div style=\"margin-bottom:25px;\">\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"shape1\">setosa<\/label>\n    <div>\n      <select id=\"shape1\"><option value=\"19\" selected>19<\/option>\n<option value=\"21\">21<\/option>\n<option value=\"17\">17<\/option>\n<option value=\"24\">24<\/option>\n<option value=\"15\">15<\/option>\n<option value=\"22\">22<\/option><\/select>\n      <script type=\"application/json\" data-for=\"shape1\" data-nonempty=\"\">{}<\/script>\n    <\/div>\n  <\/div>\n<\/div>\n<div style=\"margin-bottom:25px;\">\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"shape2\">versicolor<\/label>\n    <div>\n      <select id=\"shape2\"><option value=\"19\">19<\/option>\n<option value=\"21\" selected>21<\/option>\n<option value=\"17\">17<\/option>\n<option value=\"24\">24<\/option>\n<option value=\"15\">15<\/option>\n<option value=\"22\">22<\/option><\/select>\n      <script type=\"application/json\" data-for=\"shape2\" data-nonempty=\"\">{}<\/script>\n    <\/div>\n  <\/div>\n<\/div>\n<div style=\"margin-bottom:25px;\">\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"shape3\">virginica<\/label>\n    <div>\n      <select id=\"shape3\"><option value=\"19\">19<\/option>\n<option value=\"21\">21<\/option>\n<option value=\"17\" selected>17<\/option>\n<option value=\"24\">24<\/option>\n<option value=\"15\">15<\/option>\n<option value=\"22\">22<\/option><\/select>\n      <script type=\"application/json\" data-for=\"shape3\" data-nonempty=\"\">{}<\/script>\n    <\/div>\n  <\/div>\n<\/div>",
