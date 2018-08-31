@@ -16,8 +16,7 @@ Imports: ggplot2, dplyr, tidyr, tibble, stringr, readr, readxl, scales, stats,
 Suggests: 
     knitr,
     rmarkdown,
-    testthat,
-    shinytest
+    testthat
 VignetteBuilder: knitr
 biocViews: FlowCytometry, GraphAndNetwork, StatisticalMethod, 
   DataImport, GUI, MultipleComparison
