@@ -33,7 +33,7 @@
 #' @param dataset Define your data set which should be a gathered tibble
 #' @param comparison Specify the comparison you would like to make 
 #' (e.g., Genotype)
-#' @param group.by Specify the variable to group by (e.g., Tissue)
+#' @param group.by Specify the variable to group by (e.g., Tissue).
 #' @param levs Specify the order of the grouping variables
 #' @param val Specify column name that contains values (optional)
 #' @param geom Define the list of geoms you want to plot

@@ -25,8 +25,8 @@
 #' @importFrom tidyr gather
 #' @importFrom stats na.omit start
 #' @importFrom colourpicker colourInput updateColourInput
-#' @param sheet Takes a vector of sheets to be read
 #' @param file Takes an excel file to be read from
+#' @param sheet Takes a vector of sheets to be read
 #' @keywords readData
 #' @return Tibble assembled from the sheets selected from the file
 #' @examples
