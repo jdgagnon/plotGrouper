@@ -2,6 +2,7 @@ context("test-gplot")
 library(plotGrouper)
 
 test_that("gplot works", {
+  skip_on_bioc()
   gt <- iris %>% 
     dplyr::mutate(Species = as.character(Species)) %>%
     dplyr::group_by(Species) %>%
