@@ -1,6 +1,6 @@
 Package: plotGrouper
 Title: Shiny app GUI wrapper for ggplot with built-in statistical analysis
-Version: 0.99.27
+Version: 0.99.28
 Authors@R: person("John", "Gagnon", 
   email = "john.gagnon.42@gmail.com", 
   role = c("aut", "cre"))
@@ -21,7 +21,7 @@ Imports:
     readr (>= 1.1.1), 
     readxl (>= 1.1.0), 
     scales (>= 1.0.0), 
-    stats (>= 3.5.1),
+    stats,
     grid (>= 3.5.1),
     gridExtra (>= 2.3), 
     egg (>= 0.4.0), 
