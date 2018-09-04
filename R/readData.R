@@ -1,8 +1,7 @@
-
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to read an excel file and combine its sheets into a 
+#' A function to read an excel file and combine its sheets into a
 #' single dataframe.
 #'
 #' This function will read an excel file and combine its sheets into a single
@@ -33,28 +32,29 @@
 #' datasets <- readData_example("iris.xlsx")
 #' readData(datasets, "iris")
 #' @export
-readData <- function(
-    file = NULL,
-    sheet = NULL) {
+readData <- function(file = NULL,
+                     sheet = NULL) {
   for (i in seq_len(length(sheet))) {
     a <- readxl::read_excel(file,
-      sheet = sheet[i],
-      col_names = TRUE
-    ) %>%
+                            sheet = sheet[i],
+                            col_names = TRUE) %>%
       dplyr::mutate("Sheet" = sheet[i]) %>%
       dplyr::select(.data$Sheet, dplyr::everything())
-
+    
     column_names <- names(a)
-    column_names <- stringr::str_replace_all(column_names, c(
-      ",Freq. of Parent" = " %",
-      ",Count" = " #",
-      "\u2014" = "-",
-      ",," = "",
-      ",Median,<.*>," = " MFI "
-    ))
-
+    column_names <- stringr::str_replace_all(
+      column_names,
+      c(
+        ",Freq. of Parent" = " %",
+        ",Count" = " #",
+        "\u2014" = "-",
+        ",," = "",
+        ",Median,<.*>," = " MFI "
+      )
+    )
+    
     colnames(a) <- column_names
-
+    
     if (i == 1) {
       f <- a
     } else {

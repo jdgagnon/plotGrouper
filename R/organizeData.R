@@ -1,8 +1,7 @@
-
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
-#' A function to organize a tibble into tidy format 
+#' A function to organize a tibble into tidy format
 #' and perform count transformations
 #'
 #' This function will organize a tibble into tidy format and perform count
@@ -14,7 +13,8 @@
 #' @rawNamespace import(Hmisc, except = c(summarize, src))
 #' @importFrom rlang .data
 #' @importFrom tibble as.tibble
-#' @importFrom  gridExtra grid.arrange arrangeGrob
+#' @importFrom grid convertUnit nullGrob
+#' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom ggpubr compare_means get_legend
@@ -32,7 +32,7 @@
 #' @param variables A vector of the variables to be plotted
 #' @param id The name of unique identifier column
 #' @param beadColumn The column name that has total number of beads/sample
-#' @param dilutionColumn The column name that has dilution factor for 
+#' @param dilutionColumn The column name that has dilution factor for
 #' each sample 1/x
 #' @keywords organizeData
 #' @return Tibble in tidy format based on columns chosen to be excluded.
@@ -40,7 +40,7 @@
 #' @examples
 #' iris %>% dplyr::mutate(Species = as.character(Species)) %>%
 #' dplyr::group_by(Species) %>%
-#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()), 
+#' dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),
 #' Sheet = "iris") %>%
 #' dplyr::select(Sample, Sheet, Species, dplyr::everything()) %>%
 #' plotGrouper::organizeData(data = .,
@@ -52,45 +52,48 @@
 #' beadColumn = "none",
 #' dilutionColumn = "none")
 #' @export
-organizeData <- function(
-    data = NULL,
-    exclude = NULL,
-    comp = NULL,
-    comps = NULL,
-    variables = NULL,
-    id = NULL,
-    beadColumn = NULL,
-    dilutionColumn = NULL) {
-  
+organizeData <- function(data = NULL,
+                         exclude = NULL,
+                         comp = NULL,
+                         comps = NULL,
+                         variables = NULL,
+                         id = NULL,
+                         beadColumn = NULL,
+                         dilutionColumn = NULL) {
   if (!beadColumn %in% c("", "none") &
-    !dilutionColumn %in% c("", "none") &
-    any(stringr::str_detect(variables, "#"))) {
+      !dilutionColumn %in% c("", "none") &
+      any(stringr::str_detect(variables, "#"))) {
     shiny::showNotification(
-      ui = paste0("Count data is being transformed
-                  by the equation:
-                  (value/Bead)*", beadColumn, "*", dilutionColumn),
+      ui = paste0(
+        "Count data is being transformed
+        by the equation:
+        (value/Bead)*",
+        beadColumn,
+        "*",
+        dilutionColumn
+      ),
       type = "message",
       duration = 5
     )
   }
-
-  d <- tidyr::gather(
-    data,
-    "variable",
-    "value",
-    -c(exclude)
-  ) %>%
+  
+  d <- tidyr::gather(data,
+                     "variable",
+                     "value", -c(exclude)) %>%
     mutate("value" = as.numeric(.data$value)) %>%
     dplyr::filter(get(comp) %in% comps)
-
+  
   if (!beadColumn %in% c("", "none") &
       !dilutionColumn %in% c("", "none")) {
     d <- d %>%
       dplyr::group_by_(id) %>%
-      dplyr::mutate("value" = ifelse(stringr::str_detect(.data$variable, "#"),
-        (.data$value / .data$value[.data$variable == "Bead #"] *
-          get(beadColumn) *
-          get(dilutionColumn)),
+      dplyr::mutate("value" = ifelse(
+        stringr::str_detect(.data$variable, "#"),
+        (
+          .data$value / .data$value[.data$variable == "Bead #"] *
+            get(beadColumn) *
+            get(dilutionColumn)
+        ),
         .data$value
       )) %>%
       dplyr::ungroup() %>%

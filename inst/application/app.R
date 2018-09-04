@@ -1,4 +1,3 @@
-
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
@@ -10,10 +9,15 @@ ui <- function(request) {
   fluidPage(
     title = "plotGrouper",
     theme = shinythemes::shinytheme("cosmo"),
-    navbarPage(id = "navbar",
-      (shiny::tags$img(src = "logo_white_small.png", 
-                       width = "100px", 
-                       height = "100px")),
+    navbarPage(
+      id = "navbar",
+      (
+        shiny::tags$img(
+          src = "logo_white_small.png",
+          width = "100px",
+          height = "100px"
+        )
+      ),
       fluid = TRUE,
       position = "fixed-top",
       tabPanel(
@@ -27,64 +31,66 @@ ui <- function(request) {
             hr(),
             #### File input ####
             fileInput("file",
-              "Data file",
-              accept = c(
-                ".csv",
-                ".tsv",
-                ".xlsx",
-                ".xls"
-              )
-            ),
-
+                      "Data file",
+                      accept = c(".csv",
+                                 ".tsv",
+                                 ".xlsx",
+                                 ".xls")),
+            
             #### Sheet selection ####
             h4("Build plot"),
-            fluidRow(
-              column(8, selectInput("sheet",
+            fluidRow(column(
+              8,
+              selectInput(
+                "sheet",
                 "Sheet(s)",
                 multiple = TRUE,
                 choices = NULL
-              ))
-            ),
-
-            selectInput("columns",
+              )
+            )),
+            
+            selectInput(
+              "columns",
               "Organizational variables",
               multiple = TRUE,
               choices = NULL
             ),
-
-            selectInput("variables",
+            
+            selectInput(
+              "variables",
               "Variables to plot",
               multiple = TRUE,
               choices = NULL
             ),
-
+            
             #### Select comparison and grouping columns ####
-            fluidRow(
-              column(6, selectInput("comp",
-                "Comparisons",
-                choices = NULL
-              )),
-              column(6, selectInput("group",
-                "Independent variable",
-                choices = NULL
-              ))
+            fluidRow(column(
+              6, selectInput("comp",
+                             "Comparisons",
+                             choices = NULL)
             ),
+            column(
+              6,
+              selectInput("group",
+                          "Independent variable",
+                          choices = NULL)
+            )),
             hr(),
             #### Save plot ####
             fluidRow(
-              column(8, textInput(
-                "filename",
-                "Filename",
-                "Plot1"
-              )),
-              column(4,
+              column(8, textInput("filename",
+                                  "Filename",
+                                  "Plot1")),
+              column(
+                4,
                 style = "margin-top: 30px;",
-                downloadButton("downloadPlot",
+                downloadButton(
+                  "downloadPlot",
                   "Save",
                   class = "btn btn-primary btn-sm",
                   style = "color: #fff;
-                                   background-color: #337ab7;
-                                   border-color: #2e6da4"
+                  background-color: #337ab7;
+                  border-color: #2e6da4"
                 )
               )
             ),
@@ -92,428 +98,441 @@ ui <- function(request) {
             #### Modify Y label ####
             fluidRow(
               column(8, textInput("y.lab",
-                "Replace y axis label",
-                value = NULL
-              )),
-              column(1.5,
+                                  "Replace y axis label",
+                                  value = NULL)),
+              column(
+                1.5,
                 style = "margin-top: 25px;",
                 checkboxInput("scientific",
-                  "10^x",
-                  value = FALSE
-                )
+                              "10^x",
+                              value = FALSE)
               )
             ),
             hr(),
             #### Modify group lables ####
             fluidRow(
-              column(
-                6,
-                textInput("split.on",
-                  "Split on text",
-                  value = NULL
-                )
-              ),
+              column(6,
+                     textInput("split.on",
+                               "Split on text",
+                               value = NULL)),
               column(3,
-                style = "margin-top: 25px;",
-                checkboxInput(
-                  "split",
-                  "Split",
-                  value = TRUE
-                )
-              ),
+                     style = "margin-top: 25px;",
+                     checkboxInput("split",
+                                   "Split",
+                                   value = TRUE)),
               column(3,
-                style = "margin-top: 25px;",
-                checkboxInput(
-                  "angle.x",
-                  "Angle",
-                  value = FALSE
-                )
-              )
+                     style = "margin-top: 25px;",
+                     checkboxInput("angle.x",
+                                   "Angle",
+                                   value = FALSE))
             ),
             textInput("trim",
-              "Trim text from right side of group labels",
-              value = "none"
-            ),
+                      "Trim text from right side of group labels",
+                      value = "none"),
             hr(),
             #### Transform Y axis ####
             fluidRow(
               column(
                 4,
-                selectInput("trans.y",
+                selectInput(
+                  "trans.y",
                   "Transform y",
                   choices = c("identity", "log2", "log10"),
                   selected = "identity"
                 )
               ),
-              column(
-                4,
-                numericInput("y.min",
-                  "Y min",
-                  value = NULL
-                )
-              ),
-              column(
-                4,
-                numericInput("y.max",
-                  "Y max",
-                  value = NULL
-                )
-              )
+              column(4,
+                     numericInput("y.min",
+                                  "Y min",
+                                  value = NULL)),
+              column(4,
+                     numericInput("y.max",
+                                  "Y max",
+                                  value = NULL))
             ),
             hr(),
             #### Select error type to plot ####
-            selectInput("errortype",
+            selectInput(
+              "errortype",
               "Errorbar format",
               choices = c("SE", "SD"),
               selected = "SD"
             ),
             #### Select statistical method ####
             fluidRow(
-              column(4, selectInput("method",
+              column(4, selectInput(
+                "method",
                 "Stat test",
-                choices = c(
-                  "t.test",
-                  "wilcox.test",
-                  "anova",
-                  "kruskal.test"
-                )
+                choices = c("t.test",
+                            "wilcox.test",
+                            "anova",
+                            "kruskal.test")
               )),
-              column(4,
+              column(
+                4,
                 style = "margin-top: 25px;",
                 checkboxInput("refGroup",
-                  "Reference group",
-                  value = FALSE
-                )
+                              "Reference group",
+                              value = FALSE)
               ),
               column(4,
-                style = "margin-top: 25px;",
-                checkboxInput("paired",
-                  "Paired",
-                  value = FALSE
-                )
-              )
+                     style = "margin-top: 25px;",
+                     checkboxInput("paired",
+                                   "Paired",
+                                   value = FALSE))
             ),
             hr(),
             #### Format width and dodge ####
-            fluidRow(
-              column(6, sliderInput("width",
+            fluidRow(column(
+              6,
+              sliderInput(
+                "width",
                 "Group width",
                 min = 0,
                 max = 1,
                 step = 0.05,
                 value = 0.80
-              )),
-              column(6, sliderInput("dodge",
+              )
+            ),
+            column(
+              6,
+              sliderInput(
+                "dodge",
                 "Comparison Dodge",
                 min = 0,
                 max = 2,
                 step = 0.05,
                 value = 0.80
-              ))
-            ),
+              )
+            )),
             hr(),
             #### Options for transforming counts ####
             h4("Transform count data"),
             fluidRow(
-              column(
-                4,
-                selectInput("id",
-                  "Unique ID",
-                  choices = NULL
-                )
-              ),
-              column(
-                4,
-                selectInput("beadColumn",
-                  "# Beads/Sample",
-                  choices = NULL
-                )
-              ),
+              column(4,
+                     selectInput("id",
+                                 "Unique ID",
+                                 choices = NULL)),
+              column(4,
+                     selectInput(
+                       "beadColumn",
+                       "# Beads/Sample",
+                       choices = NULL
+                     )),
               column(
                 4,
                 selectInput("dilutionColumn",
-                  "Dilution (1/x)",
-                  choices = NULL
-                )
+                            "Dilution (1/x)",
+                            choices = NULL)
               )
             )
           ),
-
+          
           mainPanel(
             #### Plot type & legend options ####
             fluidRow(
-              column(3, sliderInput("plotHeight",
-                "Plot height (mm)",
-                step = 2.5,
-                min = 10,
-                max = 150,
-                value = 30
-              )),
-              column(3, sliderInput("plotWidth",
-                "Plot width (mm)",
-                step = 2.5,
-                min = 10,
-                max = 150,
-                value = 20
-              )),
-              column(4, selectInput("geom",
-                "Geoms to plot",
-                choices = c(
-                  "bar",
-                  "crossbar",
-                  "errorbar",
-                  "point",
-                  "point_noJitter",
-                  # "paired_lines",
-                  "dot",
-                  "stat",
-                  "seg",
-                  "box",
-                  "violin",
-                  "line",
-                  "line_point",
-                  "line_error",
-                  "line_point_stat",
-                  "density"
-                ),
-                selected = c(
-                  "bar",
-                  "errorbar",
-                  "point",
-                  "stat",
-                  "seg"
-                ),
-                multiple = TRUE
-              )),
-              column(2, selectInput("legend",
-                "Legend position",
-                choices = c(
-                  "top",
-                  "right",
-                  "bottom",
-                  "left",
-                  "none"
-                ),
-                selected = "right"
-              ))
-            ),
-
-            fluidRow(
-              column(2,
-                style = "margin-top: 30px;",
-                actionButton("refreshData",
-                  label = "Refresh current plot",
-                  class = "btn btn-primary btn-sm",
-                  style = "color: #fff;
-                                  background-color: #337ab7;
-                                  border-color: #2e6da4"
+              column(
+                3,
+                sliderInput(
+                  "plotHeight",
+                  "Plot height (mm)",
+                  step = 2.5,
+                  min = 10,
+                  max = 150,
+                  value = 30
                 )
               ),
-
-              column(2,
-                style = "margin-top: 30px;",
-                actionButton("plt2rprt",
-                  label = "Add plot to report",
-                  class = "btn btn-primary btn-sm",
-                  style = "color: #fff;
-                          background-color: #337ab7;
-                          border-color: #2e6da4"
+              column(
+                3,
+                sliderInput(
+                  "plotWidth",
+                  "Plot width (mm)",
+                  step = 2.5,
+                  min = 10,
+                  max = 150,
+                  value = 20
+                )
+              ),
+              column(
+                4,
+                selectInput(
+                  "geom",
+                  "Geoms to plot",
+                  choices = c(
+                    "bar",
+                    "crossbar",
+                    "errorbar",
+                    "point",
+                    "point_noJitter",
+                    # "paired_lines",
+                    "dot",
+                    "stat",
+                    "seg",
+                    "box",
+                    "violin",
+                    "line",
+                    "line_point",
+                    "line_error",
+                    "line_point_stat",
+                    "density"
+                  ),
+                  selected = c("bar",
+                               "errorbar",
+                               "point",
+                               "stat",
+                               "seg"),
+                  multiple = TRUE
                 )
               ),
               column(
                 2,
-                selectInput("loadPlot",
-                  "Report plot #",
-                  choices = NULL
+                selectInput(
+                  "legend",
+                  "Legend position",
+                  choices = c("top",
+                              "right",
+                              "bottom",
+                              "left",
+                              "none"),
+                  selected = "right"
+                )
+              )
+            ),
+            
+            fluidRow(
+              column(
+                2,
+                style = "margin-top: 30px;",
+                actionButton(
+                  "refreshData",
+                  label = "Refresh current plot",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff;
+                  background-color: #337ab7;
+                  border-color: #2e6da4"
+                )
+              ),
+              
+              column(
+                2,
+                style = "margin-top: 30px;",
+                actionButton(
+                  "plt2rprt",
+                  label = "Add plot to report",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff;
+                  background-color: #337ab7;
+                  border-color: #2e6da4"
                 )
               ),
               column(2,
+                     selectInput("loadPlot",
+                                 "Report plot #",
+                                 choices = NULL)),
+              column(
+                2,
                 style = "margin-top: 30px;",
-                actionButton("load",
+                actionButton(
+                  "load",
                   label = "Load plot from report",
                   class = "btn btn-primary btn-sm",
                   style = "color: #fff;
-                                  background-color: #337ab7;
-                                  border-color: #2e6da4"
+                  background-color: #337ab7;
+                  border-color: #2e6da4"
                 )
               ),
-              column(2,
+              column(
+                2,
                 style = "margin-top: 30px;",
-                actionButton("update",
+                actionButton(
+                  "update",
                   label = "Update plot in report",
                   class = "btn btn-primary btn-sm",
                   style = "color: #fff;
-                                  background-color: #337ab7;
-                                  border-color: #2e6da4"
+                  background-color: #337ab7;
+                  border-color: #2e6da4"
                 )
               )
             ),
-
+            
             #### Font, point, stroke ####
             fluidRow(
-              column(3, sliderInput("font",
-                "Font size",
-                min = 8,
-                max = 25,
-                value = 8,
-                step = 0.5
-              )),
-              column(3, sliderInput("size",
-                "Point size",
-                min = 0.5,
-                max = 10,
-                value = 1,
-                step = 0.5
-              )),
-              column(3, sliderInput("stroke",
-                "Stroke size",
-                min = 0.25,
-                max = 1,
-                value = 0.25,
-                step = 0.25
-              )),
-
-              column(3, selectInput("comps",
-                "Order of comparisons",
-                multiple = TRUE,
-                choices = NULL
-              ))
-            ),
-
-            hr(),
-
-            #### Plot ####
-            fluidRow(
-              column(12,
-                align = "center",
-                imageOutput("myPlot",
-                  height = "100%",
-                  width = "100%"
+              column(
+                3,
+                sliderInput(
+                  "font",
+                  "Font size",
+                  min = 8,
+                  max = 25,
+                  value = 8,
+                  step = 0.5
+                )
+              ),
+              column(
+                3,
+                sliderInput(
+                  "size",
+                  "Point size",
+                  min = 0.5,
+                  max = 10,
+                  value = 1,
+                  step = 0.5
+                )
+              ),
+              column(
+                3,
+                sliderInput(
+                  "stroke",
+                  "Stroke size",
+                  min = 0.25,
+                  max = 1,
+                  value = 0.25,
+                  step = 0.25
+                )
+              ),
+              
+              column(
+                3,
+                selectInput(
+                  "comps",
+                  "Order of comparisons",
+                  multiple = TRUE,
+                  choices = NULL
                 )
               )
             ),
-
+            
             hr(),
-
+            
+            #### Plot ####
+            fluidRow(column(
+              12,
+              align = "center",
+              imageOutput("myPlot",
+                          height = "100%",
+                          width = "100%")
+            )),
+            
+            hr(),
+            
             #### Shape, color, fill UI ####
             fluidRow(
               column(4, h4("Shapes"), uiOutput("shapes")),
               column(4, h4("Color"), uiOutput("colors")),
               column(4, h4("Fill"), uiOutput("fills"))
             ),
-
+            
             fluidRow(
               column(4, checkboxInput("lock.shapes", "Lock", FALSE)),
               column(4, checkboxInput("lock.cols", "Lock", FALSE)),
               column(4, checkboxInput("lock.fills", "Lock", FALSE))
             ),
-
+            
             hr()
           )
         )
       ),
-
+      
       tabPanel(
         h2("Report", style = "margin-top: 30px; margin-bottom: 30px"),
-        fluidPage(
-          mainPanel(
-
-            #### Clear report objects ####
-            fluidRow(
-              column(
-                4,
-                actionButton("clear",
-                  "Clear last",
-                  class = "btn btn-primary btn-md",
-                  style = "color: #fff;
-                                               background-color: #337ab7;
-                                               border-color: #2e6da4"
-                )
-              ),
-              column(4, actionButton("clearAll",
+        fluidPage(mainPanel(
+          #### Clear report objects ####
+          fluidRow(
+            column(
+              4,
+              actionButton(
+                "clear",
+                "Clear last",
+                class = "btn btn-primary btn-md",
+                style = "color: #fff;
+                background-color: #337ab7;
+                border-color: #2e6da4"
+              )
+            ),
+            column(
+              4,
+              actionButton(
+                "clearAll",
                 "Clear all",
                 class = "btn btn-primary btn-md",
                 style = "color: #fff;
-                                        background-color: #337ab7;
-                                        border-color: #2e6da4"
-              )),
-              column(4, actionButton("refresh",
+                background-color: #337ab7;
+                border-color: #2e6da4"
+              )
+            ),
+            column(
+              4,
+              actionButton(
+                "refresh",
                 "Refresh plots",
                 class = "btn btn-primary btn-md",
                 style = "color: #fff;
-                                        background-color: #337ab7;
-                                        border-color: #2e6da4"
-              ))
-            ),
-
-            #### Save report ####
-            fluidRow(
-              column(5, textInput(
-                "report",
-                "Filename",
-                "Report1"
-              )),
-              column(5,
-                style = "margin-top: 25px;",
-                downloadButton("downloadReport",
-                  "Save",
-                  class = "btn btn-primary btn-md",
-                  style = "color: #fff;
-                                                 background-color: #337ab7;
-                                                 border-color: #2e6da4"
-                )
-              )
-            ),
-
-            #### Display report ####
-            fluidRow(
-              column(12,
-                align = "center",
-                imageOutput("myReport",
-                  height = "100%",
-                  width = "100%"
-                )
+                background-color: #337ab7;
+                border-color: #2e6da4"
               )
             )
-          )
-        )
+          ),
+          
+          #### Save report ####
+          fluidRow(
+            column(5, textInput("report",
+                                "Filename",
+                                "Report1")),
+            column(
+              5,
+              style = "margin-top: 25px;",
+              downloadButton(
+                "downloadReport",
+                "Save",
+                class = "btn btn-primary btn-md",
+                style = "color: #fff;
+                background-color: #337ab7;
+                border-color: #2e6da4"
+              )
+            )
+          ),
+          
+          #### Display report ####
+          fluidRow(column(
+            12,
+            align = "center",
+            imageOutput("myReport",
+                        height = "100%",
+                        width = "100%")
+          ))
+        ))
       ),
-
+      
       #### Statistics ####
       tabPanel(
         h2("Statistics", style = "margin-top: 30px; margin-bottom: 30px;"),
-        fluidPage(
-          mainPanel(
-            dataTableOutput("stat_display"),
-
-            downloadButton("save.stat",
-              "Download",
-              style = "color: #fff;
-                      background-color: #337ab7;
-                      border-color: #2e6da4;"
-            )
+        fluidPage(mainPanel(
+          dataTableOutput("stat_display"),
+          
+          downloadButton(
+            "save.stat",
+            "Download",
+            style = "color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;"
           )
-        )
+        ))
       ),
-
+      
       #### Table of plotting data ####
       tabPanel(
         h2("Plot Data", style = "margin-top: 30px; margin-bottom: 30px"),
-        fluidPage(
-          mainPanel(
-            dataTableOutput("data_table_display")
-          )
-        )
+        fluidPage(mainPanel(
+          dataTableOutput("data_table_display")
+        ))
       ),
-
+      
       #### Raw import data ####
       tabPanel(
         h2("Raw Data", style = "margin-top: 30px; margin-bottom: 30px"),
-        fluidPage(
-          mainPanel(
-            dataTableOutput("raw_data_table_display")
-          )
-        )
+        fluidPage(mainPanel(
+          dataTableOutput("raw_data_table_display")
+        ))
       )
     )
   )
@@ -523,17 +542,19 @@ ui <- function(request) {
 
 
 server <- function(input, output, session) {
-  options(shiny.maxRequestSize = 50 * 1024^2)
-  setBookmarkExclude(c(
-    "file",
-    "loadPlot",
-    "plt2rprt",
-    "sampleFile",
-    "clear",
-    "clearAll",
-    "load",
-    "update"
-  ))
+  options(shiny.maxRequestSize = 50 * 1024 ^ 2)
+  setBookmarkExclude(
+    c(
+      "file",
+      "loadPlot",
+      "plt2rprt",
+      "sampleFile",
+      "clear",
+      "clearAll",
+      "load",
+      "update"
+    )
+  )
   `%>%` <- magrittr::`%>%`
   fileExtension <- reactiveVal(NULL)
   dataFrame <- reactiveVal(NULL)
@@ -547,15 +568,11 @@ server <- function(input, output, session) {
   sheets <- reactiveVal(NULL)
   wlist <- reactiveValues()
   hlist <- reactiveValues()
-
-  palette_cols <- reactiveVal(
-    c("#000000", "#000000")
-  )
-
-  palette_fills <- reactiveVal(
-    c("#444444", "#00000000")
-  )
-
+  
+  palette_cols <- reactiveVal(c("#000000", "#000000"))
+  
+  palette_fills <- reactiveVal(c("#444444", "#00000000"))
+  
   observeEvent(input$sampleFile, {
     print("Updating sheet with iris")
     inFile(NULL)
@@ -566,7 +583,7 @@ server <- function(input, output, session) {
       selected = "iris"
     )
   }, priority = 100)
-
+  
   #### Get file/read sheets ####
   observeEvent({
     input$file
@@ -574,12 +591,10 @@ server <- function(input, output, session) {
     print("File input changed")
     inFile(input$file)
     # Identify file type
-    fileExtension(stringr::word(input$file$name,
-      -1,
-      sep = stringr::fixed(".")
-    ))
+    fileExtension(stringr::word(input$file$name,-1,
+                                sep = stringr::fixed(".")))
     # Identify sheets and use them as choices to load file
-    if (fileExtension() %in% c("xlsx","xls")) {
+    if (fileExtension() %in% c("xlsx", "xls")) {
       sheets(readxl::excel_sheets(input$file$datapath))
     }
     if (fileExtension() %in% c("tsv", "csv")) {
@@ -594,34 +609,30 @@ server <- function(input, output, session) {
       selected = sheets()[1]
     )
   }, priority = 1)
-
+  
   #### Make tibble from file ####
   observeEvent({
     input$sheet
   }, {
     req(input$sheet)
     print("Sheet changed")
-
+    
     # Use iris data
     if (is.null(inFile())) {
       print("using iris data")
       f <- iris %>%
         dplyr::mutate(Species = as.character(Species)) %>%
         dplyr::group_by(Species) %>%
-        dplyr::mutate(
-          Sample = paste0(Species, "_", dplyr::row_number()),
-          Sheet = input$sheet
-        ) %>%
+        dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),
+                      Sheet = input$sheet) %>%
         dplyr::select(Sheet, Sample, Species, dplyr::everything())
     }
-
+    
     # Read excel file in
     if (!is.null(inFile())) {
       if (fileExtension() %in% c("xlsx", "xls")) {
-        f <- plotGrouper::readData(
-          sheet = input$sheet,
-          file = input$file$datapath
-        )
+        f <- plotGrouper::readData(sheet = input$sheet,
+                                   file = input$file$datapath)
       }
       if (fileExtension() == "csv") {
         f <- readr::read_csv(input$file$datapath, col_names = TRUE) %>%
@@ -637,7 +648,7 @@ server <- function(input, output, session) {
     }
     print("dataframe created")
     rawData(f)
-
+    
     vars <- names(f)
     columns_select <- c(
       "Experiment",
@@ -652,15 +663,13 @@ server <- function(input, output, session) {
       "Total Bead",
       "Pairs"
     )
-
-    variables <- vars[which(!vars %in% c(
-      columns_select,
-      "Bead %",
-      "Bead #",
-      "Beads %",
-      "Beads #"
-    ))]
-
+    
+    variables <- vars[which(!vars %in% c(columns_select,
+                                         "Bead %",
+                                         "Bead #",
+                                         "Beads %",
+                                         "Beads #"))]
+    
     current_columns <- input$columns
     if (is.null(input$columns)) {
       current_columns <- "empty"
@@ -668,19 +677,17 @@ server <- function(input, output, session) {
     if (!all(current_columns %in% vars)) {
       print("updating columns")
       updateSelectInput(session,
-        "columns",
-        choices = vars,
-        selected = vars[which(vars %in% columns_select)]
-      )
+                        "columns",
+                        choices = vars,
+                        selected = vars[which(vars %in% columns_select)])
     } else if (all(current_columns %in% vars)) {
       print("updating column choices; keeping selected")
       updateSelectInput(session,
-        "columns",
-        choices = vars,
-        selected = input$columns
-      )
+                        "columns",
+                        choices = vars,
+                        selected = input$columns)
     }
-
+    
     current_variables <- input$variables
     if (is.null(input$variables)) {
       current_variables <- "empty"
@@ -688,19 +695,17 @@ server <- function(input, output, session) {
     if (!all(current_variables %in% variables)) {
       print("updating variables")
       updateSelectInput(session,
-        "variables",
-        choices = variables,
-        selected = variables[1]
-      )
+                        "variables",
+                        choices = variables,
+                        selected = variables[1])
     } else if (all(current_variables %in% variables)) {
       print("updating variable choices; keeping selected")
       updateSelectInput(session,
-        "variables",
-        choices = variables,
-        selected = input$variables
-      )
+                        "variables",
+                        choices = variables,
+                        selected = input$variables)
     }
-
+    
     current_comp <- input$comp
     if (is.null(input$comp)) {
       current_comp <- "empty"
@@ -708,23 +713,19 @@ server <- function(input, output, session) {
     if (!current_comp %in% vars) {
       print("updating comp")
       updateSelectInput(session,
-        "comp",
-        choices = vars,
-        selected = vars[which(vars %in% c(
-          "Genotype",
-          "Condition",
-          "Species"
-        ))]
-      )
+                        "comp",
+                        choices = vars,
+                        selected = vars[which(vars %in% c("Genotype",
+                                                          "Condition",
+                                                          "Species"))])
     } else if (all(current_comp %in% vars)) {
       print("updating comp choices; keeping selected")
       updateSelectInput(session,
-        "comp",
-        choices = vars,
-        selected = input$comp
-      )
+                        "comp",
+                        choices = vars,
+                        selected = input$comp)
     }
-
+    
     current_group <- input$group
     if (is.null(input$group)) {
       current_group <- "empty"
@@ -732,19 +733,19 @@ server <- function(input, output, session) {
     if (!current_group %in% vars) {
       print("updating group")
       updateSelectInput(session,
-        "group",
-        choices = c("variable", vars),
-        selected = "variable"
-      )
+                        "group",
+                        choices = c("variable", vars),
+                        selected = "variable")
     } else if (current_group %in% vars) {
       print("updating group choices; keeping selected")
-      updateSelectInput(session,
+      updateSelectInput(
+        session,
         "group",
         choices = c("variable", vars),
         selected = input$group
       )
     }
-
+    
     current_id <- input$id
     if (is.null(input$id)) {
       current_id <- "empty"
@@ -752,55 +753,50 @@ server <- function(input, output, session) {
     if (!current_id %in% vars) {
       print("updating id")
       updateSelectInput(session,
-        "id",
-        choices = vars,
-        selected = "Sample"
-      )
+                        "id",
+                        choices = vars,
+                        selected = "Sample")
     } else if (current_id %in% vars) {
       print("updating id choices; keeping selected")
       updateSelectInput(session,
-        "id",
-        choices = vars,
-        selected = input$id
-      )
+                        "id",
+                        choices = vars,
+                        selected = input$id)
     }
-
+    
     updateSelectInput(session,
-      "beadColumn",
-      choices = c("none", vars),
-      selected = "Total Bead"
-    )
-
-    updateSelectInput(session,
+                      "beadColumn",
+                      choices = c("none", vars),
+                      selected = "Total Bead")
+    
+    updateSelectInput(
+      session,
       "dilutionColumn",
       choices = c("none", vars),
       selected = "Dilution"
     )
   }, priority = 3)
-
-
+  
+  
   #### Update comps ####
   observeEvent({
     input$sheet
     input$comp
   }, {
-    req(
-      input$sheet,
-      input$comp
-    )
+    req(input$sheet,
+        input$comp)
     print("updating comps")
     vars <- unique(rawData()[[input$comp]])
     if (is.null(vars)) {
       vars <- character(0)
     }
     updateSelectInput(session,
-      "comps",
-      choices = vars,
-      selected = vars
-    )
+                      "comps",
+                      choices = vars,
+                      selected = vars)
   }, priority = 2)
-
-
+  
+  
   #### Filter tibble ####
   observeEvent({
     input$refreshData
@@ -824,7 +820,7 @@ server <- function(input, output, session) {
     )
     
     print("organizing dataframe")
-
+    
     d <- plotGrouper::organizeData(
       data = rawData(),
       exclude = input$columns,
@@ -837,7 +833,7 @@ server <- function(input, output, session) {
     )
     dataFrame(d)
   }, priority = 1)
-
+  
   #### Create plot object ####
   plotInput <- function() {
     print("running plotting function")
@@ -845,40 +841,39 @@ server <- function(input, output, session) {
     groups <- unique(dataFrame()[[input$group]])
     comparisons <- unique(dataFrame()[[input$comp]])
     comps <- c(input$comps)
-
-    errortype <- ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
-
+    
+    errortype <-
+      ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
+    
     y.min <- ifelse(is.null(input$y.min), NA, input$y.min)
     y.max <- ifelse(is.null(input$y.max), NA, input$y.max)
-
+    
     y.lim <- c(y.min, y.max)
-
+    
     if (input$split.on == "") {
       split_str <- NULL
     } else {
       split_str <- input$split.on
     }
-
+    
     if (input$y.lab == "") {
       y.lab <- NULL
     } else {
       y.lab <- input$y.lab
     }
-
+    
     ref.group <- NULL
-
+    
     if (input$refGroup == TRUE) {
       ref.group <- comps[1]
     }
-
+    
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
-      levels = comps
-    ))
-
+                               levels = comps))
+    
     levs <- order(factor(unique(dataFrame()[[input$group]]),
-      levels = variables
-    ))
-
+                         levels = variables))
+    
     cols <- c()
     fills <- c()
     shapes <- c()
@@ -887,12 +882,12 @@ server <- function(input, output, session) {
       fills[i] <<- input[[paste0("fill", i)]]
       shapes[i] <<- as.numeric(input[[paste0("shape", i)]])
     })
-
-
+    
+    
     if (input$trim == "") {
       updateTextInput(session, "trim", value = "none")
     }
-
+    
     plotGrouper::gplot(
       dataset = dataFrame(),
       comparison = input$comp,
@@ -925,24 +920,23 @@ server <- function(input, output, session) {
       sci = input$scientific
     )
   }
-
+  
   #### Create current plot ####
   currentPlot <- reactive({
     print("currentPlot triggered")
     req(!is.null(dataFrame()),
         all(dataFrame()$variable %in% colnames(rawData())))
     
-    lapply(seq_len(length(unique(dataFrame()[[input$comp]]))), function(i) {
-      req(
-        input[[paste0("shape", i)]],
-        input[[paste0("col", i)]],
-        input[[paste0("fill", i)]]
-      )
+    lapply(seq_len(length(unique(dataFrame(
+    )[[input$comp]]))), function(i) {
+      req(input[[paste0("shape", i)]],
+          input[[paste0("col", i)]],
+          input[[paste0("fill", i)]])
     })
     print("Generating current plot")
     plotInput()
   })
-
+  
   #### Store current plot height ####
   cpHeight <- reactive({
     print("calculating plot height")
@@ -950,11 +944,12 @@ server <- function(input, output, session) {
       return(1)
     }
     req(currentPlot())
-    pheight <- sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
+    pheight <-
+      sum(as.numeric(grid::convertUnit(currentPlot()$heights, "mm")))
     # return total height in pixels
     return(pheight * 3.7795275591)
   })
-
+  
   #### Store current plot width ####
   cpWidth <- reactive({
     print("calculating plot width")
@@ -962,32 +957,32 @@ server <- function(input, output, session) {
       return(1)
     }
     req(currentPlot())
-    pwidth <- sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
+    pwidth <-
+      sum(as.numeric(grid::convertUnit(currentPlot()$widths, "mm")))
     return(pwidth * 3.7795275591)
   })
-
-
+  
+  
   #### Calculate stats ####
   stats <- function() {
     print("calculating statistics")
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
     comps <- c(input$comps)
-
-    errortype <- ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
-
+    
+    errortype <-
+      ifelse(input$errortype == "SE", "mean_se", "mean_sdl")
+    
     if (input$group == "variable") {
       levs <- order(factor(unique(dataFrame()[[input$group]]),
-        levels = variables
-      ))
+                           levels = variables))
     } else {
       levs <- order(factor(groups), levels = groups)
     }
-
+    
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
-      levels = comps
-    ))
-
+                               levels = comps))
+    
     plotGrouper::gplot(
       dataset = dataFrame(),
       comparison = input$comp,
@@ -1004,55 +999,50 @@ server <- function(input, output, session) {
   #### Calculate report dimensions ####
   reportDims <- function(current_numcol = NULL) {
     widths <- unlist(reactiveValuesToList(wlist), use.names = FALSE)
-    heights <- unlist(reactiveValuesToList(hlist), use.names = FALSE)
-    length(widths) <- suppressWarnings(prod(dim(matrix(widths, 
-                                                       ncol = current_numcol)
-                                                )
-                                            )
-                                       )
-    length(heights) <- suppressWarnings(prod(dim(matrix(heights, 
-                                                        ncol = current_numcol)
-                                                 )
-                                             )
-                                        )
+    heights <-
+      unlist(reactiveValuesToList(hlist), use.names = FALSE)
+    length(widths) <- suppressWarnings(prod(dim(matrix(widths,
+                                                       ncol = current_numcol))))
+    length(heights) <- suppressWarnings(prod(dim(
+      matrix(heights,
+             ncol = current_numcol)
+    )))
     widths[is.na(widths)] <- 0
     heights[is.na(heights)] <- 0
-    wdims <- tibble::as.tibble(matrix(widths, 
-                                      ncol = current_numcol, 
+    wdims <- tibble::as.tibble(matrix(widths,
+                                      ncol = current_numcol,
                                       byrow = TRUE)) %>%
       dplyr::mutate(rowSums = rowSums(., na.rm = TRUE))
-    hdims <- tibble::as.tibble(matrix(heights, 
-                                      ncol = current_numcol, 
+    hdims <- tibble::as.tibble(matrix(heights,
+                                      ncol = current_numcol,
                                       byrow = TRUE))
     reportWidth(ceiling(max(wdims$rowSums, na.rm = TRUE)))
     reportHeight(ceiling(max(colSums(hdims, na.rm = TRUE), na.rm = TRUE)))
   }
-
+  
   #### Create shape picker ####
   output$shapes <- renderUI({
-    req(
-      input$sheet,
-      input$comp,
-      length(input$comps) > 1,
-      input$group
-    )
+    req(input$sheet,
+        input$comp,
+        length(input$comps) > 1,
+        input$group)
     print("shape picker")
-
+    
     comparisons <- c(input$comps)
     options <- c(19, 21, 17, 24, 15, 22)
     choices <- c(19, 21, 17, 24, 15, 22)
     comps <- input$comps
-
+    
     if (input$lock.shapes) {
       choices <- c()
       lapply(seq_len(length(comparisons)), function(i) {
         choices[i] <<- as.numeric(input[[paste0("shape", i)]])
       })
     }
-
-    selection <- rep(choices[seq_len(length(comparisons))], 
+    
+    selection <- rep(choices[seq_len(length(comparisons))],
                      length(comparisons))
-
+    
     lapply(1:length(comparisons), function(i) {
       shiny::tags$div(
         style = "margin-bottom:25px;",
@@ -1065,30 +1055,28 @@ server <- function(input, output, session) {
       )
     })
   })
-
+  
   #### Create color picker ####
   output$colors <- renderUI({
-    req(
-      input$sheet,
-      input$comp,
-      length(input$comps) > 1,
-      input$group
-    )
+    req(input$sheet,
+        input$comp,
+        length(input$comps) > 1,
+        input$group)
     print("color picker")
-
+    
     comparisons <- c(input$comps)
     choices <- palette_cols()
     comps <- input$comps
-
+    
     if (input$lock.cols) {
       choices <- c()
       lapply(seq_len(length(comparisons)), function(i) {
         choices[i] <<- input[[paste0("col", i)]]
       })
     }
-
+    
     selection <- rep(choices, length(comparisons))
-
+    
     lapply(seq_len(length(comparisons)), function(i) {
       colourpicker::colourInput(
         inputId = paste0("col", i),
@@ -1097,30 +1085,28 @@ server <- function(input, output, session) {
       )
     })
   })
-
+  
   #### Create fill picker ####
   output$fills <- renderUI({
-    req(
-      input$sheet,
-      input$comp,
-      length(input$comps) > 1,
-      input$group
-    )
+    req(input$sheet,
+        input$comp,
+        length(input$comps) > 1,
+        input$group)
     print("fill picker")
-
+    
     comparisons <- c(input$comps)
     comps <- input$comps
     choices <- palette_fills()
-
+    
     if (input$lock.fills) {
       choices <- c()
       lapply(seq_len(length(comparisons)), function(i) {
         choices[i] <<- input[[paste0("fill", i)]]
       })
     }
-
+    
     selection <- rep(choices, length(comparisons))
-
+    
     lapply(1:length(comparisons), function(i) {
       colourpicker::colourInput(
         inputId = paste0("fill", i),
@@ -1130,27 +1116,28 @@ server <- function(input, output, session) {
       )
     })
   })
-
+  
   #### Plot the data ####
   # output$myPlot <- renderPlot({
   #   gridExtra::grid.arrange(currentPlot())
   # }, height = function() cpHeight(), width = function() cpWidth())
-
+  
   output$myPlot <- renderImage({
     print("rendering plot")
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = ".png")
-
+    
     # Generate the PNG
-    png(outfile,
+    png(
+      outfile,
       width = cpWidth() * 3,
       height = cpHeight() * 3,
       res = 72 * 3
     )
     gridExtra::grid.arrange(currentPlot())
     dev.off()
-
+    
     # Return a list containing the filename
     list(
       src = outfile,
@@ -1160,14 +1147,15 @@ server <- function(input, output, session) {
       alt = "This is alternate text"
     )
   }, deleteFile = TRUE)
-
+  
   #### Save plot ####
   output$downloadPlot <- downloadHandler(
     file = function() {
       paste0(input$filename, ".pdf")
     },
     content = function(file) {
-      ggplot2::ggsave(file,
+      ggplot2::ggsave(
+        file,
         plot = isolate(currentPlot()),
         useDingbats = FALSE,
         height = isolate(cpHeight()) / 3.7795275591,
@@ -1177,14 +1165,14 @@ server <- function(input, output, session) {
       )
     }
   )
-
+  
   #### Create stats table ####
   output$stat_display <- renderDataTable({
     print("creating datatable of statistics")
     req(input$variables)
     stats()
   })
-
+  
   #### Save stats table ####
   output$save.stat <- downloadHandler(
     file = function() {
@@ -1194,21 +1182,21 @@ server <- function(input, output, session) {
       readr::write_csv(stats(), file, col_names = TRUE)
     }
   )
-
+  
   #### Create table of plotted data ####
   output$data_table_display <- renderDataTable({
     print("creating datatable of plotted data")
     req(input$variables)
     dataFrame()
   })
-
+  
   #### Create table with raw data ####
   output$raw_data_table_display <- renderDataTable({
     print("creating datatable of raw data")
     req(input$variables)
     rawData()
   })
-
+  
   #### Add current plot to report ####
   observeEvent(input$plt2rprt, {
     req(input$sheet)
@@ -1217,19 +1205,22 @@ server <- function(input, output, session) {
     previous_plotListLength <- plotListLength()
     plotListLength(previous_plotListLength + 1)
     current_plotListLength <- previous_plotListLength + 1
-    prev_numcol <- ifelse(previous_plotListLength == 0, 1, 
+    prev_numcol <- ifelse(previous_plotListLength == 0, 1,
                           floor(sqrt(previous_plotListLength)))
     current_numcol <- floor(sqrt(current_plotListLength))
-    prev_numrow <- ifelse(previous_plotListLength == 0, 1, 
+    prev_numrow <- ifelse(previous_plotListLength == 0,
+                          1,
                           ceiling(previous_plotListLength / prev_numcol))
-    current_numrow <- ceiling(current_plotListLength / current_numcol)
+    current_numrow <-
+      ceiling(current_plotListLength / current_numcol)
     wlist[[as.character(current_plotListLength)]] <- cpWidth()
     hlist[[as.character(current_plotListLength)]] <- cpHeight()
     
     reportDims(current_numcol = current_numcol)
-
-    plotList[[as.character(current_plotListLength)]] <- isolate(currentPlot())
-    inputs[[as.character(current_plotListLength)]] <- 
+    
+    plotList[[as.character(current_plotListLength)]] <-
+      isolate(currentPlot())
+    inputs[[as.character(current_plotListLength)]] <-
       isolate(reactiveValuesToList(input))
     reportPlots <- as.character(1:current_plotListLength)
     cols <- c()
@@ -1244,16 +1235,15 @@ server <- function(input, output, session) {
     inputs[[as.character(current_plotListLength)]]$fills <- fills
     inputs[[as.character(current_plotListLength)]]$shapes <- shapes
     updateSelectInput(session,
-      "loadPlot",
-      choices = reportPlots,
-      selected = reportPlots[current_plotListLength]
-    )
+                      "loadPlot",
+                      choices = reportPlots,
+                      selected = reportPlots[current_plotListLength])
   })
-
+  
   #### Clear last plot from report ####
   observeEvent(input$clear, {
     print("clear last plot from report was clicked")
-
+    
     previous_plotListLength <- plotListLength()
     if (previous_plotListLength > 1) {
       current_plotListLength <- previous_plotListLength - 1
@@ -1261,19 +1251,19 @@ server <- function(input, output, session) {
       prev_numcol <- floor(sqrt(previous_plotListLength))
       current_numcol <- floor(sqrt(current_plotListLength))
       prev_numrow <- ceiling(previous_plotListLength / prev_numcol)
-      current_numrow <- ceiling(current_plotListLength / current_numcol)
+      current_numrow <-
+        ceiling(current_plotListLength / current_numcol)
       wlist[[as.character(previous_plotListLength)]] <- NULL
       hlist[[as.character(previous_plotListLength)]] <- NULL
-      plotList[[as.character(previous_plotListLength)]] <- 
+      plotList[[as.character(previous_plotListLength)]] <-
         grid::nullGrob(vp = NULL)
       inputs[[as.character(previous_plotListLength)]] <- NULL
       reportDims(current_numcol = current_numcol)
       reportPlots <- as.character(1:current_plotListLength)
       updateSelectInput(session,
-        "loadPlot",
-        choices = reportPlots,
-        selected = reportPlots[current_plotListLength]
-      )
+                        "loadPlot",
+                        choices = reportPlots,
+                        selected = reportPlots[current_plotListLength])
     }
     if (previous_plotListLength == 1) {
       plotList[[as.character(1)]] <- grid::nullGrob(vp = NULL)
@@ -1284,13 +1274,12 @@ server <- function(input, output, session) {
       reportHeight(10)
       reportWidth(10)
       updateSelectInput(session,
-        "loadPlot",
-        choices = "",
-        selected = ""
-      )
+                        "loadPlot",
+                        choices = "",
+                        selected = "")
     }
   })
-
+  
   #### Clear all plots from report ####
   observeEvent(input$clearAll, {
     print("clear all plots from report was clicked")
@@ -1305,12 +1294,11 @@ server <- function(input, output, session) {
     reportHeight(10)
     reportWidth(10)
     updateSelectInput(session,
-      "loadPlot",
-      choices = "",
-      selected = ""
-    )
+                      "loadPlot",
+                      choices = "",
+                      selected = "")
   })
-
+  
   #### Update plot in report ####
   observeEvent(input$update, {
     print("updating plot in report")
@@ -1335,7 +1323,7 @@ server <- function(input, output, session) {
     inputs[[input$loadPlot]]$fills <- fills
     inputs[[input$loadPlot]]$shapes <- shapes
   })
-
+  
   #### Create report ####
   output$myReport <- renderImage({
     print("rendering report image")
@@ -1343,9 +1331,10 @@ server <- function(input, output, session) {
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = ".png")
-
+    
     # Generate the PNG
-    png(outfile,
+    png(
+      outfile,
       width = reportWidth() * 3,
       height = reportHeight() * 3,
       res = 72 * 3
@@ -1354,11 +1343,10 @@ server <- function(input, output, session) {
       numcol <- floor(sqrt(current_plotListLength))
       gridExtra::grid.arrange(
         grobs = reactiveValuesToList(plotList)[1:current_plotListLength],
-        ncol = numcol
-      )
+                              ncol = numcol)
     }
     dev.off()
-
+    
     # Return a list containing the filename
     list(
       src = outfile,
@@ -1368,22 +1356,21 @@ server <- function(input, output, session) {
       alt = "Nothing added to report yet."
     )
   }, deleteFile = TRUE)
-
+  
   #### Download report ####
   output$downloadReport <- downloadHandler(
     file = function() {
       paste(input$report, "pdf", sep = ".")
     },
     content = function(file) {
-      ggplot2::ggsave(file,
+      ggplot2::ggsave(
+        file,
         plot =
           if (plotListLength() > 0) {
             numcol <- floor(sqrt(plotListLength()))
-            gridExtra::arrangeGrob(
-              grobs = reactiveValuesToList(plotList)
-              [1:isolate(plotListLength())],
-              ncol = numcol
-            )
+            gridExtra::arrangeGrob(grobs = reactiveValuesToList(plotList)
+                                   [1:isolate(plotListLength())],
+                                   ncol = numcol)
           },
         useDingbats = FALSE,
         height = reportHeight() / 3.7795275591,
@@ -1394,192 +1381,162 @@ server <- function(input, output, session) {
       )
     }
   )
-
+  
   #### Load plot from report ####
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading last sheet")
     updateSelectInput(session,
-      "sheet",
-      selected = inputs[[input$loadPlot]]$sheet
-    )
+                      "sheet",
+                      selected = inputs[[input$loadPlot]]$sheet)
   }, priority = -1)
-
+  
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading last columns")
     updateSelectInput(session,
-      "columns",
-      selected = inputs[[input$loadPlot]]$columns
-    )
+                      "columns",
+                      selected = inputs[[input$loadPlot]]$columns)
   }, priority = -2)
-
+  
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading last variables")
     updateSelectInput(session,
-      "variables",
-      selected = inputs[[input$loadPlot]]$variables
-    )
+                      "variables",
+                      selected = inputs[[input$loadPlot]]$variables)
   }, priority = -3)
-
+  
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading last comparisons")
     updateSelectInput(session,
-      "comp",
-      selected = inputs[[input$loadPlot]]$comp
-    )
+                      "comp",
+                      selected = inputs[[input$loadPlot]]$comp)
   }, priority = -4)
-
+  
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading last id")
     updateSelectInput(session,
-      "id",
-      selected = inputs[[input$loadPlot]]$id
-    )
+                      "id",
+                      selected = inputs[[input$loadPlot]]$id)
   }, priority = -5)
-
+  
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading last group")
     updateSelectInput(session,
-      "group",
-      selected = inputs[[input$loadPlot]]$group
-    )
+                      "group",
+                      selected = inputs[[input$loadPlot]]$group)
     updateSelectInput(session,
-      "comps",
-      selected = inputs[[input$loadPlot]]$comps
-    )
+                      "comps",
+                      selected = inputs[[input$loadPlot]]$comps)
   }, priority = -6)
-
+  
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("Loading independent inputs")
     updateSelectInput(session,
-      "beadColumn",
-      selected = inputs[[input$loadPlot]]$beadColumn
-    )
+                      "beadColumn",
+                      selected = inputs[[input$loadPlot]]$beadColumn)
     updateSelectInput(session,
-      "dilutionColumn",
-      selected = inputs[[input$loadPlot]]$dilutionColumn
-    )
+                      "dilutionColumn",
+                      selected = inputs[[input$loadPlot]]$dilutionColumn)
     updateTextInput(session,
-      "y.lab",
-      value = inputs[[input$loadPlot]]$y.lab
-    )
+                    "y.lab",
+                    value = inputs[[input$loadPlot]]$y.lab)
     updateSelectInput(session,
-      "geom",
-      selected = inputs[[input$loadPlot]]$geom
-    )
+                      "geom",
+                      selected = inputs[[input$loadPlot]]$geom)
     updateSelectInput(session,
-      "method",
-      selected = inputs[[input$loadPlot]]$method
-    )
+                      "method",
+                      selected = inputs[[input$loadPlot]]$method)
     updateSelectInput(session,
-      "trans.y",
-      selected = inputs[[input$loadPlot]]$trans.y
-    )
+                      "trans.y",
+                      selected = inputs[[input$loadPlot]]$trans.y)
     updateSelectInput(session,
-      "legend",
-      selected = inputs[[input$loadPlot]]$legend
-    )
+                      "legend",
+                      selected = inputs[[input$loadPlot]]$legend)
     updateSelectInput(session,
-      "errortype",
-      selected = inputs[[input$loadPlot]]$errortype
-    )
+                      "errortype",
+                      selected = inputs[[input$loadPlot]]$errortype)
     updateSliderInput(session,
-      "font",
-      value = inputs[[input$loadPlot]]$font
-    )
+                      "font",
+                      value = inputs[[input$loadPlot]]$font)
     updateSliderInput(session,
-      "size",
-      value = inputs[[input$loadPlot]]$size
-    )
+                      "size",
+                      value = inputs[[input$loadPlot]]$size)
     updateSliderInput(session,
-      "stroke",
-      value = inputs[[input$loadPlot]]$stroke
-    )
+                      "stroke",
+                      value = inputs[[input$loadPlot]]$stroke)
     updateSliderInput(session,
-      "plotWidth",
-      value = inputs[[input$loadPlot]]$plotWidth
-    )
+                      "plotWidth",
+                      value = inputs[[input$loadPlot]]$plotWidth)
     updateSliderInput(session,
-      "plotHeight",
-      value = inputs[[input$loadPlot]]$plotHeight
-    )
+                      "plotHeight",
+                      value = inputs[[input$loadPlot]]$plotHeight)
     updateSliderInput(session,
-      "width",
-      value = inputs[[input$loadPlot]]$width
-    )
+                      "width",
+                      value = inputs[[input$loadPlot]]$width)
     updateSliderInput(session,
-      "dodge",
-      value = inputs[[input$loadPlot]]$dodge
-    )
+                      "dodge",
+                      value = inputs[[input$loadPlot]]$dodge)
     updateTextInput(session,
-      "trim",
-      value = inputs[[input$loadPlot]]$trim
-    )
+                    "trim",
+                    value = inputs[[input$loadPlot]]$trim)
     updateTextInput(session,
-      "split.on",
-      value = inputs[[input$loadPlot]]$split.on
-    )
+                    "split.on",
+                    value = inputs[[input$loadPlot]]$split.on)
     updateCheckboxInput(session,
-      "split",
-      value = inputs[[input$loadPlot]]$split
-    )
+                        "split",
+                        value = inputs[[input$loadPlot]]$split)
     updateCheckboxInput(session,
-      "angle.x",
-      value = inputs[[input$loadPlot]]$angle.x
-    )
+                        "angle.x",
+                        value = inputs[[input$loadPlot]]$angle.x)
     updateCheckboxInput(session,
-      "refGroup",
-      value = inputs[[input$loadPlot]]$refGroup
-    )
+                        "refGroup",
+                        value = inputs[[input$loadPlot]]$refGroup)
     updateCheckboxInput(session,
-      "paired",
-      value = inputs[[input$loadPlot]]$paired
-    )
+                        "paired",
+                        value = inputs[[input$loadPlot]]$paired)
     updateCheckboxInput(session,
-      "scientific",
-      value = inputs[[input$loadPlot]]$scientific
-    )
+                        "scientific",
+                        value = inputs[[input$loadPlot]]$scientific)
   }, priority = -7)
-
+  
   observeEvent(input$load, {
     req(plotListLength() >= 1)
     print("updating colors, fills, shapes")
     for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
       colourpicker::updateColourInput(session,
-        paste0("col", i),
-        value = inputs[[input$loadPlot]][[paste0("col", i)]]
-      )
+                                      paste0("col", i),
+                                      value = inputs[[input$loadPlot]][[paste0(
+                                        "col", 
+                                        i)]])
       colourpicker::updateColourInput(session,
-        paste0("fill", i),
-        value = inputs[[input$loadPlot]][[paste0("fill", i)]]
-      )
+                                      paste0("fill", i),
+                                      value = inputs[[input$loadPlot]][[paste0(
+                                        "fill", 
+                                        i)]])
       updateSelectInput(session,
-        paste0("shape", i),
-        selected = inputs[[input$loadPlot]][[paste0("shape", i)]]
-      )
+                        paste0("shape", i),
+                        selected = inputs[[input$loadPlot]][[paste0(
+                          "shape", 
+                          i)]])
     }
   }, priority = -8)
-
+  
   #### Refresh plots in report ####
   observeEvent(input$refresh, {
-    req(
-      input$file,
-      plotListLength() >= 1
-    )
+    req(input$file,
+        plotListLength() >= 1)
     for (i in as.character(seq_len(plotListLength()))) {
       print(paste0("refreshing plot: ", i))
       
       if (fileExtension() %in% c("xlsx", "xls")) {
-        rData <- plotGrouper::readData(
-          sheet = input$sheet,
-          file = input$file$datapath
-        )
+        rData <- plotGrouper::readData(sheet = input$sheet,
+                                       file = input$file$datapath)
       }
       if (fileExtension() == "csv") {
         rData <- readr::read_csv(input$file$datapath, col_names = TRUE) %>%
@@ -1591,7 +1548,7 @@ server <- function(input, output, session) {
           dplyr::mutate("Sheet" = input$sheet) %>%
           dplyr::select(Sheet, dplyr::everything())
       }
-
+      
       oData <- plotGrouper::organizeData(
         data = rData,
         exclude = inputs[[i]]$columns,
@@ -1602,43 +1559,42 @@ server <- function(input, output, session) {
         beadColumn = inputs[[i]]$beadColumn,
         dilutionColumn = inputs[[i]]$dilutionColumn
       )
-
-      errortype <- ifelse(inputs[[i]]$errortype == "SE", "mean_se", "mean_sdl")
-
+      
+      errortype <-
+        ifelse(inputs[[i]]$errortype == "SE", "mean_se", "mean_sdl")
+      
       if (inputs[[i]]$split.on == "") {
         split_str <- NULL
       } else {
         split_str <- inputs[[i]]$split.on
       }
-
+      
       if (inputs[[i]]$y.lab == "") {
         y.lab <- NULL
       } else {
         y.lab <- inputs[[i]]$y.lab
       }
-
+      
       ref.group <- NULL
-
+      
       if (inputs[[i]]$refGroup == TRUE) {
         ref.group <- inputs[[i]]$comps[1]
       }
-
+      
       levs.comps <- order(factor(unique(oData[[inputs[[i]]$comp]]),
-        levels = inputs[[i]]$comps
-      ))
-
+                                 levels = inputs[[i]]$comps))
+      
       levs <- order(factor(unique(oData[[inputs[[i]]$group]]),
-        levels = inputs[[i]]$variables
-      ))
-
+                           levels = inputs[[i]]$variables))
+      
       cols <- inputs[[i]]$cols
       fills <- inputs[[i]]$fills
       shapes <- inputs[[i]]$shapes
-
+      
       if (inputs[[i]]$trim == "") {
         updateTextInput(session, "trim", value = "none")
       }
-
+      
       cPlot <- plotGrouper::gplot(
         dataset = oData,
         comparison = inputs[[i]]$comp,
@@ -1669,9 +1625,11 @@ server <- function(input, output, session) {
         shape.groups = shapes,
         sci = inputs[[i]]$scientific
       )
-      pheight <- sum(as.numeric(grid::convertUnit(cPlot$heights, "mm"))) * 
+      pheight <-
+        sum(as.numeric(grid::convertUnit(cPlot$heights, "mm"))) *
         3.7795275591
-      pwidth <- sum(as.numeric(grid::convertUnit(cPlot$widths, "mm"))) * 
+      pwidth <-
+        sum(as.numeric(grid::convertUnit(cPlot$widths, "mm"))) *
         3.7795275591
       wlist[[i]] <- pwidth
       hlist[[i]] <- pheight
@@ -1681,7 +1639,7 @@ server <- function(input, output, session) {
     current_numcol <- floor(sqrt(current_plotListLength))
     reportDims(current_numcol = current_numcol)
   })
-
+  
   #### Bookmarking values ####
   onBookmark(function(state) {
     state$values$plotList <- reactiveValuesToList(plotList)
@@ -1690,28 +1648,31 @@ server <- function(input, output, session) {
     state$values$hlist <- reactiveValuesToList(hlist)
     state$values$wlist <- reactiveValuesToList(wlist)
   })
-
+  
   #### Restoring values ####
   onRestored(function(state) {
     print("Restoring report")
     plotListLength(state$values$plotListLength)
     for (i in seq_len(isolate(plotListLength()))) {
       inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]
-      plotList[[as.character(i)]] <- state$values$plotList[[as.character(i)]]
-      hlist[[as.character(i)]] <- state$values$hlist[[as.character(i)]]
-      wlist[[as.character(i)]] <- state$values$wlist[[as.character(i)]]
+      plotList[[as.character(i)]] <-
+        state$values$plotList[[as.character(i)]]
+      hlist[[as.character(i)]] <-
+        state$values$hlist[[as.character(i)]]
+      wlist[[as.character(i)]] <-
+        state$values$wlist[[as.character(i)]]
     }
-    plotListPlots <- as.character(seq_len(isolate(plotListLength())))
+    plotListPlots <-
+      as.character(seq_len(isolate(plotListLength())))
     updateSelectInput(session,
-      "loadPlot",
-      choices = plotListPlots,
-      selected = tail(plotListPlots, 1)
-    )
+                      "loadPlot",
+                      choices = plotListPlots,
+                      selected = tail(plotListPlots, 1))
     current_plotListLength <- plotListLength()
     current_numcol <- floor(sqrt(current_plotListLength))
     reportDims(current_numcol = current_numcol)
   })
-
+  
   #### Stop app on close ####
   session$onSessionEnded(function() {
     graphics.off()
