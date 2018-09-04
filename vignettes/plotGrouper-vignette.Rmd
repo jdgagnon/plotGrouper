@@ -51,7 +51,7 @@ download the latest version [Here](https://cran.r-project.org).
 
 2. Download the package from Bioconductor.
 
-```{r getPackage, eval = FALSE}
+```
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
   BiocManager::install("plotGrouper")
@@ -59,15 +59,16 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 
  + Or install the development version of the package from Github.
 
-```{r, eval = FALSE}
+```
 BiocManager::install(“jdgagnon/plotGrouper”)
 ```
 
 3. Load the package into the R session.
 
-```{r, eval = FALSE}
+```
 library(plotGrouper)
 ```
+
 <br><br>
 
 ## Running plotGrouper
@@ -79,10 +80,10 @@ To initialize the shiny app, paste the following code in your R console
 and run it.
 
 
-```{r, eval=FALSE}
+```
 plotGrouper()
 ```
-
+<br>
 
 Once the web app opens, you can access the `iris` dataset by clicking the iris 
 button to learn how to use the app. After the `iris` data loads, the selection 
@@ -91,7 +92,9 @@ The `Raw Data` tab displays the structure of the data loaded. Your file should
 be organized to include:  
 
 
-`Unique identifier | Comparisons | Variables`
+```
+Unique identifier | Comparisons | Variables
+```
 
 
 
@@ -177,7 +180,7 @@ file along with the automatically created `Sheet` column.
 Here is the output of `sessionInfo()` on the system on which this package was
 developed:
 
-```{r, eval=FALSE}
+```
 R version 3.5.1 (2018-07-02)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
 Running under: macOS High Sierra 10.13.6
