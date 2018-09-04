@@ -2,7 +2,7 @@
 % Please edit documentation in R/organizeData.R
 \name{organizeData}
 \alias{organizeData}
-\title{A function to organize a tibble into tidy format 
+\title{A function to organize a tibble into tidy format
 and perform count transformations}
 \usage{
 organizeData(data = NULL, exclude = NULL, comp = NULL,
@@ -24,7 +24,7 @@ organizeData(data = NULL, exclude = NULL, comp = NULL,
 
 \item{beadColumn}{The column name that has total number of beads/sample}
 
-\item{dilutionColumn}{The column name that has dilution factor for 
+\item{dilutionColumn}{The column name that has dilution factor for
 each sample 1/x}
 }
 \value{
@@ -38,7 +38,7 @@ transformations if appropriate columns are specified.
 \examples{
 iris \%>\% dplyr::mutate(Species = as.character(Species)) \%>\%
 dplyr::group_by(Species) \%>\%
-dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()), 
+dplyr::mutate(Sample = paste0(Species, "_", dplyr::row_number()),
 Sheet = "iris") \%>\%
 dplyr::select(Sample, Sheet, Species, dplyr::everything()) \%>\%
 plotGrouper::organizeData(data = .,

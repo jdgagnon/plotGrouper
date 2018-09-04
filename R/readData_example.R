@@ -3,8 +3,8 @@
 
 #' Get path to readData example
 #'
-#' readData comes bundled with an example file in its `inst/applications/www`
-#' directory. This function make them easy to access.
+#' readData comes bundled with a example files in its `inst/applications/www`
+#' directory. This function makes them easy to access.
 #'
 #' @param path Name of file. If `NULL`, the example files will be listed.
 #' @return Located example excel file in package

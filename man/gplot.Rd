@@ -115,7 +115,7 @@ Table grob of the plot
 This function allows you to create a grouped plot and return a table grob.
 It takes a tidy dataset containing sample replicate values for at least one
 variable, a column organizing each replicate into the proper comparison
-group, and a column that gruops the variables to be plotted. Additional
+group, and a column that groups the variables to be plotted. Additional
 arguments allow for the re-ordering of the variables and the
 comparisons being ploted, selection of the type of graph to display (e.g.,
 bar graph, boxplot, violin plot, points, statistical summary, etc...), as

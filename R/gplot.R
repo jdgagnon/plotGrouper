@@ -6,7 +6,7 @@
 #' This function allows you to create a grouped plot and return a table grob.
 #' It takes a tidy dataset containing sample replicate values for at least one
 #' variable, a column organizing each replicate into the proper comparison
-#' group, and a column that gruops the variables to be plotted. Additional
+#' group, and a column that groups the variables to be plotted. Additional
 #' arguments allow for the re-ordering of the variables and the
 #' comparisons being ploted, selection of the type of graph to display (e.g.,
 #' bar graph, boxplot, violin plot, points, statistical summary, etc...), as
@@ -19,7 +19,7 @@
 #' @importFrom rlang .data
 #' @importFrom tibble as.tibble
 #' @importFrom grid convertUnit nullGrob
-#' @importFrom  gridExtra grid.arrange arrangeGrob
+#' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom ggpubr compare_means get_legend
@@ -42,12 +42,12 @@
 #' @param ref.group Specify a reference group to compare all other
 #' comparisons to
 #' @param p.adjust.method Method used for adjusting the pvalue
-#' @param comparisons Specify which of the available comparisons within your
-#' data you would like to plot
 #' @param method Specify the statistical test to be used
 #' @param paired Specify whether or not the statistical comparisons should be
 #' paired
 #' @param errortype Specify the method of statistical error to plot
+#' @param comparisons Specify which of the available comparisons within your
+#' data you would like to plot
 #' @param y.lim Specify the min and max values to be used for the y-axis
 #' @param y.lab Specify a custom y-axis label to use
 #' @param expand.y Specify values to expand the y-axis
@@ -149,7 +149,7 @@ gplot <- function(dataset = NULL,
       x
     }
   } else if (is.null(group.labs) &
-             split == TRUE & is.null(split_str)) {
+             split & is.null(split_str)) {
     group.labs <- function(x) {
       vapply(stringr::str_remove(
         stringr::word(stringr::str_remove(x, trim),-1,
@@ -161,7 +161,7 @@ gplot <- function(dataset = NULL,
       1)
     }
   } else if (is.null(group.labs) &
-             split == TRUE & !is.null(split_str)) {
+             split & !is.null(split_str)) {
     group.labs <- function(x) {
       vapply(
         strsplit(
@@ -361,7 +361,7 @@ gplot <- function(dataset = NULL,
     statistics <- dplyr::tibble("p.signif" = NA)
   }
   
-  if (stats == TRUE) {
+  if (stats) {
     return(statOut)
   }
   
@@ -409,7 +409,7 @@ gplot <- function(dataset = NULL,
     format(l2, trim = FALSE)
   }
   
-  if (angle.x == TRUE) {
+  if (angle.x) {
     angle <- 45
     vjust <- 1
     hjust <- 1
@@ -419,7 +419,7 @@ gplot <- function(dataset = NULL,
     hjust <- 0.5
   }
   
-  if (isTRUE(sci)) {
+  if (sci) {
     labs.y <- fancy_scientific
     y.lab <-
       bquote(.(paste0(gsub(
