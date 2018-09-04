@@ -22,7 +22,7 @@ Imports:
     readxl (>= 1.1.0), 
     scales (>= 1.0.0), 
     stats,
-    grid (>= 3.5.1),
+    grid,
     gridExtra (>= 2.3), 
     egg (>= 0.4.0), 
     gtable (>= 0.2.0), 
