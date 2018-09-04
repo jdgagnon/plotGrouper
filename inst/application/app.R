@@ -36,7 +36,27 @@ ui <- function(request) {
                                  ".tsv",
                                  ".xlsx",
                                  ".xls")),
-            
+            hr(),
+            #### Save plot ####
+            h4("Save current plot"),
+            fluidRow(
+              column(8, textInput("filename",
+                                  "Filename",
+                                  "Plot1")),
+              column(
+                4,
+                style = "margin-top: 30px;",
+                downloadButton(
+                  "downloadPlot",
+                  "Save",
+                  class = "btn btn-primary btn-sm",
+                  style = "color: #fff;
+                  background-color: #337ab7;
+                  border-color: #2e6da4"
+                )
+              )
+            ),
+            hr(),
             #### Sheet selection ####
             h4("Build plot"),
             fluidRow(column(
@@ -76,26 +96,8 @@ ui <- function(request) {
                           choices = NULL)
             )),
             hr(),
-            #### Save plot ####
-            fluidRow(
-              column(8, textInput("filename",
-                                  "Filename",
-                                  "Plot1")),
-              column(
-                4,
-                style = "margin-top: 30px;",
-                downloadButton(
-                  "downloadPlot",
-                  "Save",
-                  class = "btn btn-primary btn-sm",
-                  style = "color: #fff;
-                  background-color: #337ab7;
-                  border-color: #2e6da4"
-                )
-              )
-            ),
-            hr(),
             #### Modify Y label ####
+            h4("Y-axis modifications"),
             fluidRow(
               column(8, textInput("y.lab",
                                   "Replace y axis label",
@@ -108,28 +110,6 @@ ui <- function(request) {
                               value = FALSE)
               )
             ),
-            hr(),
-            #### Modify group lables ####
-            fluidRow(
-              column(6,
-                     textInput("split.on",
-                               "Split on text",
-                               value = NULL)),
-              column(3,
-                     style = "margin-top: 25px;",
-                     checkboxInput("split",
-                                   "Split",
-                                   value = TRUE)),
-              column(3,
-                     style = "margin-top: 25px;",
-                     checkboxInput("angle.x",
-                                   "Angle",
-                                   value = FALSE))
-            ),
-            textInput("trim",
-                      "Trim text from right side of group labels",
-                      value = "none"),
-            hr(),
             #### Transform Y axis ####
             fluidRow(
               column(
@@ -151,37 +131,27 @@ ui <- function(request) {
                                   value = NULL))
             ),
             hr(),
-            #### Select error type to plot ####
-            selectInput(
-              "errortype",
-              "Errorbar format",
-              choices = c("SE", "SD"),
-              selected = "SD"
-            ),
-            #### Select statistical method ####
+            #### Modify group lables ####
+            h4("X-axis modifications"),
             fluidRow(
-              column(4, selectInput(
-                "method",
-                "Stat test",
-                choices = c("t.test",
-                            "wilcox.test",
-                            "anova",
-                            "kruskal.test")
-              )),
-              column(
-                4,
-                style = "margin-top: 25px;",
-                checkboxInput("refGroup",
-                              "Reference group",
-                              value = FALSE)
-              ),
-              column(4,
+              column(6,
+                     textInput("split.on",
+                               "Split on text",
+                               value = NULL)),
+              column(3,
                      style = "margin-top: 25px;",
-                     checkboxInput("paired",
-                                   "Paired",
+                     checkboxInput("split",
+                                   "Split",
+                                   value = TRUE)),
+              column(3,
+                     style = "margin-top: 25px;",
+                     checkboxInput("angle.x",
+                                   "Angle",
                                    value = FALSE))
             ),
-            hr(),
+            textInput("trim",
+                      "Trim text from right side of group labels",
+                      value = "none"),
             #### Format width and dodge ####
             fluidRow(column(
               6,
@@ -418,8 +388,8 @@ ui <- function(request) {
             #### Shape, color, fill UI ####
             fluidRow(
               column(4, h4("Shapes"), uiOutput("shapes")),
-              column(4, h4("Color"), uiOutput("colors")),
-              column(4, h4("Fill"), uiOutput("fills"))
+              column(4, h4("Colors"), uiOutput("colors")),
+              column(4, h4("Fills"), uiOutput("fills"))
             ),
             
             fluidRow(
@@ -427,7 +397,45 @@ ui <- function(request) {
               column(4, checkboxInput("lock.cols", "Lock", FALSE)),
               column(4, checkboxInput("lock.fills", "Lock", FALSE))
             ),
-            
+            #### Select statistical method ####
+            fluidRow(
+              column(3, selectInput(
+                "method",
+                "Stat test",
+                choices = c("t.test",
+                            "wilcox.test",
+                            "anova",
+                            "kruskal.test")
+              )),
+              column(
+                3,
+                style = "margin-top: 25px;",
+                checkboxInput("refGroup",
+                              "Reference group",
+                              value = FALSE)
+              ),
+              column(2,
+                     style = "margin-top: 25px;",
+                     checkboxInput("paired",
+                                   "Paired",
+                                   value = FALSE)
+              ),
+              column(2,
+                     selectInput(
+                       "pDisplay",
+                       "Display p value",
+                       choices = c("p.signif", "p.format", "p.adj"),
+                       selected = "p.signif"
+                     )
+              ),
+              column(2,
+                     selectInput(
+                       "errortype",
+                       "Errorbar format",
+                       choices = c("SE", "SD"),
+                       selected = "SD"
+                     ))
+            ),
             hr()
           )
         )
@@ -864,7 +872,7 @@ server <- function(input, output, session) {
     
     ref.group <- NULL
     
-    if (input$refGroup == TRUE) {
+    if (input$refGroup) {
       ref.group <- comps[1]
     }
     
@@ -896,12 +904,13 @@ server <- function(input, output, session) {
       errortype = errortype,
       method = input$method,
       paired = input$paired,
+      ref.group = ref.group,
+      p = input$pDisplay,
       size = input$size,
       stroke = input$stroke,
       width = input$width,
       dodge = input$dodge,
       font_size = input$font,
-      ref.group = ref.group,
       plotWidth = input$plotWidth,
       plotHeight = input$plotHeight,
       trans.y = input$trans.y,
@@ -983,6 +992,12 @@ server <- function(input, output, session) {
     levs.comps <- order(factor(unique(dataFrame()[[input$comp]]),
                                levels = comps))
     
+    ref.group <- NULL
+    
+    if (input$refGroup) {
+      ref.group <- comps[1]
+    }
+    
     plotGrouper::gplot(
       dataset = dataFrame(),
       comparison = input$comp,
@@ -990,6 +1005,7 @@ server <- function(input, output, session) {
       errortype = errortype,
       method = input$method,
       paired = input$paired,
+      ref.group = ref.group,
       levs = levs,
       levs.comps = levs.comps,
       stats = TRUE
@@ -1500,6 +1516,9 @@ server <- function(input, output, session) {
     updateCheckboxInput(session,
                         "paired",
                         value = inputs[[input$loadPlot]]$paired)
+    updateSelectInput(session,
+                      "pDisplay",
+                      selected = inputs[[input$loadPlot]]$pDisplay)
     updateCheckboxInput(session,
                         "scientific",
                         value = inputs[[input$loadPlot]]$scientific)
@@ -1577,7 +1596,7 @@ server <- function(input, output, session) {
       
       ref.group <- NULL
       
-      if (inputs[[i]]$refGroup == TRUE) {
+      if (inputs[[i]]$refGroup) {
         ref.group <- inputs[[i]]$comps[1]
       }
       
@@ -1603,12 +1622,13 @@ server <- function(input, output, session) {
         errortype = errortype,
         method = inputs[[i]]$method,
         paired = inputs[[i]]$paired,
+        ref.group = ref.group,
+        p = inputs[[i]]$pDisplay,
         size = inputs[[i]]$size,
         stroke = inputs[[i]]$stroke,
         width = inputs[[i]]$width,
         dodge = inputs[[i]]$dodge,
         font_size = inputs[[i]]$font,
-        ref.group = ref.group,
         plotWidth = inputs[[i]]$plotWidth,
         plotHeight = inputs[[i]]$plotHeight,
         trans.y = inputs[[i]]$trans.y,
