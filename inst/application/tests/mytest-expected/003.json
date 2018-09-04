@@ -59,6 +59,7 @@
     "method": "t.test",
     "navbar": "<h2 style=\"margin-top: 30px; margin-bottom: 30px\">Report<\/h2>",
     "paired": false,
+    "pDisplay": "p.signif",
     "plotHeight": 72.5,
     "plotWidth": 80,
     "plt2rprt": 2,
