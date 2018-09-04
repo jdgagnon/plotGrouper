@@ -2,7 +2,7 @@
 % Please edit documentation in R/readData.R
 \name{readData}
 \alias{readData}
-\title{A function to read an excel file and combine its sheets into a 
+\title{A function to read an excel file and combine its sheets into a
 single dataframe.}
 \usage{
 readData(file = NULL, sheet = NULL)
