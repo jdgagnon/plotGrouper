@@ -13,7 +13,7 @@
 #' @rawNamespace import(Hmisc, except = c(summarize, src))
 #' @importFrom rlang .data
 #' @importFrom tibble as.tibble
-#' @importFrom  gridExtra grid.arrange arrangeGrob
+#' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom ggpubr compare_means get_legend
