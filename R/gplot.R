@@ -1,4 +1,3 @@
-
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
@@ -19,6 +18,7 @@
 #' @rawNamespace import(Hmisc, except = c(summarize, src))
 #' @importFrom rlang .data
 #' @importFrom tibble as.tibble
+#' @importFrom grid convertUnit nullGrob
 #' @importFrom  gridExtra grid.arrange arrangeGrob
 #' @importFrom egg set_panel_size
 #' @importFrom readxl excel_sheets read_excel
@@ -96,19 +96,16 @@
 #' fill.groups = c("black","#E016BE", "#1243C9")) %>%
 #' gridExtra::grid.arrange()
 #' @export
-gplot <- function(
-                  dataset = NULL,
+gplot <- function(dataset = NULL,
                   comparison = NULL,
                   group.by = NULL,
                   levs = TRUE,
                   val = "value",
-                  geom = c(
-                    "bar",
-                    "errorbar",
-                    "point",
-                    "stat",
-                    "seg"
-                  ),
+                  geom = c("bar",
+                           "errorbar",
+                           "point",
+                           "stat",
+                           "seg"),
                   p = "p.signif",
                   ref.group = NULL,
                   p.adjust.method = "holm",
@@ -143,229 +140,253 @@ gplot <- function(
                   color.groups = c("black", "black"),
                   fill.groups = c("#444444", NA, "#A33838")) {
   . <- "Stop NOTE"
-
+  
   df <- droplevels(dataset)
-
+  
   # Assign labels to the groups
   suppressWarnings(if (is.null(group.labs) & split == FALSE) {
     group.labs <- function(x) {
       x
     }
-  } else if (is.null(group.labs) & split == TRUE & is.null(split_str)) {
+  } else if (is.null(group.labs) &
+             split == TRUE & is.null(split_str)) {
     group.labs <- function(x) {
-      vapply(stringr::str_remove(stringr::word(stringr::str_remove(x, trim),
-        -1,
-        sep = "/"
-      ), " %| #|% |# "), "[", FUN.VALUE = "", 1)
+      vapply(stringr::str_remove(
+        stringr::word(stringr::str_remove(x, trim),-1,
+                      sep = "/"),
+        " %| #|% |# "
+      ),
+      "[",
+      FUN.VALUE = "",
+      1)
     }
-  } else if (is.null(group.labs) & split == TRUE & !is.null(split_str)) {
+  } else if (is.null(group.labs) &
+             split == TRUE & !is.null(split_str)) {
     group.labs <- function(x) {
-      vapply(strsplit(stringr::str_remove(x, trim),
-        split = split_str,
-        fixed = TRUE
-      ), "[", FUN.VALUE = "", 2)
+      vapply(
+        strsplit(
+          stringr::str_remove(x, trim),
+          split = split_str,
+          fixed = TRUE
+        ),
+        "[",
+        FUN.VALUE = "",
+        2
+      )
     }
   } else {
     group.labs <- group.labs
   })
-
+  
   # If the column of values has a different column name than 'value',
   # assign it 'value'
   colnames(df)[colnames(df) == val] <- "value"
   df$value <- as.numeric(df$value)
-
+  
   # If comparison variable is not a factor, coerce it to one
   if (!is.factor(df[[comparison]])) {
     df[, comparison] <- factor(df[[comparison]],
-      levels = unique(df[[comparison]])[levs.comps]
-    )
+                               levels = unique(df[[comparison]])[levs.comps])
   }
-
+  
   # If grouping variable is not numeric, scale x discretely, and assign levels.
   # If it is numeric, scale x continuously
   if (is.factor(df[[group.by]])) {
-    scale.x <- ggplot2::scale_x_discrete(
-      labels = group.labs,
-      breaks = unique(df[[group.by]])
-    )
-  } else if (!is.numeric(df[[group.by]]) & !is.factor(df[[group.by]])) {
+    scale.x <- ggplot2::scale_x_discrete(labels = group.labs,
+                                         breaks = unique(df[[group.by]]))
+  } else if (!is.numeric(df[[group.by]]) &
+             !is.factor(df[[group.by]])) {
     df[, group.by] <- factor(df[[group.by]],
-      levels = unique(df[[group.by]])[levs]
-    )
-    scale.x <- ggplot2::scale_x_discrete(
-      labels = group.labs,
-      breaks = unique(df[[group.by]])
-    )
+                             levels = unique(df[[group.by]])[levs])
+    scale.x <- ggplot2::scale_x_discrete(labels = group.labs,
+                                         breaks = unique(df[[group.by]]))
   } else {
     scale.x <- ggplot2::scale_x_continuous(
       breaks = df[[group.by]],
       labels = formatC(df[[group.by]],
-        drop0trailing = TRUE
-      ),
+                       drop0trailing = TRUE),
       trans = trans.x,
       limits = x.lim
     )
   }
-
+  
   df <- dplyr::arrange_(df, comparison)
-
+  
   # Create a tibble of max values by group for assigning height of p values
-  dmax <- droplevels(df %>%
-    dplyr::group_by_(group.by, comparison) %>%
-    dplyr::mutate("error_max" = max(get(errortype)(.data$value, mult = 1),
-      na.rm = TRUE
-    )) %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by_(group.by) %>%
-    dplyr::slice(which.max(.data$value)) %>%
-    dplyr::select_(group.by, "value", "error_max") %>%
-    dplyr::ungroup() %>%
-    dplyr::arrange_(group.by))
-
+  dmax <- droplevels(
+    df %>%
+      dplyr::group_by_(group.by, comparison) %>%
+      dplyr::mutate("error_max" = max(
+        get(errortype)(.data$value, mult = 1),
+        na.rm = TRUE
+      )) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by_(group.by) %>%
+      dplyr::slice(which.max(.data$value)) %>%
+      dplyr::select_(group.by, "value", "error_max") %>%
+      dplyr::ungroup() %>%
+      dplyr::arrange_(group.by)
+  )
+  
   if (all(is.na(y.lim))) {
-    y.lim <- c(0, max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
+    y.lim <-
+      c(0, max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[1]) & is.na(y.lim[2])) {
     y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")],
-      na.rm = TRUE
-    ) * 1.08)
+                             na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[2] & is.na(y.lim[1]))) {
     y.lim <- c(0, y.lim[2])
   }
-
+  
   # If no comparisons are specified, perform all comparisons
   if (is.null(comparisons)) {
     comparisons <- df[[comparison]]
   }
-
+  
   symnum.args <- list(
     cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1),
     symbols = c("****", "***", "**", "*", NA)
   )
-
+  
   # Calculate p values for all comparisons being made
   statOut <- try(ggpubr::compare_means(
     formula = stats::formula(paste("value", "~", comparison)),
-    data = df, method = method, group.by = group.by, ref.group = ref.group,
-    paired = paired, symnum.args = symnum.args,
+    data = df,
+    method = method,
+    group.by = group.by,
+    ref.group = ref.group,
+    paired = paired,
+    symnum.args = symnum.args,
     p.adjust.method = p.adjust.method
   ))
-
+  
   if (method %in% c("t.test", "wilcox.test")) {
     statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
-      dplyr::filter(.data$group1 %in% comparisons |
-        .data$group2 %in% comparisons) %>%
-      dplyr::mutate("max" = max(c(.data$value, .data$error_max),
-        na.rm = TRUE
-      ) * 0.05) %>%
-      dplyr::group_by_(group.by) %>%
-      dplyr::mutate(
-        "n" = dplyr::row_number(),
-        "group1" = factor(.data$group1, levels = levels(df[[comparison]])),
-        "group2" = factor(.data$group2, levels = levels(df[[comparison]])),
-        "r" = dplyr::if_else(
-          p == "p.signif",
-          .data$max * 0.1,
-          .data$max * 0.2
-        ),
-        "e" = .data$max * .data$n,
-        "n_comps" = max(.data$n),
-        "group.by_n" = as.numeric(get(group.by)), # numbergrouping variables
-        "group1_n" = as.integer(.data$group1),
-        "group2_n" = as.integer(.data$group2),
-        "unit" = (width / max(.data$group2_n)) * dodge / width, # relative
-        # width of 1 bar
-        "start" = .data$group.by_n -
-          .data$unit *
-            max(.data$group2_n) / 2, # center position of the first bar
-        "w.start" = .data$start +
-          (.data$group1_n - 1) *
-            .data$unit +
-          .data$unit /
-            2, # center position of group1
-        "w.stop" = .data$start +
-          (.data$group2_n - 1) *
-            .data$unit +
-          .data$unit / 2
-      ) %>% # center position of group2
-      dplyr::ungroup() %>%
-      dplyr::mutate(
-        "x.pos" = rowMeans(.[, c(
-          "w.start",
-          "w.stop"
-        )]), # center of line segment
-        "w.start" = ifelse(!is.na(.data$p.signif), .data$w.start, NA),
-        "w.stop" = ifelse(!is.na(.data$p.signif), .data$w.stop, NA),
-        "h.p" = .data$value + .data$e,
-        "h.s" = .data$value + .data$e - .data$r
-      ))
+                        dplyr::filter(.data$group1 %in% comparisons |
+                                        .data$group2 %in% comparisons) %>%
+                        dplyr::mutate("max" = max(c(.data$value, 
+                                                    .data$error_max),
+                                                  na.rm = TRUE) * 0.05) %>%
+                        dplyr::group_by_(group.by) %>%
+                        dplyr::mutate(
+                          "n" = dplyr::row_number(),
+                          "group1" = factor(.data$group1, 
+                                            levels = levels(df[[comparison]])),
+                          "group2" = factor(.data$group2, 
+                                            levels = levels(df[[comparison]])),
+                          "r" = dplyr::if_else(p == "p.signif",
+                                               .data$max * 0.1,
+                                               .data$max * 0.2),
+                          "e" = .data$max * .data$n,
+                          "n_comps" = max(.data$n),
+                          "group.by_n" = as.numeric(get(group.by)),
+                          # numbergrouping variables
+                          "group1_n" = as.integer(.data$group1),
+                          "group2_n" = as.integer(.data$group2),
+                          "unit" = (width / max(.data$group2_n)) * 
+                            dodge / 
+                            width,
+                          # relative
+                          # width of 1 bar
+                          "start" = .data$group.by_n -
+                            .data$unit *
+                            max(.data$group2_n) / 2,
+                          # center position of the first bar
+                          "w.start" = .data$start +
+                            (.data$group1_n - 1) *
+                            .data$unit +
+                            .data$unit /
+                            2,
+                          # center position of group1
+                          "w.stop" = .data$start +
+                            (.data$group2_n - 1) *
+                            .data$unit +
+                            .data$unit / 2
+                        ) %>% # center position of group2
+                        dplyr::ungroup() %>%
+                        dplyr::mutate(
+                          "x.pos" = rowMeans(.[, c("w.start",
+                                                   "w.stop")]),
+                          # center of line segment
+                          "w.start" = ifelse(!is.na(.data$p.signif), 
+                                             .data$w.start, NA),
+                          "w.stop" = ifelse(!is.na(.data$p.signif), 
+                                            .data$w.stop, NA),
+                          "h.p" = .data$value + .data$e,
+                          "h.s" = .data$value + .data$e - .data$r
+                        ))
   } else {
     statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
-      dplyr::mutate("max" = max(c(
-        .data$value,
-        .data$error_max
-      ),
-      na.rm = TRUE
-      ) * 0.05) %>%
-      dplyr::group_by_(group.by) %>%
-      dplyr::mutate(
-        "n" = dplyr::row_number(),
-        "r" = dplyr::if_else(p == "p.signif", max * 0.1, max * 0.2),
-        "e" = .data$max * .data$n,
-        "n_comps" = max(.data$n),
-        "group.by_n" = as.numeric(get(group.by)),
-        "w.start" = .data$group.by_n - width / length(unique(df[[comparison]])),
-        "w.stop" = .data$group.by_n + width / length(unique(df[[comparison]]))
-      ) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(
-        "x.pos" = rowMeans(.[, c("w.start", "w.stop")]), # center of segment
-        "w.start" = ifelse(!is.na(.data$p.signif), .data$w.start, NA),
-        "w.stop" = ifelse(!is.na(.data$p.signif), .data$w.stop, NA),
-        "h.p" = .data$value + .data$e,
-        "h.s" = .data$value + .data$e - .data$r
-      ))
+                        dplyr::mutate("max" = max(c(.data$value,
+                                                    .data$error_max),
+                                                  na.rm = TRUE) * 0.05) %>%
+                        dplyr::group_by_(group.by) %>%
+                        dplyr::mutate(
+                          "n" = dplyr::row_number(),
+                          "r" = dplyr::if_else(p == "p.signif", 
+                                               max * 0.1, 
+                                               max * 0.2),
+                          "e" = .data$max * .data$n,
+                          "n_comps" = max(.data$n),
+                          "group.by_n" = as.numeric(get(group.by)),
+                          "w.start" = .data$group.by_n - 
+                            width / length(unique(df[[comparison]])),
+                          "w.stop" = .data$group.by_n + 
+                            width / 
+                            length(unique(df[[comparison]]))
+                        ) %>%
+                        dplyr::ungroup() %>%
+                        dplyr::mutate(
+                          "x.pos" = rowMeans(.[, c("w.start", "w.stop")]),
+                          # center of segment
+                          "w.start" = ifelse(!is.na(.data$p.signif), 
+                                             .data$w.start, 
+                                             NA),
+                          "w.stop" = ifelse(!is.na(.data$p.signif), 
+                                            .data$w.stop, 
+                                            NA),
+                          "h.p" = .data$value + .data$e,
+                          "h.s" = .data$value + .data$e - .data$r
+                        ))
   }
-
-
+  
+  
   if (("try-error" %in% class(statOut))) {
     statistics <- dplyr::tibble("p.signif" = NA)
   }
-
+  
   if (("try-error" %in% class(statistics))) {
     statistics <- dplyr::tibble("p.signif" = NA)
   }
-
+  
   if (stats == TRUE) {
     return(statOut)
   }
-
+  
   if (trans.y != "identity" & !all(is.na(statistics$p.signif))) {
     logBase <- readr::parse_number(trans.y)
     statistics <- statistics %>%
-      dplyr::mutate(
-        "h.p" = .data$h.p * logBase,
-        "h.s" = .data$h.s * logBase
-      )
+      dplyr::mutate("h.p" = .data$h.p * logBase,
+                    "h.s" = .data$h.s * logBase)
   }
-
+  
   if (is.null(y.lab)) {
     y.lab <- unique(df$variable)
-
+    
     if (length(y.lab) > 1) {
       y.lab <- y.lab[1]
     }
   } # If not specified by user, set y axis label to the variable being plotted.
-
+  
   # Make pretty scientific notation
   max_e <- as.numeric(stringr::str_split(
     string = format(max(c(
       dmax$value,
       dmax$error_max
     )),
-    scientific = TRUE
-    ),
+    scientific = TRUE),
     pattern = "e\\+"
   )[[1]][2])
   fancy_scientific <- function(l) {
@@ -382,13 +403,12 @@ gplot <- function(
     l2 <- c()
     for (i in seq_len(length(e))) {
       l2[i] <- ifelse(e[i] == 0, l[i],
-        ifelse(e[i] < max_e, (10^-e_dif[i]) * l[i], l[i])
-      )
+                      ifelse(e[i] < max_e, (10 ^ -e_dif[i]) * l[i], l[i]))
     }
-
+    
     format(l2, trim = FALSE)
   }
-
+  
   if (angle.x == TRUE) {
     angle <- 45
     vjust <- 1
@@ -398,82 +418,89 @@ gplot <- function(
     vjust <- 0
     hjust <- 0.5
   }
-
+  
   if (isTRUE(sci)) {
     labs.y <- fancy_scientific
-    y.lab <- bquote(.(paste0(gsub("\\s*#\\s*", "", y.lab), " "))(10^.(max_e)))
+    y.lab <-
+      bquote(.(paste0(gsub(
+        "\\s*#\\s*", "", y.lab
+      ), " "))(10 ^ .(max_e)))
   } else {
     labs.y <- ggplot2::waiver()
   }
   if (trans.y != "identity") {
     .x <- NULL
     if (trans.y == "log2") {
-      labs.y <- scales::trans_format(trans.y, scales::math_format(2^.x))
+      labs.y <- scales::trans_format(trans.y, scales::math_format(2 ^ .x))
       y.lim <- c(NA, NA)
     } else {
-      labs.y <- scales::trans_format(trans.y, scales::math_format(10^.x))
+      labs.y <- scales::trans_format(trans.y, scales::math_format(10 ^ .x))
       y.lim <- c(NA, NA)
     }
     expand.y <- c(0.05, 0.05)
   }
-
+  
   # Assign names to the shape, fill, color, and alpha arguments
-
+  
   for (x in c("shape.groups", "fill.groups", "color.groups")) {
     assign(x, stats::setNames(object = get(x), levels(df[[comparison]])))
   }
-
+  
   # Create geoms
-  crossbar <- ggplot2::stat_summary(ggplot2::aes(
-    group = get(comparison),
-    color = get(comparison)
-  ),
-  fun.y = mean,
-  fun.ymax = mean,
-  fun.ymin = mean,
-  size = stroke / 3,
-  geom = "crossbar",
-  width = width,
-  position = ggplot2::position_dodge(dodge)
+  crossbar <- ggplot2::stat_summary(
+    ggplot2::aes(
+      group = get(comparison),
+      color = get(comparison)
+    ),
+    fun.y = mean,
+    fun.ymax = mean,
+    fun.ymin = mean,
+    size = stroke / 3,
+    geom = "crossbar",
+    width = width,
+    position = ggplot2::position_dodge(dodge)
   )
-
-  point <- ggplot2::geom_point(ggplot2::aes(
-    shape = get(comparison),
-    color = get(comparison)
-  ),
-  stroke = stroke,
-  size = size,
-  position = ggplot2::position_jitterdodge(
-    jitter.width = 0.25,
-    dodge.width = dodge
+  
+  point <- ggplot2::geom_point(
+    ggplot2::aes(
+      shape = get(comparison),
+      color = get(comparison)
+    ),
+    stroke = stroke,
+    size = size,
+    position = ggplot2::position_jitterdodge(jitter.width = 0.25,
+                                             dodge.width = dodge)
   )
+  
+  point_noJitter <- ggplot2::geom_point(
+    ggplot2::aes(
+      shape = get(comparison),
+      color = get(comparison)
+    ),
+    stroke = stroke,
+    size = size,
+    position = ggplot2::position_dodge(dodge)
   )
-
-  point_noJitter <- ggplot2::geom_point(ggplot2::aes(
-    shape = get(comparison),
-    color = get(comparison)
-  ),
-  stroke = stroke,
-  size = size,
-  position = ggplot2::position_dodge(dodge)
-  )
-
+  
   # paired_lines <- ggplot2::geom_line(ggplot2::aes(
   #   group = Pairs),
   #   position = position_dodge(width = dodge)
   # )
-
-  errorbar <- ggplot2::stat_summary(ggplot2::aes(group = get(comparison)),
-    fun.data = errortype,
-    fun.args = list(mult = 1),
-    geom = "errorbar",
-    color = "black",
-    width = 0.25 * width,
-    position = ggplot2::position_dodge(dodge),
-    size = stroke
-  )
-
-  bar <- ggplot2::stat_summary(ggplot2::aes(fill = get(comparison)),
+  
+  errorbar <-
+    ggplot2::stat_summary(
+      ggplot2::aes(group = get(comparison)),
+      fun.data = errortype,
+      fun.args = list(mult = 1),
+      geom = "errorbar",
+      color = "black",
+      width = 0.25 * width,
+      position = ggplot2::position_dodge(dodge),
+      size = stroke
+    )
+  
+  bar <- ggplot2::stat_summary(
+    ggplot2::aes(fill = get(comparison)),
     color = "black",
     fun.y = mean,
     size = stroke,
@@ -482,78 +509,82 @@ gplot <- function(
     position = ggplot2::position_dodge(dodge),
     show.legend = TRUE
   )
-
-  violin <- ggplot2::geom_violin(ggplot2::aes(
-    fill = get(comparison),
-    color = get(comparison)
-  ),
-  show.legend = TRUE,
-  position = ggplot2::position_dodge(dodge)
-  )
-
-  box <- ggplot2::geom_boxplot(ggplot2::aes(
-    color = get(comparison),
-    fill = get(comparison)
-  ),
-  show.legend = TRUE,
-  position = ggplot2::position_dodge(dodge)
-  )
-
-  line <- ggplot2::stat_summary(ggplot2::aes(
-    group = get(comparison),
-    color = get(comparison)
-  ),
-  fun.y = mean,
-  geom = "line",
-  size = stroke
-  )
-
-  line_error <- ggplot2::stat_summary(ggplot2::aes(group = get(comparison)),
-    fun.data = errortype,
-    fun.args = list(mult = 1),
-    geom = "errorbar",
-    color = "black",
-    width = 0.25 * width,
-    size = stroke
-  )
-
-  line_point <- ggplot2::stat_summary(ggplot2::aes(
-    fill = get(comparison),
-    shape = get(comparison),
-    color = get(comparison)
-  ),
-  stroke = stroke,
-  size = size,
-  fun.y = mean,
-  geom = "point"
-  )
-
-  dot <- ggplot2::geom_dotplot(ggplot2::aes(color = get(comparison)),
-    binaxis = "y",
-    stackdir = "center",
-    method = "histodot",
+  
+  violin <- ggplot2::geom_violin(
+    ggplot2::aes(fill = get(comparison),
+                 color = get(comparison)),
+    show.legend = TRUE,
     position = ggplot2::position_dodge(dodge)
   )
-
+  
+  box <- ggplot2::geom_boxplot(
+    ggplot2::aes(color = get(comparison),
+                 fill = get(comparison)),
+    show.legend = TRUE,
+    position = ggplot2::position_dodge(dodge)
+  )
+  
+  line <- ggplot2::stat_summary(
+    ggplot2::aes(
+      group = get(comparison),
+      color = get(comparison)
+    ),
+    fun.y = mean,
+    geom = "line",
+    size = stroke
+  )
+  
+  line_error <-
+    ggplot2::stat_summary(
+      ggplot2::aes(group = get(comparison)),
+      fun.data = errortype,
+      fun.args = list(mult = 1),
+      geom = "errorbar",
+      color = "black",
+      width = 0.25 * width,
+      size = stroke
+    )
+  
+  line_point <- ggplot2::stat_summary(
+    ggplot2::aes(
+      fill = get(comparison),
+      shape = get(comparison),
+      color = get(comparison)
+    ),
+    stroke = stroke,
+    size = size,
+    fun.y = mean,
+    geom = "point"
+  )
+  
+  dot <-
+    ggplot2::geom_dotplot(
+      ggplot2::aes(color = get(comparison)),
+      binaxis = "y",
+      stackdir = "center",
+      method = "histodot",
+      position = ggplot2::position_dodge(dodge)
+    )
+  
   density <- ggplot2::geom_density(ggplot2::aes(
     color = get(comparison),
     fill = get(comparison),
     x = .data$value
   ),
-  inherit.aes = FALSE
-  )
-
+  inherit.aes = FALSE)
+  
   if (all(is.na(statOut$p.signif))) {
     geom <- geom[which(!geom %in% c("stat", "seg"))]
   } else {
     stat <- ggplot2::geom_text(
-      data = statistics, ggplot2::aes(.data$x.pos, stats::na.omit(.data$h.p)),
+      data = statistics,
+      ggplot2::aes(.data$x.pos, stats::na.omit(.data$h.p)),
       label = statistics[[p]],
       size = font_size / (1 / 0.35),
       inherit.aes = FALSE,
       na.rm = TRUE
     )
-
+    
     seg <- ggplot2::geom_segment(
       data = statistics,
       ggplot2::aes(
@@ -567,25 +598,22 @@ gplot <- function(
       na.rm = TRUE
     )
   }
-
-
+  
+  
   suppressWarnings(if ("line_point_stat" %in% geom) {
     geom <- c("line", "line_error", "line_point", "stat")
   })
-
+  
   suppressWarnings(if ("density" %in% geom) {
-    scale.x <- ggplot2::scale_x_continuous(expand = c(0, 0), limits = x.lim)
+    scale.x <-
+      ggplot2::scale_x_continuous(expand = c(0, 0), limits = x.lim)
     y.lim <- c(0, NA)
   })
-
+  
   # Create ggplot object and plot
-  g <- ggplot2::ggplot(
-    data = df,
-    ggplot2::aes(
-      x = get(group.by),
-      y = .data$value
-    )
-  ) +
+  g <- ggplot2::ggplot(data = df,
+                       ggplot2::aes(x = get(group.by),
+                                    y = .data$value)) +
     ggplot2::labs(
       x = x.lab,
       y = y.lab,
@@ -606,27 +634,20 @@ gplot <- function(
     ggplot2::scale_shape_manual(values = shape.groups) +
     ggplot2::scale_fill_manual(values = fill.groups) +
     ggplot2::scale_color_manual(values = color.groups) +
-    lapply(geom, function(x) get(x)) +
+    lapply(geom, function(x)
+      get(x)) +
     ggplot2::theme(
-      line = ggplot2::element_line(
-        colour = "black",
-        size = stroke
-      ),
-      text = ggplot2::element_text(
-        size = font_size,
-        colour = "black"
-      ),
+      line = ggplot2::element_line(colour = "black",
+                                   size = stroke),
+      text = ggplot2::element_text(size = font_size,
+                                   colour = "black"),
       rect = ggplot2::element_blank(),
       panel.grid = ggplot2::element_blank(),
       legend.position = leg.pos,
-      legend.title = ggplot2::element_text(
-        size = font_size,
-        colour = "black"
-      ),
-      legend.text = ggplot2::element_text(
-        size = font_size,
-        colour = "black"
-      ),
+      legend.title = ggplot2::element_text(size = font_size,
+                                           colour = "black"),
+      legend.text = ggplot2::element_text(size = font_size,
+                                          colour = "black"),
       axis.line.x = ggplot2::element_line(colour = "black", size = stroke),
       axis.line.y = ggplot2::element_line(colour = "black", size = stroke),
       axis.ticks.x = ggplot2::element_blank(),
@@ -637,10 +658,8 @@ gplot <- function(
         vjust = vjust,
         hjust = hjust
       ),
-      axis.text = ggplot2::element_text(
-        size = font_size,
-        colour = "black"
-      ),
+      axis.text = ggplot2::element_text(size = font_size,
+                                        colour = "black"),
       plot.margin = ggplot2::margin(5, 0, 5, 0, "mm"),
       legend.margin = ggplot2::margin(0, 0, 0, 0, "mm")
     )
@@ -651,84 +670,88 @@ gplot <- function(
     } else {
       lwidth <- 0
     }
-    gt <- egg::set_panel_size(g,
+    gt <- egg::set_panel_size(
+      g,
       width = ggplot2::unit(plotWidth, "mm"),
       height = ggplot2::unit(plotHeight, "mm")
     )
     gt$layout$clip[gt$layout$name == "panel"] <- "off"
-
+    
     # rect grobs such as those created by geom_bar() have "height" / "width"
     # measurements, while point & text grobs have "y" / "x" measurements,
     # & we look for both
-    max.grob.heights <- vapply(
-      gt$grob[[which(gt$layout$name == "panel")]]$children,
-      function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
-          max(as.numeric(x$height), na.rm = TRUE),
-          ifelse(!is.null(x$y) & "unit" %in% class(x$y),
-            max(as.numeric(x$y)),
-            0
-          )
-        ), numeric(1)
-    )
+    max.grob.heights <- vapply(gt$grob[[which(
+      gt$layout$name == "panel")]]$children,
+                               function(x)
+                                 ifelse(
+                                   !is.null(x$height) & 
+                                     "unit" %in% class(x$height),
+                                   max(as.numeric(x$height), na.rm = TRUE),
+                                   ifelse(!is.null(x$y) & 
+                                            "unit" %in% class(x$y),
+                                          max(as.numeric(x$y)),
+                                          0)
+                                 ), numeric(1))
     max.grob.heights <- max(max.grob.heights, na.rm = TRUE)
-
-    min.grob.heights <- vapply(
-      gt$grob[[which(gt$layout$name == "panel")]]$children,
-      function(x) ifelse(!is.null(x$height) & "unit" %in% class(x$height),
-          min(as.numeric(x$height), na.rm = TRUE),
-          ifelse(!is.null(x$y) & "unit" %in% class(x$y),
-            min(as.numeric(x$y)),
-            0
-          )
-        ), numeric(1)
-    )
+    
+    min.grob.heights <- vapply(gt$grob[[which(
+      gt$layout$name == "panel")]]$children,
+                               function(x)
+                                 ifelse(
+                                   !is.null(x$height) & 
+                                     "unit" %in% class(x$height),
+                                   min(as.numeric(x$height), 
+                                       na.rm = TRUE),
+                                   ifelse(!is.null(x$y) & 
+                                            "unit" %in% class(x$y),
+                                          min(as.numeric(x$y)),
+                                          0)
+                                 ), numeric(1))
     min.grob.heights <- min(min.grob.heights, na.rm = TRUE)
-
+    
     # identify panel row & calculate panel height
     panel.row <- gt$layout[gt$layout$name == "panel", "t"] # = 7
-    panel.height <- as.numeric(grid::convertUnit(gt$heights[panel.row], "mm"))
-
+    panel.height <-
+      as.numeric(grid::convertUnit(gt$heights[panel.row], "mm"))
+    
     # calculate height of all the grobs above the panel
     height.above.panel <- gt$heights[seq_len(panel.row - 1)]
-    height.above.panel <- sum(as.numeric(grid::convertUnit(
-      height.above.panel,
-      "mm"
-    )), na.rm = TRUE)
-
+    height.above.panel <- sum(as.numeric(
+      grid::convertUnit(height.above.panel, "mm")), na.rm = TRUE)
+    
     # check whether the out-of-bound object (if any) exceeds this height,
     # & replace if necessary
     if (max.grob.heights > 1) {
       oob.height.above.panel <- (max.grob.heights - 1) * panel.height
-      height.above.panel <- max(height.above.panel, oob.height.above.panel,
-        na.rm = TRUE
-      )
+      height.above.panel <-
+        max(height.above.panel, oob.height.above.panel,
+            na.rm = TRUE)
     }
-
+    
     # as above, calculate the height of all the grobs below the panel
-    height.below.panel <- gt$heights[(panel.row + 1):length(gt$heights)]
-    height.below.panel <- sum(as.numeric(grid::convertUnit(
-      height.below.panel,
-      "mm"
-    )), na.rm = TRUE)
-
+    height.below.panel <-
+      gt$heights[(panel.row + 1):length(gt$heights)]
+    height.below.panel <- sum(as.numeric(
+      grid::convertUnit(height.below.panel, "mm")), na.rm = TRUE)
+    
     # as above
     if (min.grob.heights < 0) {
       oob.height.below.panel <- abs(min.grob.heights) * panel.height
-      height.below.panel <- max(height.below.panel, oob.height.below.panel,
-        na.rm = TRUE
-      )
+      height.below.panel <-
+        max(height.below.panel, oob.height.below.panel,
+            na.rm = TRUE)
     }
-
+    
     # sum the result
-    pheight <- height.above.panel + panel.height + height.below.panel
+    pheight <-
+      height.above.panel + panel.height + height.below.panel
     gt <- gtable::gtable_add_padding(gt,
-      padding = ggplot2::unit(c(
-        height.above.panel,
-        lwidth / 2,
-        5,
-        lwidth / 2
-      ), "mm")
-    )
+                                     padding = ggplot2::unit(c(
+                                       height.above.panel,
+                                       lwidth / 2,
+                                       5,
+                                       lwidth / 2
+                                     ), "mm"))
     return(gt)
   }
 }

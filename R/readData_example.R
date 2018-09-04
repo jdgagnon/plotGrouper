@@ -1,4 +1,3 @@
-
 # Copyright 2017-2018 John Gagnon
 # This program is distributed under the terms of the GNU General Public License
 
@@ -16,9 +15,9 @@ readData_example <- function(path = NULL) {
   if (is.null(path)) {
     dir(system.file("application/www", package = "plotGrouper"))
   } else {
-    system.file("application/www", 
-                path, 
-                package = "plotGrouper", 
+    system.file("application/www",
+                path,
+                package = "plotGrouper",
                 mustWork = TRUE)
   }
 }
