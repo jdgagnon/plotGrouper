@@ -28,7 +28,7 @@ Imports:
     gtable (>= 0.2.0), 
     ggpubr (>= 0.1.8), 
     shiny (>= 1.1.0), 
-    shinythemes (>= 1.1.1), 
+    shinythemes (>= 1.1.1),
     colourpicker (>= 1.0),
     magrittr (>= 1.5), 
     Hmisc (>= 4.1.1), 
