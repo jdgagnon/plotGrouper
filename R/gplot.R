@@ -372,13 +372,14 @@ gplot <- function(dataset = NULL,
                     "h.s" = .data$h.s * logBase)
   }
   
+  # If not specified by user, set y axis label to the variable being plotted.
   if (is.null(y.lab)) {
     y.lab <- unique(df$variable)
     
     if (length(y.lab) > 1) {
       y.lab <- y.lab[1]
     }
-  } # If not specified by user, set y axis label to the variable being plotted.
+  }
   
   # Make pretty scientific notation
   max_e <- as.numeric(stringr::str_split(
@@ -481,11 +482,6 @@ gplot <- function(dataset = NULL,
     size = size,
     position = ggplot2::position_dodge(dodge)
   )
-  
-  # paired_lines <- ggplot2::geom_line(ggplot2::aes(
-  #   group = Pairs),
-  #   position = position_dodge(width = dodge)
-  # )
   
   errorbar <-
     ggplot2::stat_summary(

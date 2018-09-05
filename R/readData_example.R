@@ -10,6 +10,7 @@
 #' @return Located example excel file in package
 #' @examples
 #' readData_example(path = "iris.xlsx")
+#' readData_example(path = "iris.csv")
 #' @export
 readData_example <- function(path = NULL) {
   if (is.null(path)) {

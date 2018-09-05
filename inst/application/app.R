@@ -186,7 +186,7 @@ ui <- function(request) {
               column(4,
                      selectInput(
                        "beadColumn",
-                       "# Beads/Sample",
+                       "Beads/Sample",
                        choices = NULL
                      )),
               column(
@@ -234,7 +234,6 @@ ui <- function(request) {
                     "errorbar",
                     "point",
                     "point_noJitter",
-                    # "paired_lines",
                     "dot",
                     "stat",
                     "seg",
@@ -563,6 +562,7 @@ server <- function(input, output, session) {
       "update"
     )
   )
+  
   `%>%` <- magrittr::`%>%`
   fileExtension <- reactiveVal(NULL)
   dataFrame <- reactiveVal(NULL)
@@ -579,7 +579,7 @@ server <- function(input, output, session) {
   
   palette_cols <- reactiveVal(c("#000000", "#000000"))
   
-  palette_fills <- reactiveVal(c("#444444", "#00000000"))
+  palette_fills <- reactiveVal(c("#444444", "#00000000", "#A33838"))
   
   observeEvent(input$sampleFile, {
     print("Updating sheet with iris")
@@ -1134,9 +1134,6 @@ server <- function(input, output, session) {
   })
   
   #### Plot the data ####
-  # output$myPlot <- renderPlot({
-  #   gridExtra::grid.arrange(currentPlot())
-  # }, height = function() cpHeight(), width = function() cpWidth())
   
   output$myPlot <- renderImage({
     print("rendering plot")
