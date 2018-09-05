@@ -18,4 +18,5 @@ directory. This function makes them easy to access.
 }
 \examples{
 readData_example(path = "iris.xlsx")
+readData_example(path = "iris.csv")
 }
