@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
 ```
 
 # plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
+_by John Gagnon_
 
 [![Travis-CI Build Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
 <!-- [![Bioconductor Build Status](http://bioconductor.org/rss/build/packages/plotGrouper.rss) -->
@@ -51,11 +52,19 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
   BiocManager::install("plotGrouper")
 ```
 
- + Or install the development version of the package from Github.
+ + Or install the development version of the package from Github using
+ `BbiocManager`
 
 ```{r eval = FALSE}
 BiocManager::install(“jdgagnon/plotGrouper”)
 ```
+
+ + Or using `devtools`.
+ 
+ ```{r eval = FALSE}
+devtools::install_github(“jdgagnon/plotGrouper”)
+```
+
 
 ## Usage
 
@@ -166,7 +175,7 @@ are stored in the `Statistics` tab. These can be saved by clicking the
 * The `Raw Data` tab displays the dataframe that was created upon import of the 
 file along with the automatically created `Sheet` column.
 
-# Session info
+## Session info
 
 Here is the output of `sessionInfo()` on the system on which this package was
 developed:
@@ -176,7 +185,7 @@ sessionInfo()
 ```
 <br><br>
 
-# License
+## License
 
 GNU GPL-3.0-or-later
 

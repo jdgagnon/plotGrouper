@@ -3,6 +3,8 @@
 
 # plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
 
+*by John Gagnon*
+
 [![Travis-CI Build
 Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
 <!-- [![Bioconductor Build Status](http://bioconductor.org/rss/build/packages/plotGrouper.rss) -->
@@ -47,12 +49,21 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
   BiocManager::install("plotGrouper")
 ```
 
-  - Or install the development version of the package from Github.
+  - Or install the development version of the package from Github using
+    `BbiocManager`
 
 <!-- end list -->
 
 ``` r
 BiocManager::install(“jdgagnon/plotGrouper”)
+```
+
+  - Or using `devtools`.
+
+<!-- end list -->
+
+``` r
+devtools::install_github(“jdgagnon/plotGrouper”)
 ```
 
 ## Usage
@@ -150,7 +161,7 @@ report`.
     import of the file along with the automatically created `Sheet`
     column.
 
-# Session info
+## Session info
 
 Here is the output of `sessionInfo()` on the system on which this
 package was developed:
@@ -180,7 +191,7 @@ sessionInfo()
 
 <br><br>
 
-# License
+## License
 
 GNU GPL-3.0-or-later
 
