@@ -26,15 +26,24 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r logo, echo=FALSE}
+htmltools::img(src = knitr::image_uri("logo_small.png"), 
+               alt = 'logo', 
+               style = 'position:absolute; 
+               top:0; 
+               right:0; 
+               padding:10px; 
+               width:150px')
+```
+
+
+
 ```{r style, echo = FALSE, results = 'asis'}
   BiocStyle::markdown()
 ```
 
 # Description
 
-```{r logo, echo=FALSE, out.width = '40%'}
-knitr::include_graphics("logo_small.png")
-```
 A tool for generating figure-ready graphs from 
 data in an excel, csv, or tsv file. It borrows heavily from packages developed 
 by others, including ggplot2 and dplyr from the tidyverse and batch statistical 
