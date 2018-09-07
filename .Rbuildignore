@@ -4,6 +4,7 @@
 ^img$
 ^\.github$
 ^README\.md$
+^README\.Rmd$
 ^_config\.yml$
 ^plotGrouper\.Rproj$
 ^run_tests\.R$
