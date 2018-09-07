@@ -65,7 +65,7 @@ dilution perfomred).
 
 ``` r
 install.packages("devtools")
-devtools::install_github(“jdgagnon/plotGrouper”)
+devtools::install_github("jdgagnon/plotGrouper")
 ```
 
 ## Usage

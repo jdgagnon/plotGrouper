@@ -61,9 +61,9 @@ download and install the latest [version](https://cran.r-project.org).
 
  2. install using `devtools`.
  
- ```{r eval = FALSE}
- install.packages("devtools")
-devtools::install_github(“jdgagnon/plotGrouper”)
+```{r eval = FALSE}
+install.packages("devtools")
+devtools::install_github("jdgagnon/plotGrouper")
 ```
 
 

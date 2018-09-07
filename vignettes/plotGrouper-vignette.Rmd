@@ -61,7 +61,7 @@ download the latest version [Here](https://cran.r-project.org).
 
 2. Download the package from Bioconductor.
 
-```
+```{r eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
   BiocManager::install("plotGrouper")
@@ -71,13 +71,13 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
  using `BbiocManager`:
 
 ```{r eval = FALSE}
-BiocManager::install(“jdgagnon/plotGrouper”)
+BiocManager::install("jdgagnon/plotGrouper")
 ```
 
  + Or using `devtools`:
  
- ```{r eval = FALSE}
-devtools::install_github(“jdgagnon/plotGrouper”)
+```{r eval = FALSE}
+devtools::install_github("jdgagnon/plotGrouper")
 ```
 
 
