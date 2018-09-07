@@ -3,13 +3,19 @@
 
 # plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
 
-*by John Gagnon*
+*by **John Gagnon*** <br> *University of California, San Francisco*
 
 [![Travis-CI Build
 Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
 <!-- [![Bioconductor Build Status](http://bioconductor.org/rss/build/packages/plotGrouper.rss) -->
 
-## Overview
+### Table of Contents
+
+**[Overview](#overview)**<br> **[Installation](#installation)**<br>
+**[Usage](#usage)**<br> **[Session info](#session-info)**<br>
+**[License](#license)**<br>
+
+# Overview
 
 plotGrouper is a shiny app wrapper for ggplot2. It is designed to make
 the visualization of data and statistical analysis as straightforward as
@@ -26,47 +32,49 @@ dilution perfomred).
 
 ![](vignettes/Box_Crossbar_example.png)
 
-## Installation
+# Installation
 
 1.  If you do not already have R installed, or your version is out of
-    date, download the latest version
-    [Here](https://cran.r-project.org).
+    date, download and install the latest
+    [version](https://cran.r-project.org).
 
 <!-- end list -->
 
   - Optionally, install the latest version of [RStudio
     Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
 
-<!-- end list -->
+<!-- 2. Download the package from Bioconductor (NOT YET AVAILABLE FROM BIOCONDUCTOR. -->
 
-2.  Download the package from Bioconductor.
+<!-- ```{r eval = FALSE} -->
+
+<!-- if (!requireNamespace("BiocManager", quietly = TRUE)) -->
+
+<!--   install.packages("BiocManager") -->
+
+<!--   BiocManager::install("plotGrouper") -->
+
+<!-- ``` -->
+
+<!--  + Or install the development version of the package from Github using -->
+
+<!--  `BbiocManager` -->
+
+<!-- ```{r eval = FALSE} -->
+
+<!-- BiocManager::install(“jdgagnon/plotGrouper”) -->
+
+<!-- ``` -->
+
+2.  Install using `devtools`.
 
 <!-- end list -->
 
 ``` r
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-  BiocManager::install("plotGrouper")
+install.packages("devtools")
+devtools::install_github("jdgagnon/plotGrouper")
 ```
 
-  - Or install the development version of the package from Github using
-    `BbiocManager`
-
-<!-- end list -->
-
-``` r
-BiocManager::install(“jdgagnon/plotGrouper”)
-```
-
-  - Or using `devtools`.
-
-<!-- end list -->
-
-``` r
-devtools::install_github(“jdgagnon/plotGrouper”)
-```
-
-## Usage
+# Usage
 
 Load the package into the R session.
 
@@ -161,7 +169,7 @@ report`.
     import of the file along with the automatically created `Sheet`
     column.
 
-## Session info
+# Session info
 
 Here is the output of `sessionInfo()` on the system on which this
 package was developed:
@@ -191,7 +199,7 @@ sessionInfo()
 
 <br><br>
 
-## License
+# License
 
 GNU GPL-3.0-or-later
 
