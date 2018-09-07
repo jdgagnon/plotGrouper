@@ -38,7 +38,10 @@
 #' @param val Specify column name that contains values (optional)
 #' @param geom Define the list of geoms you want to plot
 #' @param p Specify representation of pvalue
-#' ('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)
+#' (p.signif = astrisk representation of the raw p value;
+#' p.format = 'p = 0.05'; 
+#' p.adj = adjusted p-value; 
+#' p.adj.signif = astrisk representation of the adjusted p value)
 #' @param ref.group Specify a reference group to compare all other
 #' comparisons to
 #' @param p.adjust.method Method used for adjusting the pvalue
@@ -143,6 +146,19 @@ gplot <- function(dataset = NULL,
   
   df <- droplevels(dataset)
   
+  # If the column of values has a different column name than 'value',
+  # assign it 'value'
+  colnames(df)[colnames(df) == val] <- "value"
+  df$value <- as.numeric(df$value)
+  
+  # If comparison variable is not a factor, coerce it to one
+  if (!is.factor(df[[comparison]])) {
+    df[, comparison] <- factor(df[[comparison]],
+                               levels = unique(df[[comparison]])[levs.comps])
+  }
+  
+  df <- dplyr::arrange_(df, comparison)
+  
   # Assign labels to the groups
   suppressWarnings(if (is.null(group.labs) & split == FALSE) {
     group.labs <- function(x) {
@@ -178,17 +194,6 @@ gplot <- function(dataset = NULL,
     group.labs <- group.labs
   })
   
-  # If the column of values has a different column name than 'value',
-  # assign it 'value'
-  colnames(df)[colnames(df) == val] <- "value"
-  df$value <- as.numeric(df$value)
-  
-  # If comparison variable is not a factor, coerce it to one
-  if (!is.factor(df[[comparison]])) {
-    df[, comparison] <- factor(df[[comparison]],
-                               levels = unique(df[[comparison]])[levs.comps])
-  }
-  
   # If grouping variable is not numeric, scale x discretely, and assign levels.
   # If it is numeric, scale x continuously
   if (is.factor(df[[group.by]])) {
@@ -210,8 +215,6 @@ gplot <- function(dataset = NULL,
     )
   }
   
-  df <- dplyr::arrange_(df, comparison)
-  
   # Create a tibble of max values by group for assigning height of p values
   dmax <- droplevels(
     df %>%
@@ -227,18 +230,6 @@ gplot <- function(dataset = NULL,
       dplyr::ungroup() %>%
       dplyr::arrange_(group.by)
   )
-  
-  if (all(is.na(y.lim))) {
-    y.lim <-
-      c(0, max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
-  }
-  if (!is.na(y.lim[1]) & is.na(y.lim[2])) {
-    y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")],
-                             na.rm = TRUE) * 1.08)
-  }
-  if (!is.na(y.lim[2] & is.na(y.lim[1]))) {
-    y.lim <- c(0, y.lim[2])
-  }
   
   # If no comparisons are specified, perform all comparisons
   if (is.null(comparisons)) {
@@ -259,73 +250,94 @@ gplot <- function(dataset = NULL,
     ref.group = ref.group,
     paired = paired,
     symnum.args = symnum.args,
-    p.adjust.method = p.adjust.method
-  ))
+    p.adjust.method = p.adjust.method) %>%
+    mutate("p.adj.method" = p.adjust.method))
+  statOut$p.adj.signif <- try(vapply(X = statOut$p.adj, 
+                                     FUN = stats::symnum, 
+                                     FUN.VALUE = "",
+                                     cutpoints = symnum.args$cutpoints,
+                                     symbols = symnum.args$symbols))
   
   if (method %in% c("t.test", "wilcox.test")) {
     statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
                         dplyr::filter(.data$group1 %in% comparisons |
                                         .data$group2 %in% comparisons) %>%
+                        # Find max value (individual point or errorbar)
                         dplyr::mutate("max" = max(c(.data$value, 
                                                     .data$error_max),
                                                   na.rm = TRUE) * 0.05) %>%
                         dplyr::group_by_(group.by) %>%
                         dplyr::mutate(
+                          # Row number
                           "n" = dplyr::row_number(),
+                          # First comparison group
                           "group1" = factor(.data$group1, 
                                             levels = levels(df[[comparison]])),
+                          # Second comparison group
                           "group2" = factor(.data$group2, 
                                             levels = levels(df[[comparison]])),
-                          "r" = dplyr::if_else(p == "p.signif",
+                          # Adjustment of the height of the segment
+                          "r" = dplyr::if_else(p == "p.signif" |
+                                             p == "p.adj.signif",
                                                .data$max * 0.1,
                                                .data$max * 0.2),
+                          # Adjustment of the hieght of the stats
                           "e" = .data$max * .data$n,
+                          # Number of comparisons
                           "n_comps" = max(.data$n),
+                          # Number of grouping variables
                           "group.by_n" = as.numeric(get(group.by)),
-                          # numbergrouping variables
+                          # Group number associated with first comparison group
                           "group1_n" = as.integer(.data$group1),
+                          # Group number associated with second comparison group
                           "group2_n" = as.integer(.data$group2),
+                          # Relative width of 1 bar
                           "unit" = (width / max(.data$group2_n)) * 
                             dodge / 
-                            width,
-                          # relative
-                          # width of 1 bar
+                            width, 
+                          # Center position of the first bar
                           "start" = .data$group.by_n -
                             .data$unit *
                             max(.data$group2_n) / 2,
-                          # center position of the first bar
+                          # Center position of group1
                           "w.start" = .data$start +
                             (.data$group1_n - 1) *
                             .data$unit +
                             .data$unit /
                             2,
-                          # center position of group1
+                          # Center position of group2
                           "w.stop" = .data$start +
                             (.data$group2_n - 1) *
                             .data$unit +
                             .data$unit / 2
-                        ) %>% # center position of group2
+                        ) %>% 
                         dplyr::ungroup() %>%
                         dplyr::mutate(
+                          # Center of comparison line segment
                           "x.pos" = rowMeans(.[, c("w.start",
                                                    "w.stop")]),
-                          # center of line segment
+                          # Update w.start if p.signif is.na()
                           "w.start" = ifelse(!is.na(.data$p.signif), 
                                              .data$w.start, NA),
+                          # Update w.stop if p.signif is.na()
                           "w.stop" = ifelse(!is.na(.data$p.signif), 
                                             .data$w.stop, NA),
+                          # Adjust height of stats
                           "h.p" = .data$value + .data$e,
+                          # Adjust height of comparison line segment
                           "h.s" = .data$value + .data$e - .data$r
                         ))
   } else {
     statistics <- try(dplyr::left_join(statOut, dmax, by = group.by) %>%
+                        # Find max value (individual point or errorbar)
                         dplyr::mutate("max" = max(c(.data$value,
                                                     .data$error_max),
                                                   na.rm = TRUE) * 0.05) %>%
                         dplyr::group_by_(group.by) %>%
                         dplyr::mutate(
                           "n" = dplyr::row_number(),
-                          "r" = dplyr::if_else(p == "p.signif", 
+                          "r" = dplyr::if_else(p == "p.signif" |
+                                               p == "p.adj.signif", 
                                                max * 0.1, 
                                                max * 0.2),
                           "e" = .data$max * .data$n,
@@ -372,6 +384,19 @@ gplot <- function(dataset = NULL,
                     "h.s" = .data$h.s * logBase)
   }
   
+  # Specify y-axis limits
+  if (all(is.na(y.lim))) {
+    y.lim <-
+      c(0, max(dmax[, c("value", "error_max")], na.rm = TRUE) * 1.08)
+  }
+  if (!is.na(y.lim[1]) & is.na(y.lim[2])) {
+    y.lim <- c(y.lim[1], max(dmax[, c("value", "error_max")],
+                             na.rm = TRUE) * 1.08)
+  }
+  if (!is.na(y.lim[2] & is.na(y.lim[1]))) {
+    y.lim <- c(0, y.lim[2])
+  }
+  
   # If not specified by user, set y axis label to the variable being plotted.
   if (is.null(y.lab)) {
     y.lab <- unique(df$variable)
@@ -390,6 +415,7 @@ gplot <- function(dataset = NULL,
     scientific = TRUE),
     pattern = "e\\+"
   )[[1]][2])
+  
   fancy_scientific <- function(l) {
     l <- format(l, scientific = TRUE)
     e <- as.numeric(vapply(l, function(a) {

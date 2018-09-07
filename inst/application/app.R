@@ -4,6 +4,7 @@
 # UI ----------------------------------------------------------------------
 
 . <- "Stop NOTE"
+debugThis <- FALSE
 
 ui <- function(request) {
   fluidPage(
@@ -423,7 +424,10 @@ ui <- function(request) {
                      selectInput(
                        "pDisplay",
                        "Display p value",
-                       choices = c("p.signif", "p.format", "p.adj"),
+                       choices = c("p.signif", 
+                                   "p.adj.signif", 
+                                   "p.format", 
+                                   "p.adj"),
                        selected = "p.signif"
                      )
               ),
@@ -582,7 +586,9 @@ server <- function(input, output, session) {
   palette_fills <- reactiveVal(c("#444444", "#00000000", "#A33838"))
   
   observeEvent(input$sampleFile, {
-    print("Updating sheet with iris")
+    if (debugThis) { 
+      print("Updating sheet with iris")
+    }
     inFile(NULL)
     updateSelectInput(
       session = session,
@@ -596,7 +602,9 @@ server <- function(input, output, session) {
   observeEvent({
     input$file
   }, {
-    print("File input changed")
+    if (debugThis) {   
+      print("File input changed")
+    }
     inFile(input$file)
     # Identify file type
     fileExtension(stringr::word(input$file$name,-1,
@@ -623,11 +631,15 @@ server <- function(input, output, session) {
     input$sheet
   }, {
     req(input$sheet)
-    print("Sheet changed")
+    if (debugThis) {   
+      print("Sheet changed")
+    }
     
     # Use iris data
     if (is.null(inFile())) {
-      print("using iris data")
+      if (debugThis) {   
+        print("using iris data")
+      }
       f <- iris %>%
         dplyr::mutate(Species = as.character(Species)) %>%
         dplyr::group_by(Species) %>%
@@ -654,7 +666,9 @@ server <- function(input, output, session) {
       }
       
     }
-    print("dataframe created")
+    if (debugThis) {   
+      print("dataframe created")
+    }
     rawData(f)
     
     vars <- names(f)
@@ -683,13 +697,17 @@ server <- function(input, output, session) {
       current_columns <- "empty"
     }
     if (!all(current_columns %in% vars)) {
-      print("updating columns")
+      if (debugThis) {   
+        print("updating columns")
+      }
       updateSelectInput(session,
                         "columns",
                         choices = vars,
                         selected = vars[which(vars %in% columns_select)])
     } else if (all(current_columns %in% vars)) {
-      print("updating column choices; keeping selected")
+      if (debugThis) {   
+        print("updating column choices; keeping selected")
+      }
       updateSelectInput(session,
                         "columns",
                         choices = vars,
@@ -701,13 +719,17 @@ server <- function(input, output, session) {
       current_variables <- "empty"
     }
     if (!all(current_variables %in% variables)) {
-      print("updating variables")
+      if (debugThis) {   
+        print("updating variables")
+      }
       updateSelectInput(session,
                         "variables",
                         choices = variables,
                         selected = variables[1])
     } else if (all(current_variables %in% variables)) {
-      print("updating variable choices; keeping selected")
+      if (debugThis) {   
+        print("updating variable choices; keeping selected")
+      }
       updateSelectInput(session,
                         "variables",
                         choices = variables,
@@ -719,7 +741,9 @@ server <- function(input, output, session) {
       current_comp <- "empty"
     }
     if (!current_comp %in% vars) {
-      print("updating comp")
+      if (debugThis) {   
+        print("updating comp")
+      }
       updateSelectInput(session,
                         "comp",
                         choices = vars,
@@ -727,7 +751,9 @@ server <- function(input, output, session) {
                                                           "Condition",
                                                           "Species"))])
     } else if (all(current_comp %in% vars)) {
-      print("updating comp choices; keeping selected")
+      if (debugThis) {   
+        print("updating comp choices; keeping selected")
+      }
       updateSelectInput(session,
                         "comp",
                         choices = vars,
@@ -739,13 +765,17 @@ server <- function(input, output, session) {
       current_group <- "empty"
     }
     if (!current_group %in% vars) {
-      print("updating group")
+      if (debugThis) {   
+        print("updating group")
+      }
       updateSelectInput(session,
                         "group",
                         choices = c("variable", vars),
                         selected = "variable")
     } else if (current_group %in% vars) {
-      print("updating group choices; keeping selected")
+      if (debugThis) {   
+        print("updating group choices; keeping selected")
+      }
       updateSelectInput(
         session,
         "group",
@@ -759,13 +789,17 @@ server <- function(input, output, session) {
       current_id <- "empty"
     }
     if (!current_id %in% vars) {
-      print("updating id")
+      if (debugThis) {   
+        print("updating id")
+      }
       updateSelectInput(session,
                         "id",
                         choices = vars,
                         selected = "Sample")
     } else if (current_id %in% vars) {
-      print("updating id choices; keeping selected")
+      if (debugThis) {   
+        print("updating id choices; keeping selected")
+      }
       updateSelectInput(session,
                         "id",
                         choices = vars,
@@ -793,7 +827,9 @@ server <- function(input, output, session) {
   }, {
     req(input$sheet,
         input$comp)
-    print("updating comps")
+    if (debugThis) {   
+      print("updating comps")
+    }
     vars <- unique(rawData()[[input$comp]])
     if (is.null(vars)) {
       vars <- character(0)
@@ -827,7 +863,9 @@ server <- function(input, output, session) {
       input$id
     )
     
-    print("organizing dataframe")
+    if (debugThis) {   
+      print("organizing dataframe")
+    }
     
     d <- plotGrouper::organizeData(
       data = rawData(),
@@ -844,7 +882,9 @@ server <- function(input, output, session) {
   
   #### Create plot object ####
   plotInput <- function() {
-    print("running plotting function")
+    if (debugThis) {   
+      print("running plotting function")
+    }
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
     comparisons <- unique(dataFrame()[[input$comp]])
@@ -932,7 +972,9 @@ server <- function(input, output, session) {
   
   #### Create current plot ####
   currentPlot <- reactive({
-    print("currentPlot triggered")
+    if (debugThis) {   
+      print("currentPlot triggered")
+    }
     req(!is.null(dataFrame()),
         all(dataFrame()$variable %in% colnames(rawData())))
     
@@ -942,13 +984,17 @@ server <- function(input, output, session) {
           input[[paste0("col", i)]],
           input[[paste0("fill", i)]])
     })
-    print("Generating current plot")
+    if (debugThis) {   
+      print("Generating current plot")
+    }
     plotInput()
   })
   
   #### Store current plot height ####
   cpHeight <- reactive({
-    print("calculating plot height")
+    if (debugThis) {   
+      print("calculating plot height")
+    }
     if (is.null(dataFrame())) {
       return(1)
     }
@@ -961,7 +1007,9 @@ server <- function(input, output, session) {
   
   #### Store current plot width ####
   cpWidth <- reactive({
-    print("calculating plot width")
+    if (debugThis) {   
+      print("calculating plot width")
+    }
     if (is.null(dataFrame())) {
       return(1)
     }
@@ -974,7 +1022,9 @@ server <- function(input, output, session) {
   
   #### Calculate stats ####
   stats <- function() {
-    print("calculating statistics")
+    if (debugThis) {   
+      print("calculating statistics")
+    }
     variables <- c(input$variables)
     groups <- unique(dataFrame()[[input$group]])
     comps <- c(input$comps)
@@ -1042,7 +1092,9 @@ server <- function(input, output, session) {
         input$comp,
         length(input$comps) > 1,
         input$group)
-    print("shape picker")
+    if (debugThis) {   
+      print("shape picker")
+    }
     
     comparisons <- c(input$comps)
     options <- c(19, 21, 17, 24, 15, 22)
@@ -1078,7 +1130,9 @@ server <- function(input, output, session) {
         input$comp,
         length(input$comps) > 1,
         input$group)
-    print("color picker")
+    if (debugThis) {   
+      print("color picker")
+    }
     
     comparisons <- c(input$comps)
     choices <- palette_cols()
@@ -1108,7 +1162,9 @@ server <- function(input, output, session) {
         input$comp,
         length(input$comps) > 1,
         input$group)
-    print("fill picker")
+    if (debugThis) {   
+      print("fill picker")
+    }
     
     comparisons <- c(input$comps)
     comps <- input$comps
@@ -1136,7 +1192,9 @@ server <- function(input, output, session) {
   #### Plot the data ####
   
   output$myPlot <- renderImage({
-    print("rendering plot")
+    if (debugThis) {   
+      print("rendering plot")
+    }
     # A temp file to save the output.
     # This file will be removed later by renderImage
     outfile <- tempfile(fileext = ".png")
@@ -1181,7 +1239,9 @@ server <- function(input, output, session) {
   
   #### Create stats table ####
   output$stat_display <- renderDataTable({
-    print("creating datatable of statistics")
+    if (debugThis) {   
+      print("creating datatable of statistics")
+    }
     req(input$variables)
     stats()
   })
@@ -1198,14 +1258,18 @@ server <- function(input, output, session) {
   
   #### Create table of plotted data ####
   output$data_table_display <- renderDataTable({
-    print("creating datatable of plotted data")
+    if (debugThis) {   
+      print("creating datatable of plotted data")
+    }
     req(input$variables)
     dataFrame()
   })
   
   #### Create table with raw data ####
   output$raw_data_table_display <- renderDataTable({
-    print("creating datatable of raw data")
+    if (debugThis) {   
+      print("creating datatable of raw data")
+    }
     req(input$variables)
     rawData()
   })
@@ -1213,7 +1277,9 @@ server <- function(input, output, session) {
   #### Add current plot to report ####
   observeEvent(input$plt2rprt, {
     req(input$sheet)
-    print("plt2rprt was clicked")
+    if (debugThis) {   
+      print("plt2rprt was clicked")
+    }
     comparisons <- unique(dataFrame()[[input$comp]])
     previous_plotListLength <- plotListLength()
     plotListLength(previous_plotListLength + 1)
@@ -1255,7 +1321,9 @@ server <- function(input, output, session) {
   
   #### Clear last plot from report ####
   observeEvent(input$clear, {
-    print("clear last plot from report was clicked")
+    if (debugThis) {   
+      print("clear last plot from report was clicked")
+    }
     
     previous_plotListLength <- plotListLength()
     if (previous_plotListLength > 1) {
@@ -1295,7 +1363,9 @@ server <- function(input, output, session) {
   
   #### Clear all plots from report ####
   observeEvent(input$clearAll, {
-    print("clear all plots from report was clicked")
+    if (debugThis) {   
+      print("clear all plots from report was clicked")
+    }
     previous_plotListLength <- plotListLength()
     for (i in seq_len(previous_plotListLength)) {
       plotList[[as.character(i)]] <- grid::nullGrob(vp = NULL)
@@ -1314,7 +1384,9 @@ server <- function(input, output, session) {
   
   #### Update plot in report ####
   observeEvent(input$update, {
-    print("updating plot in report")
+    if (debugThis) {   
+      print("updating plot in report")
+    }
     req(plotListLength() >= 1)
     comparisons <- unique(dataFrame()[[input$comp]])
     current_plotListLength <- plotListLength()
@@ -1339,7 +1411,9 @@ server <- function(input, output, session) {
   
   #### Create report ####
   output$myReport <- renderImage({
-    print("rendering report image")
+    if (debugThis) {   
+      print("rendering report image")
+    }
     current_plotListLength <- plotListLength()
     # A temp file to save the output.
     # This file will be removed later by renderImage
@@ -1398,7 +1472,9 @@ server <- function(input, output, session) {
   #### Load plot from report ####
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("Loading last sheet")
+    if (debugThis) {   
+      print("Loading last sheet")
+    }
     updateSelectInput(session,
                       "sheet",
                       selected = inputs[[input$loadPlot]]$sheet)
@@ -1406,7 +1482,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("Loading last columns")
+    if (debugThis) {   
+      print("Loading last columns")
+    }
     updateSelectInput(session,
                       "columns",
                       selected = inputs[[input$loadPlot]]$columns)
@@ -1414,7 +1492,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("Loading last variables")
+    if (debugThis) {   
+      print("Loading last variables")
+    }
     updateSelectInput(session,
                       "variables",
                       selected = inputs[[input$loadPlot]]$variables)
@@ -1422,7 +1502,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("Loading last comparisons")
+    if (debugThis) {   
+      print("Loading last comparisons")
+    }
     updateSelectInput(session,
                       "comp",
                       selected = inputs[[input$loadPlot]]$comp)
@@ -1430,7 +1512,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("Loading last id")
+    if (debugThis) {   
+      print("Loading last id")
+    }
     updateSelectInput(session,
                       "id",
                       selected = inputs[[input$loadPlot]]$id)
@@ -1438,7 +1522,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("Loading last group")
+    if (debugThis) {   
+      print("Loading last group")
+    }
     updateSelectInput(session,
                       "group",
                       selected = inputs[[input$loadPlot]]$group)
@@ -1449,7 +1535,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("Loading independent inputs")
+    if (debugThis) {   
+      print("Loading independent inputs")
+    }
     updateSelectInput(session,
                       "beadColumn",
                       selected = inputs[[input$loadPlot]]$beadColumn)
@@ -1523,7 +1611,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$load, {
     req(plotListLength() >= 1)
-    print("updating colors, fills, shapes")
+    if (debugThis) {   
+      print("updating colors, fills, shapes")
+    }
     for (i in 1:length(unique(dataFrame()[[input$comp]]))) {
       colourpicker::updateColourInput(session,
                                       paste0("col", i),
@@ -1548,7 +1638,9 @@ server <- function(input, output, session) {
     req(input$file,
         plotListLength() >= 1)
     for (i in as.character(seq_len(plotListLength()))) {
-      print(paste0("refreshing plot: ", i))
+      if (debugThis) {   
+        print(paste0("refreshing plot: ", i))
+      }
       
       if (fileExtension() %in% c("xlsx", "xls")) {
         rData <- plotGrouper::readData(sheet = input$sheet,
@@ -1668,7 +1760,9 @@ server <- function(input, output, session) {
   
   #### Restoring values ####
   onRestored(function(state) {
-    print("Restoring report")
+    if (debugThis) {   
+      print("Restoring report")
+    }
     plotListLength(state$values$plotListLength)
     for (i in seq_len(isolate(plotListLength()))) {
       inputs[[as.character(i)]] <- state$values$inputs[[as.character(i)]]

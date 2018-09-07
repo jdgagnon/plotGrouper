@@ -1,7 +1,18 @@
 ---
+title: "plotGrouper"
 output: github_document
 ---
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r logo, echo=FALSE}
+htmltools::img(src = knitr::image_uri("vignettes/logo_small.png"), 
+               alt = 'logo', 
+               style = 'position:absolute; 
+               top:0; 
+               right:0; 
+               padding:10px; 
+               width:150px')
+```
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -10,14 +21,21 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 ```
-
-# plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
-_by John Gagnon_
+_by **John Gagnon**_
+<br>
+_University of California, San Francisco_
 
 [![Travis-CI Build Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
 <!-- [![Bioconductor Build Status](http://bioconductor.org/rss/build/packages/plotGrouper.rss) -->
 
-## Overview
+### Table of Contents  
+**[Overview](#overview)**<br>
+**[Installation](#installation)**<br>
+**[Usage](#usage)**<br>
+**[Session info](#session-info)**<br>
+**[License](#license)**<br>
+
+# Overview
 
 plotGrouper is a shiny app wrapper for ggplot2. It is designed to make the 
 visualization of data and statistical analysis as straightforward as possible 
@@ -34,7 +52,7 @@ beads per sample and information about any dilution perfomred).
 
 ![](vignettes/Box_Crossbar_example.png){width=100%}
 
-## Installation
+# Installation
 
 1. If you do not already have R installed, or your version is out of date, 
 download and install the latest [version](https://cran.r-project.org). 
@@ -67,7 +85,7 @@ devtools::install_github("jdgagnon/plotGrouper")
 ```
 
 
-## Usage
+# Usage
 
 Load the package into the R session.
 
@@ -175,7 +193,7 @@ are stored in the `Statistics` tab. These can be saved by clicking the
 * The `Raw Data` tab displays the dataframe that was created upon import of the 
 file along with the automatically created `Sheet` column.
 
-## Session info
+# Session info
 
 Here is the output of `sessionInfo()` on the system on which this package was
 developed:
@@ -185,7 +203,7 @@ sessionInfo()
 ```
 <br><br>
 
-## License
+# License
 
 GNU GPL-3.0-or-later
 
