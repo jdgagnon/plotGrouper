@@ -1,55 +1,40 @@
 ---
-title: "plotGrouper"
-author: 
-- name: "John Gagnon"
-  affiliation: University of California, San Francisco
-  email: john.gagnon.42@gmail.com
-package: "plotGrouper"
-date: "`r Sys.Date()`"
-abstract: >
-  plotGrouper is a shiny app wrapper for ggplot2. It is designed to make the 
-  visualization of data and statistical analysis as straightforward as possible 
-  through the use of dropdown menus and checkboxes. Plots created within the 
-  GUI are easily saved as individual PDFs or as reports with many plots. 
-  Addition of new data can be achieved by re-importing files and refreshing 
-  plots. Analysis of flow cytometry data is especially integrated with
-  plotGrouper. Count data can optionally be transformed to return the absolute
-  number of cells in a sample (this feature requires inclusion of the number of 
-  beads per sample and information about any dilution perfomred).
-output:
-  BiocStyle::html_document:
-    toc: true
-    toc_float: true
-vignette: >
-  %\VignetteIndexEntry{plotGrouper}
-  %\VignetteEngine{knitr::knitr}
-  %\VignetteEncoding{UTF-8}
+output: github_document
 ---
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r style, echo = FALSE, results = 'asis'}
-  BiocStyle::markdown()
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
 ```
 
-# Description
+# plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
+_by John Gagnon_
 
-```{r logo, echo=FALSE, out.width = '40%'}
-knitr::include_graphics("logo_small.png")
-```
-A tool for generating figure-ready graphs from 
-data in an excel, csv, or tsv file. It borrows heavily from packages developed 
-by others, including ggplot2 and dplyr from the tidyverse and batch statistical 
-calculations from ggpubr.
+[![Travis-CI Build Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
+<!-- [![Bioconductor Build Status](http://bioconductor.org/rss/build/packages/plotGrouper.rss) -->
 
-Plots can be made using combinations of geoms including bar, violin, box, 
-crossbar, density, point, line, and errorbar.
+## Overview
 
-![](Bar_Violin_example.png){width=100%}
+plotGrouper is a shiny app wrapper for ggplot2. It is designed to make the 
+visualization of data and statistical analysis as straightforward as possible 
+through the use of dropdown menus and checkboxes. Plots created within the 
+GUI are easily saved as individual PDFs or as reports with many plots. 
+Addition of new data can be achieved by re-importing files and refreshing 
+plots. Analysis of flow cytometry data is especially integrated with
+plotGrouper. Count data can optionally be transformed to return the absolute
+number of cells in a sample (this feature requires inclusion of the number of 
+beads per sample and information about any dilution perfomred).  
+
+![](vignettes/Bar_Violin_example.png){width=100%}
 <br><br>
 
-![](Box_Crossbar_example.png){width=100%}
+![](vignettes/Box_Crossbar_example.png){width=100%}
 
-
-# Prerequisites
+## Installation
 
 1. If you do not already have R installed, or your version is out of date, 
 download the latest version [Here](https://cran.r-project.org). 
@@ -61,27 +46,27 @@ download the latest version [Here](https://cran.r-project.org).
 
 2. Download the package from Bioconductor.
 
-```
+```{r eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
   BiocManager::install("plotGrouper")
 ```
 
- + Alternatively, install the development version of the package from Github 
- using `BbiocManager`:
+ + Or install the development version of the package from Github using
+ `BbiocManager`
 
 ```{r eval = FALSE}
 BiocManager::install(“jdgagnon/plotGrouper”)
 ```
 
- + Or using `devtools`:
+ + Or using `devtools`.
  
  ```{r eval = FALSE}
 devtools::install_github(“jdgagnon/plotGrouper”)
 ```
 
 
-# Usage
+## Usage
 
 Load the package into the R session.
 
@@ -190,9 +175,7 @@ are stored in the `Statistics` tab. These can be saved by clicking the
 * The `Raw Data` tab displays the dataframe that was created upon import of the 
 file along with the automatically created `Sheet` column.
 
-
-
-# Session info
+## Session info
 
 Here is the output of `sessionInfo()` on the system on which this package was
 developed:
@@ -202,9 +185,8 @@ sessionInfo()
 ```
 <br><br>
 
-# License
+## License
 
 GNU GPL-3.0-or-later
 
 [licence](https://www.gnu.org/licenses/gpl.txt)
-
