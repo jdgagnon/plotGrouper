@@ -29,40 +29,42 @@ dilution perfomred).
 ## Installation
 
 1.  If you do not already have R installed, or your version is out of
-    date, download the latest version
-    [Here](https://cran.r-project.org).
+    date, download and install the latest
+    [version](https://cran.r-project.org).
 
 <!-- end list -->
 
   - Optionally, install the latest version of [RStudio
     Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
 
-<!-- end list -->
+<!-- 2. Download the package from Bioconductor (NOT YET AVAILABLE FROM BIOCONDUCTOR. -->
 
-2.  Download the package from Bioconductor.
+<!-- ```{r eval = FALSE} -->
+
+<!-- if (!requireNamespace("BiocManager", quietly = TRUE)) -->
+
+<!--   install.packages("BiocManager") -->
+
+<!--   BiocManager::install("plotGrouper") -->
+
+<!-- ``` -->
+
+<!--  + Or install the development version of the package from Github using -->
+
+<!--  `BbiocManager` -->
+
+<!-- ```{r eval = FALSE} -->
+
+<!-- BiocManager::install(“jdgagnon/plotGrouper”) -->
+
+<!-- ``` -->
+
+2.  install using `devtools`.
 
 <!-- end list -->
 
 ``` r
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-  BiocManager::install("plotGrouper")
-```
-
-  - Or install the development version of the package from Github using
-    `BbiocManager`
-
-<!-- end list -->
-
-``` r
-BiocManager::install(“jdgagnon/plotGrouper”)
-```
-
-  - Or using `devtools`.
-
-<!-- end list -->
-
-``` r
+install.packages("devtools")
 devtools::install_github(“jdgagnon/plotGrouper”)
 ```
 

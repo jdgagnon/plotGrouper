@@ -37,31 +37,32 @@ beads per sample and information about any dilution perfomred).
 ## Installation
 
 1. If you do not already have R installed, or your version is out of date, 
-download the latest version [Here](https://cran.r-project.org). 
+download and install the latest [version](https://cran.r-project.org). 
 
 
   + Optionally, install the latest version of 
 [RStudio Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
 
 
-2. Download the package from Bioconductor.
+<!-- 2. Download the package from Bioconductor (NOT YET AVAILABLE FROM BIOCONDUCTOR. -->
 
-```{r eval = FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-  BiocManager::install("plotGrouper")
-```
+<!-- ```{r eval = FALSE} -->
+<!-- if (!requireNamespace("BiocManager", quietly = TRUE)) -->
+<!--   install.packages("BiocManager") -->
+<!--   BiocManager::install("plotGrouper") -->
+<!-- ``` -->
 
- + Or install the development version of the package from Github using
- `BbiocManager`
+<!--  + Or install the development version of the package from Github using -->
+<!--  `BbiocManager` -->
 
-```{r eval = FALSE}
-BiocManager::install(“jdgagnon/plotGrouper”)
-```
+<!-- ```{r eval = FALSE} -->
+<!-- BiocManager::install(“jdgagnon/plotGrouper”) -->
+<!-- ``` -->
 
- + Or using `devtools`.
+ 2. install using `devtools`.
  
  ```{r eval = FALSE}
+ install.packages("devtools")
 devtools::install_github(“jdgagnon/plotGrouper”)
 ```
 
@@ -151,7 +152,6 @@ plotted for each comparison variable.
 
 To prevent the `Shapes`, `Colors`, or `Fills` from reverting to their defaults,
 click the `Lock` checkboxes.
-
 
 
 Individual plots can be saved by clicking `Save` on the `Plot` tab or multiple
