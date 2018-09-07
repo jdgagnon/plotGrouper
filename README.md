@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# plotGrouper ![](vignettes/logo_small.png)
+# plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
 
 *by **John Gagnon*** <br> *University of California, San Francisco*
 
