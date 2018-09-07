@@ -159,6 +159,41 @@ gplot <- function(dataset = NULL,
   
   df <- dplyr::arrange_(df, comparison)
   
+  # Assign labels to the groups
+  suppressWarnings(if (is.null(group.labs) & split == FALSE) {
+    group.labs <- function(x) {
+      x
+    }
+  } else if (is.null(group.labs) &
+             split & is.null(split_str)) {
+    group.labs <- function(x) {
+      vapply(stringr::str_remove(
+        stringr::word(stringr::str_remove(x, trim),-1,
+                      sep = "/"),
+        " %| #|% |# "
+      ),
+      "[",
+      FUN.VALUE = "",
+      1)
+    }
+  } else if (is.null(group.labs) &
+             split & !is.null(split_str)) {
+    group.labs <- function(x) {
+      vapply(
+        strsplit(
+          stringr::str_remove(x, trim),
+          split = split_str,
+          fixed = TRUE
+        ),
+        "[",
+        FUN.VALUE = "",
+        2
+      )
+    }
+  } else {
+    group.labs <- group.labs
+  })
+  
   # If grouping variable is not numeric, scale x discretely, and assign levels.
   # If it is numeric, scale x continuously
   if (is.factor(df[[group.by]])) {
@@ -341,41 +376,6 @@ gplot <- function(dataset = NULL,
   if (stats) {
     return(statOut)
   }
-  
-  # Assign labels to the groups
-  suppressWarnings(if (is.null(group.labs) & split == FALSE) {
-    group.labs <- function(x) {
-      x
-    }
-  } else if (is.null(group.labs) &
-             split & is.null(split_str)) {
-    group.labs <- function(x) {
-      vapply(stringr::str_remove(
-        stringr::word(stringr::str_remove(x, trim),-1,
-                      sep = "/"),
-        " %| #|% |# "
-      ),
-      "[",
-      FUN.VALUE = "",
-      1)
-    }
-  } else if (is.null(group.labs) &
-             split & !is.null(split_str)) {
-    group.labs <- function(x) {
-      vapply(
-        strsplit(
-          stringr::str_remove(x, trim),
-          split = split_str,
-          fixed = TRUE
-        ),
-        "[",
-        FUN.VALUE = "",
-        2
-      )
-    }
-  } else {
-    group.labs <- group.labs
-  })
   
   if (trans.y != "identity" & !all(is.na(statistics$p.signif))) {
     logBase <- readr::parse_number(trans.y)
