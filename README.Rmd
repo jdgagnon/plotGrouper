@@ -59,7 +59,7 @@ download and install the latest [version](https://cran.r-project.org).
 <!-- BiocManager::install(“jdgagnon/plotGrouper”) -->
 <!-- ``` -->
 
- 2. install using `devtools`.
+ 2. Install using `devtools`.
  
 ```{r eval = FALSE}
 install.packages("devtools")

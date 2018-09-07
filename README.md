@@ -59,7 +59,7 @@ dilution perfomred).
 
 <!-- ``` -->
 
-2.  install using `devtools`.
+2.  Install using `devtools`.
 
 <!-- end list -->
 
