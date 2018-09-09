@@ -34,7 +34,10 @@ gplot(dataset = NULL, comparison = NULL, group.by = NULL,
 \item{geom}{Define the list of geoms you want to plot}
 
 \item{p}{Specify representation of pvalue
-('p.signif' = *; 'p.format' = 'p = 0.05'; 'p.adj' = adjusted p-value)}
+(p.signif = astrisk representation of the raw p value;
+p.format = 'p = 0.05'; 
+p.adj = adjusted p-value; 
+p.adj.signif = astrisk representation of the adjusted p value)}
 
 \item{ref.group}{Specify a reference group to compare all other
 comparisons to}
