@@ -10,8 +10,8 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 ```
-# plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
-_by **John Gagnon**_
+# plotGrouper <img src="vignettes/logo.png" align="right" height="150px" width="150px" />
+_by **John D. Gagnon**_
 <br>
 _University of California, San Francisco_
 
@@ -27,13 +27,14 @@ _University of California, San Francisco_
 
 # Overview
 
-plotGrouper is a shiny app wrapper for ggplot2. It is designed to make the 
-visualization of data and statistical analysis as straightforward as possible 
-through the use of dropdown menus and checkboxes. Plots created within the 
-GUI are easily saved as individual PDFs or as reports with many plots. 
-Addition of new data can be achieved by re-importing files and refreshing 
-plots. Analysis of flow cytometry data is especially integrated with
-plotGrouper. Count data can optionally be transformed to return the absolute
+A shinyapp-based GUI wrapper for ggplot with built-in statistical analysis. 
+Import data from file and use dropdown menus and checkboxes to specify the 
+plotting variables, graph type, and look of your plots. Once created, plots 
+can be saved independently or stored in a report that can be saved as a pdf. 
+If new data are added to the file, the report can be refreshed to include new 
+data. Statistical tests can be chosen and can be added to the graphs. 
+Analysis of flow cytometry data is especially integrated with plotGrouper. 
+Count data can optionally be transformed to return the absolute
 number of cells in a sample (this feature requires inclusion of the number of 
 beads per sample and information about any dilution perfomred).  
 
@@ -52,22 +53,22 @@ download and install the latest [version](https://cran.r-project.org).
 [RStudio Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
 
 
-<!-- 2. Download the package from Bioconductor (NOT YET AVAILABLE FROM BIOCONDUCTOR. -->
+2. Download the package from Bioconductor.
 
-<!-- ```{r eval = FALSE} -->
-<!-- if (!requireNamespace("BiocManager", quietly = TRUE)) -->
-<!--   install.packages("BiocManager") -->
-<!--   BiocManager::install("plotGrouper") -->
-<!-- ``` -->
+```{r eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+  BiocManager::install("plotGrouper", version = "devel")
+```
 
-<!--  + Or install the development version of the package from Github using -->
-<!--  `BbiocManager` -->
+ + Or install the development version of the package from Github using
+ `BbiocManager`
 
-<!-- ```{r eval = FALSE} -->
-<!-- BiocManager::install(“jdgagnon/plotGrouper”) -->
-<!-- ``` -->
+```{r eval = FALSE}
+BiocManager::install(“jdgagnon/plotGrouper”)
+```
 
- 2. Install using `devtools`.
+ + Or install using `devtools`.
  
 ```{r eval = FALSE}
 install.packages("devtools")

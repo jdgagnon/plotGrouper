@@ -1,9 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# plotGrouper <img src="vignettes/logo_small.png" align="right" height="150px" width="150px" />
+# plotGrouper <img src="vignettes/logo.png" align="right" height="150px" width="150px" />
 
-*by **John Gagnon*** <br> *University of California, San Francisco*
+*by **John D. Gagnon*** <br> *University of California, San Francisco*
 
 [![Travis-CI Build
 Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
@@ -17,12 +17,13 @@ Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://t
 
 # Overview
 
-plotGrouper is a shiny app wrapper for ggplot2. It is designed to make
-the visualization of data and statistical analysis as straightforward as
-possible through the use of dropdown menus and checkboxes. Plots created
-within the GUI are easily saved as individual PDFs or as reports with
-many plots. Addition of new data can be achieved by re-importing files
-and refreshing plots. Analysis of flow cytometry data is especially
+A shinyapp-based GUI wrapper for ggplot with built-in statistical
+analysis. Import data from file and use dropdown menus and checkboxes to
+specify the plotting variables, graph type, and look of your plots. Once
+created, plots can be saved independently or stored in a report that can
+be saved as a pdf. If new data are added to the file, the report can be
+refreshed to include new data. Statistical tests can be chosen and can
+be added to the graphs. Analysis of flow cytometry data is especially
 integrated with plotGrouper. Count data can optionally be transformed to
 return the absolute number of cells in a sample (this feature requires
 inclusion of the number of beads per sample and information about any
@@ -43,29 +44,28 @@ dilution perfomred).
   - Optionally, install the latest version of [RStudio
     Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
 
-<!-- 2. Download the package from Bioconductor (NOT YET AVAILABLE FROM BIOCONDUCTOR. -->
+<!-- end list -->
 
-<!-- ```{r eval = FALSE} -->
+2.  Download the package from Bioconductor.
 
-<!-- if (!requireNamespace("BiocManager", quietly = TRUE)) -->
+<!-- end list -->
 
-<!--   install.packages("BiocManager") -->
+``` r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+  BiocManager::install("plotGrouper", version = "devel")
+```
 
-<!--   BiocManager::install("plotGrouper") -->
+  - Or install the development version of the package from Github using
+    `BbiocManager`
 
-<!-- ``` -->
+<!-- end list -->
 
-<!--  + Or install the development version of the package from Github using -->
+``` r
+BiocManager::install(“jdgagnon/plotGrouper”)
+```
 
-<!--  `BbiocManager` -->
-
-<!-- ```{r eval = FALSE} -->
-
-<!-- BiocManager::install(“jdgagnon/plotGrouper”) -->
-
-<!-- ``` -->
-
-2.  Install using `devtools`.
+  - Or install using `devtools`.
 
 <!-- end list -->
 

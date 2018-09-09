@@ -9,3 +9,4 @@
 ^plotGrouper\.Rproj$
 ^run_tests\.R$
 ^inst/application/tests$
+^vignettes/logo\.png$

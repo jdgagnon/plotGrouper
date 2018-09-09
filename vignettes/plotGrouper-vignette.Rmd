@@ -1,19 +1,20 @@
 ---
 title: "plotGrouper"
 author: 
-- name: "John Gagnon"
+- name: "John D. Gagnon"
   affiliation: University of California, San Francisco
   email: john.gagnon.42@gmail.com
 package: "plotGrouper"
 date: "`r Sys.Date()`"
 abstract: >
-  plotGrouper is a shiny app wrapper for ggplot2. It is designed to make the 
-  visualization of data and statistical analysis as straightforward as possible 
-  through the use of dropdown menus and checkboxes. Plots created within the 
-  GUI are easily saved as individual PDFs or as reports with many plots. 
-  Addition of new data can be achieved by re-importing files and refreshing 
-  plots. Analysis of flow cytometry data is especially integrated with
-  plotGrouper. Count data can optionally be transformed to return the absolute
+  A shinyapp-based GUI wrapper for ggplot with built-in statistical analysis. 
+  Import data from file and use dropdown menus and checkboxes to specify the 
+  plotting variables, graph type, and look of your plots. Once created, plots 
+  can be saved independently or stored in a report that can be saved as a pdf. 
+  If new data are added to the file, the report can be refreshed to include new 
+  data. Statistical tests can be chosen and can be added to the graphs. 
+  Analysis of flow cytometry data is especially integrated with plotGrouper. 
+  Count data can optionally be transformed to return the absolute
   number of cells in a sample (this feature requires inclusion of the number of 
   beads per sample and information about any dilution perfomred).
 output:
@@ -128,8 +129,8 @@ These columns can be titled anything you want but values in the columns are
 important.  
 
 
-* The `Unique identifier` column should contain only unique values that identify 
-each individual sample (e.g., `Sample` within `iris` `Raw Data`).
+* The `Unique identifier` column should contain only unique values that 
+identify each individual sample (e.g., `Sample` within `iris` `Raw Data`).
 
 
 * The `Comparisons` column should contain replicated values that identify each
@@ -151,9 +152,9 @@ to plot (e.g., `Sepal.Width` from the `iris` data). If multiple are selected,
 they will be grouped according to the `Independent variable` selected.
 
 
-* The `Comparisons` selection window is used to choose which column contains the
-information that identifies which condition each sample belongs to (e.g., the
-`Species` column within the `iris` data).  
+* The `Comparisons` selection window is used to choose which column contains 
+theinformation that identifies which condition each sample belongs to (e.g., 
+the `Species` column within the `iris` data).  
 
 
 * The `Independent variable` selection window is used to select how the plots
@@ -188,8 +189,8 @@ the `Report` by clicking `Update plot in report`.
 
 
 
-* The statistics calculated for the current plot being displayed in the `Plot` tab
-are stored in the `Statistics` tab. These can be saved by clicking the 
+* The statistics calculated for the current plot being displayed in the `Plot` 
+tab are stored in the `Statistics` tab. These can be saved by clicking the 
 `Download` button on the `Statistics` tab.
 
 
