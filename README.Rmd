@@ -65,7 +65,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
  `BbiocManager`
 
 ```{r eval = FALSE}
-BiocManager::install(“jdgagnon/plotGrouper”)
+BiocManager::install("jdgagnon/plotGrouper")
 ```
 
  + Or install using `devtools`.
