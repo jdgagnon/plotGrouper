@@ -1,6 +1,6 @@
 Package: plotGrouper
 Title: Shiny app GUI wrapper for ggplot with built-in statistical analysis
-Version: 0.99.37
+Version: 0.99.38
 Authors@R: person("John D.", "Gagnon", 
   email = "john.gagnon.42@gmail.com", 
   role = c("aut", "cre"))
