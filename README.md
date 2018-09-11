@@ -7,7 +7,8 @@
 
 [![Travis-CI Build
 Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
-<!-- [![Bioconductor Build Status](http://bioconductor.org/rss/build/packages/plotGrouper.rss) -->
+<a href="http://www.bioconductor.org/packages/release/bioc/html/plotGrouper.html#since"><img border="0" src="http://www.bioconductor.org/shields/years-in-bioc/plotGrouper.svg" title="How long since the package was first in a released Bioconductor version (or is it in devel only)."></a>
+<!-- <a href="http://bioconductor.org/packages/stats/bioc/plotGrouper.html"><img border="0" src="http://www.bioconductor.org/shields/downloads/plotGrouper.svg" title="Percentile (top 5/20/50% or 'available') of downloads over last 6 full months. Comparison is done across all package categories (software, annotation, experiment)."></a> <a href="https://support.bioconductor.org/t/plotGrouper/"><img border="0" src="http://www.bioconductor.org/shields/posts/plotGrouper.svg" title="Support site activity, last 6 months: tagged questions/avg. answers per question/avg. comments per question/accepted answers, or 0 if no tagged posts."></a> <a href="http://www.bioconductor.org/packages/release/bioc/html/plotGrouper.html#svn_source"><img border="0" src="http://www.bioconductor.org/shields/commits/bioc/plotGrouper.svg" title="average Subversion commits (to the devel branch) per month for the last 6 months"></a> -->
 
 ### Table of Contents
 
