@@ -3,13 +3,16 @@
 
 # plotGrouper <img src="vignettes/logo.png" align="right" height="150px" width="150px" />
 
-*by **John D. Gagnon*** <br> *University of California, San Francisco*
+*by **John D. Gagnon*** <br> *University of California, San
+Francisco*
 
-[![Travis-CI Build
-Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
-<a href="http://bioconductor.org/checkResults/devel/bioc-LATEST/plotGrouper/"><img border='0' src="http://www.bioconductor.org/shields/build/devel/bioc/plotGrouper.svg" title="build results; click for full report"/></a>
-<a href="http://www.bioconductor.org/packages/release/bioc/html/plotGrouper.html#since"><img border="0" src="http://www.bioconductor.org/shields/years-in-bioc/plotGrouper.svg" title="How long since the package was first in a released Bioconductor version (or is it in devel only)."></a>
-<!-- <a href="http://bioconductor.org/packages/stats/bioc/plotGrouper.html"><img border="0" src="http://www.bioconductor.org/shields/downloads/plotGrouper.svg" title="Percentile (top 5/20/50% or 'available') of downloads over last 6 full months. Comparison is done across all package categories (software, annotation, experiment)."></a> <a href="https://support.bioconductor.org/t/plotGrouper/"><img border="0" src="http://www.bioconductor.org/shields/posts/plotGrouper.svg" title="Support site activity, last 6 months: tagged questions/avg. answers per question/avg. comments per question/accepted answers, or 0 if no tagged posts."></a> <a href="http://www.bioconductor.org/packages/release/bioc/html/plotGrouper.html#svn_source"><img border="0" src="http://www.bioconductor.org/shields/commits/bioc/plotGrouper.svg" title="average Subversion commits (to the devel branch) per month for the last 6 months"></a> -->
+<a href="https://travis-ci.org/jdgagnon/plotGrouper"><img border='0' src="https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master" title="Travis-CI build status."/></a></span>
+<!-- <a href="#archives"><img border="0" src="http://bioconductor.org/images/shields/availability/plotGrouper.svg" title="Whether the package is available on all platforms; click for details."/></a></span> -->
+<!-- <a href="http://bioconductor.org/packages/stats/bioc/plotGrouper/"><img border='0' src="http://bioconductor.org/images/shields/downloads/plotGrouper.svg" title="Ranking by number of downloads. A lower number means the package is downloaded more frequently. Determined within a package type (software, experiment, annotation, workflow)."/></a> -->
+<a href="http://bioconductor.org/checkResults/devel/bioc-LATEST/plotGrouper/"><img border='0' src="http://bioconductor.org/shields/build/devel/bioc/plotGrouper.svg" title="build results; click for full report"/></a>
+<a href="https://support.bioconductor.org/t/plotgrouper/"><img border='0' src="http://bioconductor.org/shields/posts/plotGrouper.svg" title="Support site activity, last 6 months: tagged questions/avg. answers per question/avg. comments per question/accepted answers, or 0 if no tagged posts."/></a>
+<a href="#since"><img border="0" src="http://bioconductor.org/shields/years-in-bioc/plotGrouper.svg" title="How long since the package was first in a released Bioconductor version (or is it in devel only)."/></a></span>
+<a href="http://bioconductor.org/checkResults/devel/bioc-LATEST/plotGrouper/"><img border='0' src="http://bioconductor.org/shields/lastcommit/devel/bioc/plotGrouper.svg" title="time since last commit. possible values: today, < 1 week, < 1 month, < 3 months, since release, before release"/></a>
 
 ### Table of Contents
 
@@ -17,7 +20,7 @@ Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://t
 **[Usage](#usage)**<br> **[Session info](#session-info)**<br>
 **[License](#license)**<br>
 
-# Overview
+## Overview
 
 A shinyapp-based GUI wrapper for ggplot with built-in statistical
 analysis. Import data from file and use dropdown menus and checkboxes to
@@ -35,7 +38,7 @@ dilution perfomred).
 
 ![](vignettes/Box_Crossbar_example.png)
 
-# Installation
+## Installation
 
 1.  If you do not already have R installed, or your version is out of
     date, download and install the latest
@@ -59,7 +62,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 ```
 
   - Or install the development version of the package from Github using
-    `BbiocManager`
+    `BiocManager`
 
 <!-- end list -->
 
@@ -76,7 +79,7 @@ install.packages("devtools")
 devtools::install_github("jdgagnon/plotGrouper")
 ```
 
-# Usage
+## Usage
 
 Load the package into the R session.
 
@@ -171,7 +174,7 @@ report`.
     import of the file along with the automatically created `Sheet`
     column.
 
-# Session info
+## Session info
 
 Here is the output of `sessionInfo()` on the system on which this
 package was developed:
@@ -201,7 +204,7 @@ sessionInfo()
 
 <br><br>
 
-# License
+## License
 
 GNU GPL-3.0-or-later
 
