@@ -37,12 +37,6 @@ htmltools::img(src = knitr::image_uri("logo_small.png"),
                width:150px')
 ```
 
-
-
-```{r style, echo = FALSE, results = 'asis'}
-  BiocStyle::markdown()
-```
-
 # Description
 
 A tool for generating figure-ready graphs from 
@@ -214,7 +208,5 @@ sessionInfo()
 
 # License
 
-GNU GPL-3.0-or-later
-
-[licence](https://www.gnu.org/licenses/gpl.txt)
+[GNU GPL-3.0-or-later](https://www.gnu.org/licenses/gpl.txt)
 
