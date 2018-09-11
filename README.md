@@ -206,6 +206,4 @@ sessionInfo()
 
 ## License
 
-GNU GPL-3.0-or-later
-
-[licence](https://www.gnu.org/licenses/gpl.txt)
+[GNU GPL-3.0-or-later](https://www.gnu.org/licenses/gpl.txt)
