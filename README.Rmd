@@ -15,12 +15,12 @@ _by **John D. Gagnon**_
 <br>
 _University of California, San Francisco_
 
-<a href="https://travis-ci.org/jdgagnon/plotGrouper"><img border='0' src="https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master" title="Travis-CI build status."/></a></span>
+<a href="https://travis-ci.org/jdgagnon/plotGrouper"><img border='0' src="https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master" title="Travis-CI build status."/></a>
 <!-- <a href="#archives"><img border="0" src="http://bioconductor.org/images/shields/availability/plotGrouper.svg" title="Whether the package is available on all platforms; click for details."/></a></span> -->
 <!-- <a href="http://bioconductor.org/packages/stats/bioc/plotGrouper/"><img border='0' src="http://bioconductor.org/images/shields/downloads/plotGrouper.svg" title="Ranking by number of downloads. A lower number means the package is downloaded more frequently. Determined within a package type (software, experiment, annotation, workflow)."/></a> -->
 <a href="http://bioconductor.org/checkResults/devel/bioc-LATEST/plotGrouper/"><img border='0' src="http://bioconductor.org/shields/build/devel/bioc/plotGrouper.svg" title="build results; click for full report"/></a>
 <a href="https://support.bioconductor.org/t/plotgrouper/"><img border='0' src="http://bioconductor.org/shields/posts/plotGrouper.svg" title="Support site activity, last 6 months: tagged questions/avg. answers per question/avg. comments per question/accepted answers, or 0 if no tagged posts."/></a>
-<a href="#since"><img border="0" src="http://bioconductor.org/shields/years-in-bioc/plotGrouper.svg" title="How long since the package was first in a released Bioconductor version (or is it in devel only)."/></a></span>
+<a href="#since"><img border="0" src="http://bioconductor.org/shields/years-in-bioc/plotGrouper.svg" title="How long since the package was first in a released Bioconductor version (or is it in devel only)."/></a>
  <a href="http://bioconductor.org/checkResults/devel/bioc-LATEST/plotGrouper/"><img border='0' src="http://bioconductor.org/shields/lastcommit/devel/bioc/plotGrouper.svg" title="time since last commit. possible values: today, < 1 week, < 1 month, < 3 months, since release, before release"/></a>
 
 ### Table of Contents  
