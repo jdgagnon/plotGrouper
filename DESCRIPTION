@@ -47,7 +47,7 @@ biocViews:
     DataImport, 
     GUI, 
     MultipleComparison
-URL: https://github.com/jdgagnon/plotGrouper
+URL: https://jdgagnon.github.io/plotGrouper/
 BugReports: https://github.com/jdgagnon/plotGrouper/issues
 License: GPL-3
 Encoding: UTF-8
