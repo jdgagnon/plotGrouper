@@ -22,7 +22,7 @@ Francisco*
 
 ## Overview
 
-A shinyapp-based GUI wrapper for ggplot with built-in statistical
+A shiny app-based GUI wrapper for ggplot with built-in statistical
 analysis. Import data from file and use dropdown menus and checkboxes to
 specify the plotting variables, graph type, and look of your plots. Once
 created, plots can be saved independently or stored in a report that can
