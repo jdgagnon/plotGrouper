@@ -70,15 +70,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("jdgagnon/plotGrouper")
 ```
 
-  - Or install using `devtools`.
-
-<!-- end list -->
-
-``` r
-install.packages("devtools")
-devtools::install_github("jdgagnon/plotGrouper")
-```
-
 ## Usage
 
 Load the package into the R session.
@@ -199,7 +190,7 @@ sessionInfo()
 #>  [1] compiler_3.5.1  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2
 #>  [5] tools_3.5.1     htmltools_0.3.6 yaml_2.2.0      Rcpp_0.12.18   
 #>  [9] stringi_1.2.4   rmarkdown_1.10  highr_0.7       knitr_1.20     
-#> [13] stringr_1.3.1   digest_0.6.16   evaluate_0.11
+#> [13] stringr_1.3.1   digest_0.6.17   evaluate_0.11
 ```
 
 <br><br>

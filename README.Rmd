@@ -73,13 +73,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("jdgagnon/plotGrouper")
 ```
 
- + Or install using `devtools`.
- 
-```{r eval = FALSE}
-install.packages("devtools")
-devtools::install_github("jdgagnon/plotGrouper")
-```
-
 
 ## Usage
 
