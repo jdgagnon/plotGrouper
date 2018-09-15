@@ -7,16 +7,16 @@ author:
 package: "plotGrouper"
 date: "`r Sys.Date()`"
 abstract: >
-  A shiny app-based GUI wrapper for ggplot with built-in statistical analysis. 
-  Import data from file and use dropdown menus and checkboxes to specify the 
-  plotting variables, graph type, and look of your plots. Once created, plots 
-  can be saved independently or stored in a report that can be saved as a pdf. 
-  If new data are added to the file, the report can be refreshed to include new 
-  data. Statistical tests can be chosen and can be added to the graphs. 
-  Analysis of flow cytometry data is especially integrated with plotGrouper. 
-  Count data can optionally be transformed to return the absolute
+  A shiny app-based GUI wrapper for ggplot with built-in statistical 
+  analysis. Import data from file and use dropdown menus and checkboxes to 
+  specify the plotting variables, graph type, and look of your plots. 
+  Once created, plots can be saved independently or stored in a report that 
+  can be saved as a pdf. If new data are added to the file, the report can be 
+  refreshed to include new data. Statistical tests can be selected and added to 
+  the graphs. Analysis of flow cytometry data is especially integrated with 
+  plotGrouper. Count data can be transformed to return the absolute
   number of cells in a sample (this feature requires inclusion of the number of 
-  beads per sample and information about any dilution perfomred).
+  beads per sample and information about any dilution performed). 
 output:
   BiocStyle::html_document:
     toc: true
@@ -39,8 +39,7 @@ htmltools::img(src = knitr::image_uri("logo_small.png"),
 
 # Description
 
-A tool for generating figure-ready graphs from 
-data in an excel, csv, or tsv file. It borrows heavily from packages developed 
+A tool for generating figure-ready graphs from file. It borrows heavily from packages developed 
 by others, including ggplot2 and dplyr from the tidyverse and batch statistical 
 calculations from ggpubr.
 
