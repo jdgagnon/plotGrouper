@@ -230,6 +230,9 @@ gplot <- function(dataset = NULL,
                      "min_value", 
                      "min_error") %>%
       dplyr::ungroup() %>%
+      dplyr::mutate("min" = min(c(.data$min_value, 
+                  .data$min_error),
+                na.rm = TRUE)) %>%
       dplyr::arrange_(group.by)
   )
   
@@ -250,6 +253,7 @@ gplot <- function(dataset = NULL,
       dplyr::ungroup() %>%
       dplyr::arrange_(group.by)
   )
+  
   d_min_max <- dplyr::left_join(d_min, d_max, by = group.by)
 
   
@@ -281,18 +285,18 @@ gplot <- function(dataset = NULL,
                                      symbols = symnum.args$symbols))
   
   if (method %in% c("t.test", "wilcox.test")) {
-    statistics <- try(dplyr::left_join(statOut, d_min_max, by = group.by) %>%
+    statistics <- try(dplyr::left_join(statOut, d_max, by = group.by) %>%
                         dplyr::filter(.data$group1 %in% comparisons |
                                         .data$group2 %in% comparisons) %>%
                         # Find max value (individual point or errorbar)
                         dplyr::mutate("max" = max(c(.data$max_value, 
                                                     .data$max_error),
-                                                  na.rm = TRUE),
-                                      "min" = min(c(.data$min_value, 
-                                                    .data$min_error),
                                                   na.rm = TRUE)) %>%
                         dplyr::group_by_(group.by) %>%
                         dplyr::mutate(
+                          "max_group" = max(c(.data$max_value,
+                                              .data$max_error),
+                                            na.rm = TRUE),
                           # Row number
                           "n" = dplyr::row_number(),
                           # First comparison group
@@ -348,21 +352,20 @@ gplot <- function(dataset = NULL,
                           "w.stop" = ifelse(!is.na(.data$p.signif), 
                                             .data$w.stop, NA),
                           # Adjust height of stats
-                          "h.p" = .data$max + .data$e,
+                          "h.p" = .data$max_group + .data$e,
                           # Adjust height of comparison line segment
-                          "h.s" = .data$max + .data$e - .data$r
+                          "h.s" = .data$max_group + .data$e - .data$r
                         ))
   } else {
-    statistics <- try(dplyr::left_join(statOut, d_min_max, by = group.by) %>%
+    statistics <- try(dplyr::left_join(statOut, d_max, by = group.by) %>%
                         # Find max value (individual point or errorbar)
-                        dplyr::mutate("max" = max(c(.data$max_value,
-                                                    .data$max_error),
-                                                  na.rm = TRUE),
-                                      "min" = min(c(.data$min_value,
-                                                    .data$min_error),
-                                                  na.rm = TRUE)) %>%
+                        dplyr::mutate("max" = max(c(max_value, max_error), 
+                                                  na.rm = T)) %>%
                         dplyr::group_by_(group.by) %>%
                         dplyr::mutate(
+                          "max_group" = max(c(.data$max_value,
+                                              .data$max_error),
+                                            na.rm = TRUE),
                           "n" = dplyr::row_number(),
                           "r" = dplyr::if_else(p == "p.signif" |
                                                p == "p.adj.signif", 
@@ -387,8 +390,8 @@ gplot <- function(dataset = NULL,
                           "w.stop" = ifelse(!is.na(.data$p.signif), 
                                             .data$w.stop, 
                                             NA),
-                          "h.p" = .data$max_value + .data$e,
-                          "h.s" = .data$max_value + .data$e - .data$r
+                          "h.p" = .data$max_group + .data$e,
+                          "h.s" = .data$max_group + .data$e - .data$r
                         ))
   }
   if (("try-error" %in% class(statOut))) {
@@ -404,10 +407,10 @@ gplot <- function(dataset = NULL,
   # Specify y-axis limits
   if (all(is.na(y.lim))) {
     y.lim <-
-      c(0, max(d_min_max[, c("max_value", "max_error")], na.rm = TRUE) * 1.08)
+      c(0, max(d_max[, c("max_value", "max_error")], na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[1]) & is.na(y.lim[2])) {
-    y.lim <- c(y.lim[1], max(d_min_max[, c("max_value", "max_error")],
+    y.lim <- c(y.lim[1], max(d_max[, c("max_value", "max_error")],
                              na.rm = TRUE) * 1.08)
   }
   if (!is.na(y.lim[2] & is.na(y.lim[1]))) {
@@ -435,8 +438,8 @@ gplot <- function(dataset = NULL,
   # Make pretty scientific notation
   max_e <- as.numeric(stringr::str_split(
     string = format(max(c(
-      d_min_max$max_value,
-      d_min_max$max_error
+      d_max$max_value,
+      d_max$max_error
     )),
     scientific = TRUE),
     pattern = "e\\+"
@@ -489,15 +492,15 @@ gplot <- function(dataset = NULL,
     } else {
       labs.y <- scales::trans_format(trans.y, scales::math_format(10 ^ .x))
     }
-    if (min(statistics$min, na.rm = TRUE) >= 0) {
+    if (min(d_min$min, na.rm = TRUE) >= 0) {
       y.lim <- 
         c(NA,
-          max(d_min_max[, c("max_value", "max_error")], na.rm = TRUE) * 1.08)
+          max(d_max[, c("max_value", "max_error")], na.rm = TRUE) * 1.08)
     }
-    if (min(statistics$min, na.rm = TRUE) < 0) {
+    if (min(d_min$min, na.rm = TRUE) < 0) {
       y.lim <- 
         c(NA,
-          max(d_min_max[, c("max_value", "max_error")], na.rm = TRUE) * 1.08)
+          max(d_max[, c("max_value", "max_error")], na.rm = TRUE) * 1.08)
     }
   }
   
