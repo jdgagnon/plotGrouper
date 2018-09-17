@@ -1460,8 +1460,8 @@ server <- function(input, output, session) {
                                    ncol = numcol)
           },
         useDingbats = FALSE,
-        height = reportHeight() / 3.7795275591,
-        width = reportWidth() / 3.7795275591,
+        height = (reportHeight() / 3.7795275591) + 25,
+        width = (reportWidth() / 3.7795275591) + 25,
         units = "mm",
         device = "pdf",
         limitsize = FALSE
