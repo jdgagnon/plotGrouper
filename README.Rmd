@@ -52,13 +52,13 @@ beads per sample and information about any dilution performed).
 
 ## Installation
 
-1. If you do not already have R installed, or your version is out of date, 
++ If you do not already have R installed, or your version is out of date, 
 download and install the latest [version](https://cran.r-project.org). 
 
   + Optionally, install the latest version of 
 [RStudio Desktop](https://www.rstudio.com/products/rstudio/#Desktop).
 
-2. Download the package from Bioconductor.
++ Download the package from Bioconductor.
 
 ```{r eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
