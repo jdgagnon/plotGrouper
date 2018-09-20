@@ -3,10 +3,10 @@
 
 # plotGrouper <img src="vignettes/logo.png" align="right" height="150px" width="150px" />
 
-*by **John D. Gagnon*** <br> *University of California, San
-Francisco*
+*by **John D. Gagnon*** <br> *University of California, San Francisco*
 
-<a href="https://travis-ci.org/jdgagnon/plotGrouper"><img border='0' src="https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master" title="Travis-CI build status."/></a>
+[![Travis-CI Build
+Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
 <br>
 <!-- <a href="#archives"><img border="0" src="http://bioconductor.org/images/shields/availability/plotGrouper.svg" title="Whether the package is available on all platforms; click for details."/></a></span> -->
 <!-- <a href="http://bioconductor.org/packages/stats/bioc/plotGrouper/"><img border='0' src="http://bioconductor.org/images/shields/downloads/plotGrouper.svg" title="Ranking by number of downloads. A lower number means the package is downloaded more frequently. Determined within a package type (software, experiment, annotation, workflow)."/></a> -->
