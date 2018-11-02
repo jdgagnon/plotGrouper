@@ -73,14 +73,16 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
   BiocManager::install("plotGrouper")
 ```
 
- + Or install the development version of the package from Bioconductor or Github using
- `BiocManager`
+ + Or install the development version of the package from Bioconductor:
 
 ```{r eval = FALSE}
-# Bioconductor
+'Bioconductor'
 BiocManager::install("plotGrouper", version = "devel")
+```
 
-# GitHub
+ + Or GitHub:
+
+```{r eval = FALSE}
 BiocManager::install("jdgagnon/plotGrouper")
 ```
 
