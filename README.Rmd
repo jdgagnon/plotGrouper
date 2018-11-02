@@ -15,7 +15,7 @@ _by **John D. Gagnon**_
 <br>
 _University of California, San Francisco_
 
-[![Travis-CI Build Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
+<a href="https://travis-ci.org/jdgagnon/plotGrouper"><img border='0' src="https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master" title="Travis-CI build status."/></a>
 <br>
 <!-- <a href="#archives"><img border="0" src="http://bioconductor.org/images/shields/availability/plotGrouper.svg" title="Whether the package is available on all platforms; click for details."/></a></span> -->
 <!-- <a href="http://bioconductor.org/packages/stats/bioc/plotGrouper/"><img border='0' src="http://bioconductor.org/images/shields/downloads/plotGrouper.svg" title="Ranking by number of downloads. A lower number means the package is downloaded more frequently. Determined within a package type (software, experiment, annotation, workflow)."/></a> -->
@@ -70,13 +70,17 @@ download and install the latest [version](https://cran.r-project.org).
 ```{r eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-  BiocManager::install("plotGrouper", version = "devel")
+  BiocManager::install("plotGrouper")
 ```
 
- + Or install the development version of the package from Github using
+ + Or install the development version of the package from Bioconductor or Github using
  `BiocManager`
 
 ```{r eval = FALSE}
+# Bioconductor
+BiocManager::install("plotGrouper", version = "devel")
+
+# GitHub
 BiocManager::install("jdgagnon/plotGrouper")
 ```
 

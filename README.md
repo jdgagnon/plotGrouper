@@ -3,10 +3,10 @@
 
 # plotGrouper <img src="vignettes/logo.png" align="right" height="150px" width="150px" />
 
-*by **John D. Gagnon*** <br> *University of California, San Francisco*
+*by **John D. Gagnon*** <br> *University of California, San
+Francisco*
 
-[![Travis-CI Build
-Status](https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master)](https://travis-ci.org/jdgagnon/plotGrouper)
+<a href="https://travis-ci.org/jdgagnon/plotGrouper"><img border='0' src="https://travis-ci.org/jdgagnon/plotGrouper.svg?branch=master" title="Travis-CI build status."/></a>
 <br>
 <!-- <a href="#archives"><img border="0" src="http://bioconductor.org/images/shields/availability/plotGrouper.svg" title="Whether the package is available on all platforms; click for details."/></a></span> -->
 <!-- <a href="http://bioconductor.org/packages/stats/bioc/plotGrouper/"><img border='0' src="http://bioconductor.org/images/shields/downloads/plotGrouper.svg" title="Ranking by number of downloads. A lower number means the package is downloaded more frequently. Determined within a package type (software, experiment, annotation, workflow)."/></a> -->
@@ -59,15 +59,19 @@ Examples of some of the types of plots you can create: <br>
 ``` r
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-  BiocManager::install("plotGrouper", version = "devel")
+  BiocManager::install("plotGrouper")
 ```
 
-  - Or install the development version of the package from Github using
-    `BiocManager`
+  - Or install the development version of the package from Bioconductor
+    or Github using `BiocManager`
 
 <!-- end list -->
 
 ``` r
+# Bioconductor
+BiocManager::install("plotGrouper", version = "devel")
+
+# GitHub
 BiocManager::install("jdgagnon/plotGrouper")
 ```
 
@@ -189,9 +193,9 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] compiler_3.5.1  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2
-#>  [5] tools_3.5.1     htmltools_0.3.6 yaml_2.2.0      Rcpp_0.12.18   
+#>  [5] tools_3.5.1     htmltools_0.3.6 yaml_2.2.0      Rcpp_0.12.19   
 #>  [9] stringi_1.2.4   rmarkdown_1.10  highr_0.7       knitr_1.20     
-#> [13] stringr_1.3.1   digest_0.6.17   evaluate_0.11
+#> [13] stringr_1.3.1   digest_0.6.18   evaluate_0.12
 ```
 
 <br><br>
