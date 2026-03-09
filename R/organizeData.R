@@ -22,7 +22,7 @@
 #' @importFrom readr parse_number read_csv read_tsv
 #' @importFrom scales trans_format math_format rescale_none
 #' @importFrom stringr str_remove str_split word
-#' @importFrom tidyr gather
+#' @importFrom tidyr pivot_longer
 #' @importFrom stats na.omit start
 #' @importFrom colourpicker colourInput updateColourInput
 #' @param data A tibble
@@ -77,22 +77,23 @@ organizeData <- function(data = NULL,
     )
   }
   
-  d <- tidyr::gather(data,
-                     "variable",
-                     "value", -c(exclude)) %>%
-    mutate("value" = as.numeric(.data$value)) %>%
-    dplyr::filter(get(comp) %in% comps)
+  d <- tidyr::pivot_longer(data, 
+                           cols = !dplyr::all_of(exclude),
+                           names_to = "variable", 
+                           values_to = "value") %>%
+    mutate(value = as.numeric(.data$value)) %>%
+    dplyr::filter(.data[[comp]] %in% comps)
   
   if (!beadColumn %in% c("", "none") &
       !dilutionColumn %in% c("", "none")) {
     d <- d %>%
-      dplyr::group_by_(id) %>%
-      dplyr::mutate("value" = ifelse(
+      dplyr::group_by(.data[[id]]) %>%
+      dplyr::mutate(value = dplyr::if_else(
         stringr::str_detect(.data$variable, "#"),
         (
           .data$value / .data$value[.data$variable == "Bead #"] *
-            get(beadColumn) *
-            get(dilutionColumn)
+            .data[[beadColumn]] *
+            .data[[dilutionColumn]]
         ),
         .data$value
       )) %>%
