@@ -157,7 +157,7 @@ gplot <- function(dataset = NULL,
                                levels = unique(df[[comparison]])[levs.comps])
   }
   
-  df <- dplyr::arrange_(df, comparison)
+  df <- dplyr::arrange(df, .data[[comparison]])
   
   # Assign labels to the groups
   suppressWarnings(if (is.null(group.labs) & split == FALSE) {
@@ -218,44 +218,44 @@ gplot <- function(dataset = NULL,
   # Create a tibble of max values by group for assigning height of p values
   d_min <- droplevels(
     df %>%
-      dplyr::group_by_(group.by, comparison) %>%
-      dplyr::mutate("min_error" = min(
-          get(errortype)(.data$value, mult = 1),
-          na.rm = TRUE)) %>%
+      dplyr::group_by(.data[[group.by]], .data[[comparison]]) %>%
+      dplyr::mutate(min_error = min(
+        get(errortype)(.data$value, mult = 1),
+        na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by_(group.by) %>%
+      dplyr::group_by(.data[[group.by]]) %>%
       dplyr::slice(which.min(.data$value)) %>%
-      dplyr::mutate("min_value" = .data$value) %>%
-      dplyr::select_(group.by, 
-                     "min_value", 
-                     "min_error") %>%
+      dplyr::mutate(min_value = .data$value) %>%
+      dplyr::select(dplyr::all_of(group.by), 
+                    min_value, 
+                    min_error) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate("min" = min(c(.data$min_value, 
-                  .data$min_error),
-                na.rm = TRUE)) %>%
-      dplyr::arrange_(group.by)
+      dplyr::mutate(min = min(c(.data$min_value, 
+                                .data$min_error),
+                              na.rm = TRUE)) %>%
+      dplyr::arrange(.data[[group.by]])
   )
   
   d_max <- droplevels(
     df %>%
-      dplyr::group_by_(group.by, comparison) %>%
+      dplyr::group_by(.data[[group.by]], .data[[comparison]]) %>%
       dplyr::mutate(
-        "max_error" = max(
+        max_error = max(
           get(errortype)(.data$value, mult = 1),
           na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by_(group.by) %>%
+      dplyr::group_by(.data[[group.by]]) %>%
       dplyr::slice(which.max(.data$value)) %>%
-      dplyr::mutate("max_value" = .data$value) %>%
-      dplyr::select_(group.by, 
-                     "max_value", 
-                     "max_error") %>%
+      dplyr::mutate(max_value = .data$value) %>%
+      dplyr::select(dplyr::all_of(group.by), 
+                    max_value, 
+                    max_error) %>%
       dplyr::ungroup() %>%
-      dplyr::arrange_(group.by)
+      dplyr::arrange(.data[[group.by]])
   )
   
   d_min_max <- dplyr::left_join(d_min, d_max, by = group.by)
-
+  
   
   # If no comparisons are specified, perform all comparisons
   if (is.null(comparisons)) {
@@ -277,7 +277,7 @@ gplot <- function(dataset = NULL,
     paired = paired,
     symnum.args = symnum.args,
     p.adjust.method = p.adjust.method) %>%
-    mutate("p.adj.method" = p.adjust.method))
+      mutate(p.adj.method = p.adjust.method))
   statOut$p.adj.signif <- try(vapply(X = statOut$p.adj, 
                                      FUN = stats::symnum, 
                                      FUN.VALUE = "",
@@ -289,53 +289,53 @@ gplot <- function(dataset = NULL,
                         dplyr::filter(.data$group1 %in% comparisons |
                                         .data$group2 %in% comparisons) %>%
                         # Find max value (individual point or errorbar)
-                        dplyr::mutate("max" = max(c(.data$max_value, 
-                                                    .data$max_error),
-                                                  na.rm = TRUE)) %>%
-                        dplyr::group_by_(group.by) %>%
+                        dplyr::mutate(max = max(c(.data$max_value, 
+                                                  .data$max_error),
+                                                na.rm = TRUE)) %>%
+                        dplyr::group_by(.data[[group.by]]) %>%
                         dplyr::mutate(
-                          "max_group" = max(c(.data$max_value,
-                                              .data$max_error),
-                                            na.rm = TRUE),
+                          max_group = max(c(.data$max_value,
+                                            .data$max_error),
+                                          na.rm = TRUE),
                           # Row number
-                          "n" = dplyr::row_number(),
+                          n = dplyr::row_number(),
                           # First comparison group
-                          "group1" = factor(.data$group1, 
-                                            levels = levels(df[[comparison]])),
+                          group1 = factor(.data$group1, 
+                                          levels = levels(df[[comparison]])),
                           # Second comparison group
-                          "group2" = factor(.data$group2, 
-                                            levels = levels(df[[comparison]])),
+                          group2 = factor(.data$group2, 
+                                          levels = levels(df[[comparison]])),
                           # Adjustment of the height of the segment
-                          "r" = dplyr::if_else(p == "p.signif" |
-                                             p == "p.adj.signif",
-                                               .data$max * 0.1 * 0.05,
-                                               .data$max * 0.2 * 0.05),
+                          r = dplyr::if_else(p == "p.signif" |
+                                               p == "p.adj.signif",
+                                             .data$max * 0.1 * 0.05,
+                                             .data$max * 0.2 * 0.05),
                           # Adjustment of the hieght of the stats
-                          "e" = .data$max * .data$n * 0.05,
+                          e = .data$max * .data$n * 0.05,
                           # Number of comparisons
-                          "n_comps" = max(.data$n),
+                          n_comps = max(.data$n),
                           # Number of grouping variables
-                          "group.by_n" = as.numeric(get(group.by)),
+                          group.by_n = as.numeric(.data[[group.by]]),
                           # Group number associated with first comparison group
-                          "group1_n" = as.integer(.data$group1),
+                          group1_n = as.integer(.data$group1),
                           # Group number associated with second comparison group
-                          "group2_n" = as.integer(.data$group2),
+                          group2_n = as.integer(.data$group2),
                           # Relative width of 1 bar
-                          "unit" = (width / max(.data$group2_n)) * 
+                          unit = (width / max(.data$group2_n)) * 
                             dodge / 
                             width, 
                           # Center position of the first bar
-                          "start" = .data$group.by_n -
+                          start = .data$group.by_n -
                             .data$unit *
                             max(.data$group2_n) / 2,
                           # Center position of group1
-                          "w.start" = .data$start +
+                          w.start = .data$start +
                             (.data$group1_n - 1) *
                             .data$unit +
                             .data$unit /
                             2,
                           # Center position of group2
-                          "w.stop" = .data$start +
+                          w.stop = .data$start +
                             (.data$group2_n - 1) *
                             .data$unit +
                             .data$unit / 2
@@ -343,62 +343,62 @@ gplot <- function(dataset = NULL,
                         dplyr::ungroup() %>%
                         dplyr::mutate(
                           # Center of comparison line segment
-                          "x.pos" = rowMeans(.[, c("w.start",
-                                                   "w.stop")]),
+                          x.pos = rowMeans(.[, c("w.start",
+                                                 "w.stop")]),
                           # Update w.start if p.signif is.na()
-                          "w.start" = ifelse(!is.na(.data$p.signif), 
-                                             .data$w.start, NA),
+                          w.start = ifelse(!is.na(.data$p.signif), 
+                                           .data$w.start, NA),
                           # Update w.stop if p.signif is.na()
-                          "w.stop" = ifelse(!is.na(.data$p.signif), 
-                                            .data$w.stop, NA),
+                          w.stop = ifelse(!is.na(.data$p.signif), 
+                                          .data$w.stop, NA),
                           # Adjust height of stats
-                          "h.p" = .data$max_group + .data$e,
+                          h.p = .data$max_group + .data$e,
                           # Adjust height of comparison line segment
-                          "h.s" = .data$max_group + .data$e - .data$r
+                          h.s = .data$max_group + .data$e - .data$r
                         ))
   } else {
     statistics <- try(dplyr::left_join(statOut, d_max, by = group.by) %>%
                         # Find max value (individual point or errorbar)
-                        dplyr::mutate("max" = max(c(max_value, max_error), 
-                                                  na.rm = T)) %>%
-                        dplyr::group_by_(group.by) %>%
+                        dplyr::mutate(max = max(c(max_value, max_error), 
+                                                na.rm = T)) %>%
+                        dplyr::group_by(.data[[group.by]]) %>%
                         dplyr::mutate(
-                          "max_group" = max(c(.data$max_value,
-                                              .data$max_error),
-                                            na.rm = TRUE),
-                          "n" = dplyr::row_number(),
-                          "r" = dplyr::if_else(p == "p.signif" |
+                          max_group = max(c(.data$max_value,
+                                            .data$max_error),
+                                          na.rm = TRUE),
+                          n = dplyr::row_number(),
+                          r = dplyr::if_else(p == "p.signif" |
                                                p == "p.adj.signif", 
-                                               max * 0.1 * 0.05, 
-                                               max * 0.2 * 0.05),
-                          "e" = .data$max * .data$n * 0.05,
-                          "n_comps" = max(.data$n),
-                          "group.by_n" = as.numeric(get(group.by)),
-                          "w.start" = .data$group.by_n - 
+                                             max * 0.1 * 0.05, 
+                                             max * 0.2 * 0.05),
+                          e = .data$max * .data$n * 0.05,
+                          n_comps = max(.data$n),
+                          group.by_n = as.numeric(.data[[group.by]]),
+                          w.start = .data$group.by_n - 
                             width / length(unique(df[[comparison]])),
-                          "w.stop" = .data$group.by_n + 
+                          w.stop = .data$group.by_n + 
                             width / 
                             length(unique(df[[comparison]]))
                         ) %>%
                         dplyr::ungroup() %>%
                         dplyr::mutate(
-                          "x.pos" = rowMeans(.[, c("w.start", "w.stop")]),
+                          x.pos = rowMeans(.[, c("w.start", "w.stop")]),
                           # center of segment
-                          "w.start" = ifelse(!is.na(.data$p.signif), 
-                                             .data$w.start, 
-                                             NA),
-                          "w.stop" = ifelse(!is.na(.data$p.signif), 
-                                            .data$w.stop, 
-                                            NA),
-                          "h.p" = .data$max_group + .data$e,
-                          "h.s" = .data$max_group + .data$e - .data$r
+                          w.start = ifelse(!is.na(.data$p.signif), 
+                                           .data$w.start, 
+                                           NA),
+                          w.stop = ifelse(!is.na(.data$p.signif), 
+                                          .data$w.stop, 
+                                          NA),
+                          h.p = .data$max_group + .data$e,
+                          h.s = .data$max_group + .data$e - .data$r
                         ))
   }
   if (("try-error" %in% class(statOut))) {
-    statistics <- dplyr::tibble("p.signif" = NA)
+    statistics <- dplyr::tibble(p.signif = NA)
   }
   if (("try-error" %in% class(statistics))) {
-    statistics <- dplyr::tibble("p.signif" = NA)
+    statistics <- dplyr::tibble(p.signif = NA)
   }
   if (stats) {
     return(statOut)
@@ -513,8 +513,8 @@ gplot <- function(dataset = NULL,
   # Create geoms
   crossbar <- ggplot2::stat_summary(
     ggplot2::aes(
-      group = get(comparison),
-      color = get(comparison)
+      group = .data[[comparison]],
+      color = .data[[comparison]]
     ),
     fun.y = mean,
     fun.ymax = mean,
@@ -527,8 +527,8 @@ gplot <- function(dataset = NULL,
   
   point <- ggplot2::geom_point(
     ggplot2::aes(
-      shape = get(comparison),
-      color = get(comparison)
+      shape = .data[[comparison]],
+      color = .data[[comparison]]
     ),
     stroke = stroke,
     size = size,
@@ -538,8 +538,8 @@ gplot <- function(dataset = NULL,
   
   point_noJitter <- ggplot2::geom_point(
     ggplot2::aes(
-      shape = get(comparison),
-      color = get(comparison)
+      shape = .data[[comparison]],
+      color = .data[[comparison]]
     ),
     stroke = stroke,
     size = size,
@@ -548,7 +548,7 @@ gplot <- function(dataset = NULL,
   
   errorbar <-
     ggplot2::stat_summary(
-      ggplot2::aes(group = get(comparison)),
+      ggplot2::aes(group = .data[[comparison]]),
       fun.data = errortype,
       fun.args = list(mult = 1),
       geom = "errorbar",
@@ -559,7 +559,7 @@ gplot <- function(dataset = NULL,
     )
   
   bar <- ggplot2::stat_summary(
-    ggplot2::aes(fill = get(comparison)),
+    ggplot2::aes(fill = .data[[comparison]]),
     color = "black",
     fun.y = mean,
     size = stroke,
@@ -570,23 +570,23 @@ gplot <- function(dataset = NULL,
   )
   
   violin <- ggplot2::geom_violin(
-    ggplot2::aes(fill = get(comparison),
-                 color = get(comparison)),
+    ggplot2::aes(fill = .data[[comparison]],
+                 color = .data[[comparison]]),
     show.legend = TRUE,
     position = ggplot2::position_dodge(dodge)
   )
   
   box <- ggplot2::geom_boxplot(
-    ggplot2::aes(color = get(comparison),
-                 fill = get(comparison)),
+    ggplot2::aes(color = .data[[comparison]],
+                 fill = .data[[comparison]]),
     show.legend = TRUE,
     position = ggplot2::position_dodge(dodge)
   )
   
   line <- ggplot2::stat_summary(
     ggplot2::aes(
-      group = get(comparison),
-      color = get(comparison)
+      group = .data[[comparison]],
+      color = .data[[comparison]]
     ),
     fun.y = mean,
     geom = "line",
@@ -595,7 +595,7 @@ gplot <- function(dataset = NULL,
   
   line_error <-
     ggplot2::stat_summary(
-      ggplot2::aes(group = get(comparison)),
+      ggplot2::aes(group = .data[[comparison]]),
       fun.data = errortype,
       fun.args = list(mult = 1),
       geom = "errorbar",
@@ -606,9 +606,9 @@ gplot <- function(dataset = NULL,
   
   line_point <- ggplot2::stat_summary(
     ggplot2::aes(
-      fill = get(comparison),
-      shape = get(comparison),
-      color = get(comparison)
+      fill = .data[[comparison]],
+      shape = .data[[comparison]],
+      color = .data[[comparison]]
     ),
     stroke = stroke,
     size = size,
@@ -618,7 +618,7 @@ gplot <- function(dataset = NULL,
   
   dot <-
     ggplot2::geom_dotplot(
-      ggplot2::aes(color = get(comparison)),
+      ggplot2::aes(color = .data[[comparison]]),
       binaxis = "y",
       stackdir = "center",
       method = "histodot",
@@ -626,8 +626,8 @@ gplot <- function(dataset = NULL,
     )
   
   density <- ggplot2::geom_density(ggplot2::aes(
-    color = get(comparison),
-    fill = get(comparison),
+    color = .data[[comparison]],
+    fill = .data[[comparison]],
     x = .data$value
   ),
   inherit.aes = FALSE)
@@ -671,7 +671,7 @@ gplot <- function(dataset = NULL,
   
   # Create ggplot object and plot
   g <- ggplot2::ggplot(data = df,
-                       ggplot2::aes(x = get(group.by),
+                       ggplot2::aes(x = .data[[group.by]],
                                     y = .data$value)) +
     ggplot2::labs(
       x = x.lab,
@@ -742,31 +742,31 @@ gplot <- function(dataset = NULL,
     # & we look for both
     max.grob.heights <- vapply(gt$grob[[which(
       gt$layout$name == "panel")]]$children,
-                               function(x)
-                                 ifelse(
-                                   !is.null(x$height) & 
-                                     "unit" %in% class(x$height),
-                                   max(as.numeric(x$height), na.rm = TRUE),
-                                   ifelse(!is.null(x$y) & 
-                                            "unit" %in% class(x$y),
-                                          max(as.numeric(x$y)),
-                                          0)
-                                 ), numeric(1))
+      function(x)
+        ifelse(
+          !is.null(x$height) & 
+            "unit" %in% class(x$height),
+          max(as.numeric(x$height), na.rm = TRUE),
+          ifelse(!is.null(x$y) & 
+                   "unit" %in% class(x$y),
+                 max(as.numeric(x$y)),
+                 0)
+        ), numeric(1))
     max.grob.heights <- max(max.grob.heights, na.rm = TRUE)
     
     min.grob.heights <- vapply(gt$grob[[which(
       gt$layout$name == "panel")]]$children,
-                               function(x)
-                                 ifelse(
-                                   !is.null(x$height) & 
-                                     "unit" %in% class(x$height),
-                                   min(as.numeric(x$height), 
-                                       na.rm = TRUE),
-                                   ifelse(!is.null(x$y) & 
-                                            "unit" %in% class(x$y),
-                                          min(as.numeric(x$y)),
-                                          0)
-                                 ), numeric(1))
+      function(x)
+        ifelse(
+          !is.null(x$height) & 
+            "unit" %in% class(x$height),
+          min(as.numeric(x$height), 
+              na.rm = TRUE),
+          ifelse(!is.null(x$y) & 
+                   "unit" %in% class(x$y),
+                 min(as.numeric(x$y)),
+                 0)
+        ), numeric(1))
     min.grob.heights <- min(min.grob.heights, na.rm = TRUE)
     
     # identify panel row & calculate panel height
